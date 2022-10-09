@@ -1,7 +1,10 @@
 import turtle # for python graphics
+from turtle import Screen
 import random # for generating random numbers
 
-t = turtle.Turtle()
+t = turtle.Turtle() # creatng a turtle pen
+screen = Screen()
+
 #Draw a square
 def draw_square(length):
     for i in range(0,4):
@@ -21,18 +24,36 @@ def draw_equilateral_triangle(length):
 def draw_circle(radius):
     t.circle(radius)
     
-    
-
-
-draw_square(random.randint(10,200))
+# Change the size of python screen/box (play around what is the best to be fit in the website)
+screen.setup(1000,900)
 t.penup()
-t.goto(random.randint(-350,350), random.randint(-250,250))
+t.goto(random.randint(-350,0), random.randint(-250,0))
 t.pendown()
+# set the fillcolor
+t.fillcolor("green")
+# start the filling color
+t.begin_fill()
 draw_equilateral_triangle(random.randint(10,200))
+# ending the filling of the color
+t.end_fill()
 t.penup()
-t.goto(random.randint(-350,350), random.randint(-250,250))
+t.goto(random.randint(0,350), random.randint(0,250))
 t.pendown()
+# set the fillcolor
+t.fillcolor("blue")
+# start the filling color
+t.begin_fill()
 draw_circle(random.randint(10,200))
+# ending the filling of the color
+t.end_fill()
+t.penup()
+t.goto(random.randint(0,350), random.randint(-250,0))
+t.pendown()
+# set the fillcolor
+t.fillcolor("red")
+# start the filling color
+t.begin_fill()
+draw_square(random.randint(20,120))
+# ending the filling of the color
+t.end_fill()
 turtle.Screen().exitonclick() 
-
- 
