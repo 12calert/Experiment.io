@@ -154,4 +154,54 @@
   .msgln b.user-name-left {
     background: orangered;
   }
-  
+
+html, body, #chat { 
+  height: 100%; margin: 0; 
+}
+
+body,input { 
+  font: 20px sans-serif; 
+}
+#chat { 
+  display: flex; flex-flow: row wrap; 
+}
+
+#chat > * { 
+  margin: 5px 10px; padding: 10px; border: 1px solid #999; 
+}
+
+#infobar {
+  width: 100%; 
+}
+
+#nickname { 
+  float: left; 
+}
+
+#viewCount { 
+  float: right; 
+}
+
+#textIn,#sendButton { 
+  flex: 1 0 0; 
+}
+
+#textOut { 
+  height: calc(100% - 160px); flex: 1 100%;  overflow: auto 
+}
+
+#textIn { 
+  flex-grow: 100 
+}
+
+#sendButton { 
+  background-color: #fff; border: 2px solid #000 
+}
+
+#widgets { 
+  top: 70px; right: 14px; 
+}
+
+#widgets #stats { 
+  display: none; 
+}
