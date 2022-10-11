@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <title>Bootstrap Example</title>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+ <link href="index.css" rel="stylesheet" type="text/css">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+ <style>
+   body {
+     min-height: 100vh;
+   }
+   /* Remove the navbar's default margin-bottom and rounded borders */
+   .navbar {
+     margin-bottom: 0;
+     border-radius: 0;
+   }
+
+   .button_test {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 40px;
+    cursor: pointer;
+   }
+   
+   .button_test1 {background-color: #54e259;} /* Green */
+   .button_test2 {background-color: #e03838;} /* Blue */
+  
+   /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+   .row.content {height: 90vh}
+  
+   /* Set gray background color and 100% height */
+   .sidenav {
+     padding-top: 20px;
+     background-color: #f1f1f1;
+     height: 100%;
+   }
+  
+   /* Set black background color, white text and some padding */
+   footer {
+     background-color: #555;
+     color: white;
+     padding: 15px;
+   }
+  
+   /* On small screens, set height to 'auto' for sidenav and grid */
+   @media screen and (max-width: 767px) {
+     .sidenav {
+       height: auto;
+       padding: 15px;
+     }
+     .row.content {height:auto;}
+   }
+ </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+ <div class="container-fluid">
+   <div class="navbar-header">
+     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+       <span class="icon-bar"></span>
+       <span class="icon-bar"></span>
+       <span class="icon-bar"></span>                       
+     </button>
+     <!-- <a class="navbar-brand" href="#">Logo</a> -->
+   </div>
+   <div class="collapse navbar-collapse" id="myNavbar">
+     <ul class="nav navbar-nav">
+       <li class="active"><a href="#">Game</a></li>
+       <li><a href="#">Terms & Conditions</a></li>
+     </ul>
+     <ul class="nav navbar-nav navbar-right">
+       <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+     </ul>
+   </div>
+ </div>
+</nav>
+ <div>
+ <div class="container-fluid text-center">   
+   <div class="row content">
+     <div class="col-sm-2 sidenav">
+       <h3>INSTRUCTIONS</h3>
+       <p>This game consits of 2 players, both randomly assigned to either a Giver/Follower.</p>
+       <p>This project was intented with researching how humans interact and try to guide each other with a disadvantage between each other. </p>
+       <p>Both players must interact with the chat box and try to figure out how to guide each other in order to get from the starting path to the end path.</p>
+       <p>It is recommended to explain each others maps at the start, and then go on from there, the Giver must pay attention to detail in order to guide the follower as much as they can.</p>
+       <p></p>
+     </div>
+     <div class="col-sm-8 text-left">
+       <!-- THIS IS WHERE MAP GAME GOES -->
+       <hr>
+     </div>
+     <div class="col-sm-2 sidenav">
+       <!-- THIS IS WHERE CHAT GOES -->
+      <div id="wrapper">
+        <div id="menu">
+            <p class="welcome">Welcome, <b></b></p>
+            <p class="logout"><a id="exit" href="#">Exit Chat</a></p>
+        </div>
+
+        <div id="chatbox"></div>
+
+        <form name="message" action="">
+            <input name="usermsg" type="text" id="usermsg" />
+            <input name="submitmsg" type="submit" id="submitmsg" value="Send" />
+        </form>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        // jQuery Document
+        $(document).ready(function () {});
+    </script>
+       </div>
+     </div>
+   </div>
+ </div>
+  <footer class="container-fluid text-center">
+    <button class="button_test button_test1">Complete</button>
+    <button class="button_test button_test2">Give up</button>
+ </footer>
+</div>
+ 
+</body>
+</html>
