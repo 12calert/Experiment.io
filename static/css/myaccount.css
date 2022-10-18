@@ -1,0 +1,11 @@
+.myaccount {
+  background-color: aqua;
+}
+
+.myaccount .account-summary {
+  display: inline-block;
+}
+
+.myaccount .menu_buttons {
+  display: inline-block;
+}

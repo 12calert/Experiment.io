@@ -1,0 +1,42 @@
+<!-- templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Base html{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  {% block css %}{% endblock %}
+</head>
+  <main>
+    <div class="navbar">
+        <div class="container">
+            <a class="logo" href="{% url 'home' %}">Logo<span>Template</span></a>
+            <nav>
+              <ul class="primary-nav">
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'accounts:myaccount' %}">My Account</a></li>
+                <li><a href="{% url 'logout' %}">Log Out</a></li>
+                {% else %}
+                <li><a href="{% url 'accounts:signup' %}">Create Account</a></li>
+                <li><a href="{% url 'login' %}">Log In</a></li>
+                {% endif %}
+              </ul>
+            </nav>
+        </div>
+    </div>
+
+    <section class="hero">
+      <img src="{% static 'images/herobg.jpg' %}" alt="hero">
+    </section>
+
+  <section class="page-content-wrapper">
+    <div class="center">
+    {% block content %}
+    {% endblock %}
+    </div>
+  </section>
+  </main>
+</body>
+</html>
