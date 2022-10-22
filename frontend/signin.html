@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-auth-compat.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px
+            }
+            ::-webkit-scrollbar-thumb {
+            cursor: pointer;
+            background: #8161D9;
+            }
+            .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+            /* Modal Content/Box */
+            .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            }
+            /* The Close Button */
+            .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            }
+            .close:hover,
+            .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+            }
+            .form {
+              width: px;
+              border-radius: 5px;
+              background-color: #ffffff;
+              /* height:fit-content;  */
+              padding: 5px 10px;
+            }
+    </style>
+  </head>
+  <body>
+    <div class="form">
+      <!-- Email  -->
+      <div class="email">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Write your email"
+        />
+      </div>
+      <!-- passWord -->
+      <div class="pass">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder="password"
+        />
+      </div>
+
+        <button id="submit-btn" onclick="signIn()" class="h-fit rounded-lg self-end bg-brand-purple text-white font-bold font-quicksand px-7 py-2 text-center border-2 border-transparent hover:border-brand-purple hover:bg-white hover:text-brand-purple duration-200 ease-linear" id="sendButton" type="button">Sign In</button>
+        <script>
+             function signIn() {
+                window.location.assign("interactive.html");
+             }
+       </script>
+       <p>Back to Sign Up?</p>
+      <span><a href="signup.html">Sign Up</a></span>
+    </div>
+</div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
