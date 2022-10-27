@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In</title>
+    <link href="css/sign_upin.css" rel="stylesheet" type="text/css" />
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.8.4/firebase-auth-compat.js"></script>
+  </head>
+
+
+
+  <body>
+    <div class="form">
+      <!-- Email  -->
+      <div class="email">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Write your email"
+        />
+      </div>
+      <!-- passWord -->
+      <div class="pass">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder="password"
+        />
+      </div>
+
+
+
+        <button id="submit-btn" onclick="signIn()" class="h-fit rounded-lg self-end bg-brand-purple text-white font-bold font-quicksand px-7 py-2 text-center border-2 border-transparent hover:border-brand-purple hover:bg-white hover:text-brand-purple duration-200 ease-linear" id="sendButton" type="button">Sign In</button>
+        <script>
+             function signIn() {
+                window.location.assign("interactive.html");
+             }
+       </script>
+       <p>Back to Sign Up?</p>
+      <span><a href="signup.html">Sign Up</a></span>
+    </div>
+</div>
+
+
+
+    <script src="js/firebase.js"></script>
+  </body>
+</html>
