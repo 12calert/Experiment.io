@@ -1,7 +1,6 @@
 gunicorn
 django
 jsonfield
-psycopg2==2.8.6
 channels
 daphne
 channels_redis
