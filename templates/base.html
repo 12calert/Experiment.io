@@ -17,19 +17,14 @@
               <ul class="primary-nav">
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'accounts:myaccount' %}">My Account</a></li>
-                <li><a href="{% url 'logout' %}">Log Out</a></li>
                 {% else %}
                 <li><a href="{% url 'accounts:signup' %}">Create Account</a></li>
-                <li><a href="{% url 'login' %}">Log In</a></li>
+                <li><a href="{% url 'accounts:login' %}">Log In</a></li>
                 {% endif %}
               </ul>
             </nav>
         </div>
     </div>
-
-    <section class="hero">
-      <img src="{% static 'images/herobg.jpg' %}" alt="hero">
-    </section>
 
   <section class="page-content-wrapper">
     <div class="center">
