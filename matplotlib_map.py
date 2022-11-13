@@ -1,12 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from random import randint
+from random import randint, choice
 from math import floor, ceil
 
+#can be changed depending on screen size etc. code should be robust enough to account for changing values
 maxwidth = 1000
 maxheight = 1000
+shapesToChoose = ["circle","square","rectangle","triangle"]
+colours = ["g","b","r","y"]
 shapes = []
 amountOfShapes = 3
+# should each shape/colour be distinct (just some examples of restrictions that researchers can define
+distinctShape = True
+distinctColour = True
+#define the size of the shapes note: can be changed later, right now it depends on the screen size
+size = ((1/ceil(amountOfShapes/2))*maxwidth/2)
 # create grid
 plt.axes()
 
@@ -26,7 +34,7 @@ shapesCoordRange.append((0,incrementTop,tempH,maxheight))
 placed = 1
 
 # find the coords for the top shapes
-# loop until we place every shape in the top
+# loop until we place every shape we need to in the top
 while(placed != amountTop):
     # append the tuple of the range of coordinates to list where:
     # (startX,endX,startY,endY)
@@ -45,13 +53,41 @@ while(placed != amountOfShapes):
 #create shape objects
 # loop throught the shape coordinate ranges in the list
 # place the shape somewhere randomly withing the range of the two integers for x and y
-# <------------ note: only places cirlces for now and of only one colour, can easily be 
-# extended to place differing shapes and colours, will do this is if we decide to use this implementation of the map ------------>
+# <------------- extended to place any of threee shapes and pick one of the 4 random colours,
+# can be made better by using objects --------->
 for shapeCoord in shapesCoordRange:
-    circle = plt.Circle((randint(shapeCoord[0],shapeCoord[1]), randint(shapeCoord[2],shapeCoord[3])), radius=100, fc='y')
-    print(shapeCoord[0],shapeCoord[1],shapeCoord[2],shapeCoord[3])
-    shapes.append(circle)
+    # pick random shape and colour from the lists of available
+    shape = choice(shapesToChoose)
+    colour = choice(colours)
+    # if the researcher instructs each shape to be different...
+    if (distinctShape):
+        shapesToChoose.remove(shape)
+    # if the researcher instructs each colour to be different...
+    if (distinctColour):
+        colours.remove(colour)
+    # if using python version predating 3.10 uncomment this (switch statements not supported in older versions)
+    """if shape == "circle":
+        newShape = plt.Circle((randint(shapeCoord[0]+size/2,shapeCoord[1]-size/2), randint(shapeCoord[2]+size/2,shapeCoord[3]-size/2)), size/2, fc=colour)
+    elif shape == "rectangle":
+        newShape = Rectangle((randint(shapeCoord[0],shapeCoord[1]-size), randint(shapeCoord[2],shapeCoord[3]-size/2)), size, size/2, fc=colour)
+    elif shape == "square":
+        newShape = Rectangle((randint(shapeCoord[0],shapeCoord[1]-size),randint(shapeCoord[2],shapeCoord[3]-size)), size, size, fc=colour)
 
+    shapes.append(newShape)"""
+    match shape:
+        case "circle":
+            newShape = plt.Circle((randint(shapeCoord[0]+size/2,shapeCoord[1]-size/2), randint(shapeCoord[2]+size/2,shapeCoord[3]-size/2)), radius = size/2, color = colour)
+        case "rectangle":
+            newShape = plt.Rectangle((randint(shapeCoord[0],shapeCoord[1]-size), randint(shapeCoord[2],shapeCoord[3]-size/2)), width = size, height = size/2, color = colour)
+        case "square":
+            newShape = plt.Rectangle((randint(shapeCoord[0],shapeCoord[1]-size),randint(shapeCoord[2],shapeCoord[3]-size)), width = size, height = size, color = colour)
+        case "triangle":
+            # we need the three coordinates for the point of the triangle then make a polygon with those points
+            tempx = randint(shapeCoord[0],shapeCoord[1]-size)
+            tempy = randint(shapeCoord[2],shapeCoord[3]-size)
+            p = np.array([[tempx,tempy],[tempx+size,tempy],[tempx+size/2,tempy+size]])
+            newShape = plt.Polygon(p[:3,:],color=colour)
+    shapes.append(newShape)
 
 #add shapes to grid
 for i in shapes:
