@@ -22,8 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1u6r1oki8pk9=g)&x%_7glcn-ja^@@o&ggordj0$krek-5y0ye'
 
+# NEEDED FOR PRODUCTION
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'  
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 

@@ -32,6 +32,6 @@ urlpatterns = [
     path('home', TemplateView.as_view(template_name='home.html'), name='home'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     path("chat/", include("chat.urls")),
-    path("admin/", admin.site.urls),
+    # path("admin/", admin.site.urls), ADDED TWICE - ERROR
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
