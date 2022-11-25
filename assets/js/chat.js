@@ -2,6 +2,26 @@
 // Multiuser Chat
 // Croquet Studios, 2019-2021
 
+const roomName = "1"
+
+const chatSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/chat/'
+    + roomName
+    + '/'
+);
+
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    console.log("added :", data.message)
+};
+
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+};
+
+
 let allDP = []
 
 function randomDP() {
@@ -156,7 +176,15 @@ class ChatModel extends Croquet.Model {
     constructor(model) {
       super(model);
       this.model = model;
-      sendButton.onclick = () => this.send();
+      sendButton.onclick = () => { 
+        const messageInputDom = document.querySelector('#textIn');
+        const message = messageInputDom.value;
+        console.log("send message")
+        chatSocket.send(JSON.stringify({
+            'message': message
+        }));
+        messageInputDom.value = '';
+        this.send() }
       this.subscribe("history", "refresh", this.refreshHistory);
       this.subscribe("viewInfo", "refresh", this.refreshViewInfo);
       this.refreshHistory();
