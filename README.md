@@ -4,7 +4,7 @@ How to compile the application locally:
 3.	Open a terminal and type the following commands in the specified order:
   1)	python -m venv .venv
   
-  If you using the latest version of VScode is going to ask you if you want the new environment to be selected for the workspace folder. Please select yes, otherwise select it manually based on your IDE.
+  If you using the latest version of VScode is going to ask you if you want the new environment to be selected for the workspace folder. Please select yes, otherwise select it manually based on your IDE. Make sure the virtual environment is running, otherwise you won't be able to host the application. (Caveat: virtual environments don't work in PowerShell which might be your IDE defaulted to).
   
   
   2)	pip install -r requirements.txt
