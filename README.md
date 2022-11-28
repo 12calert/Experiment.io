@@ -5,6 +5,8 @@ How to compile the application locally:
   1)	python -m venv .venv
   
   If you using the latest version of VScode it is going to ask you if you want the new environment to be selected for the workspace folder. Please select yes, otherwise select it manually based on your IDE.
+  
+  
   2)	pip install -r requirements.txt
   3)	python manage.py migrate
   4)	python -m pip install -U channels["daphne"]
