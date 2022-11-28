@@ -11,6 +11,6 @@ How to compile the application locally:
   3)	python manage.py migrate
   4)	python -m pip install -U channels["daphne"]
   5)	python manage.py runserver
-4.	The app should be successfully running now locally, in http://127.0.0.1:8000/
+4.	The app should be successfully running now locally, and you can access it at the following URL in your browser (e.g., Chrome): http://127.0.0.1:8000/
 
 In case you are struggling please kindly email one of the team members for further instructions and guidance here: a.konstantinou.20@abdn.ac.uk 
