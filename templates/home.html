@@ -44,23 +44,23 @@
         <script>
           // Get the modal
           var modal = document.getElementById("myModal");
-          
+
           // Get the button that opens the modal
           var btn = document.getElementById("myBtn");
-          
+
           // Get the <span> element that closes the modal
           var span = document.getElementsByClassName("close")[0];
-          
-          // When the user clicks the button, open the modal 
+
+          // When the user clicks the button, open the modal
           btn.onclick = function() {
             modal.style.display = "block";
           }
-          
+
           // When the user clicks on <span> (x), close the modal
           span.onclick = function() {
             modal.style.display = "none";
           }
-          
+
           // When the user clicks anywhere outside of the modal, close it
           window.onclick = function(event) {
             if (event.target == modal) {
@@ -71,7 +71,7 @@
       </div>
 
 
-      
+
       <div class="form">
       <button id="submit-btn" onclick="signOut()" class="h-fit rounded-lg self-end bg-brand-purple text-white font-bold font-quicksand px-7 py-2 text-center border-2 border-transparent hover:border-brand-purple hover:bg-white hover:text-brand-purple duration-200 ease-linear" id="sendButton" type="button">Sign in as Researcher</button>
       <script>
@@ -85,7 +85,7 @@
       <section class="bg-[#FCFCFE] w-1/3 max-w-[30%] overflow-x-hidden scroll-smooth fixed top-16 bottom-0 overflow-y-visible border-r-2 border-gray-200 right-0" id="chatSection">
         <nav class="px-7 py-3 bg-white font-quicksand h-20 flex justify-between items-center border-y border-gray-200 border-r-2 fixed top-16 w-1/3 max-w-[30%]">
           <div class="flex gap-5 items-center">
-            <img class="rounded-full w-14 h-14 object-cover" id="display-picture" src="images/profile-1.jpg" />
+            <img class="rounded-full w-14 h-14 object-cover" id="display-picture" src="{% static 'images/favicon.ico' %}" />
             <div class="flex flex-col gap-1">
               <h3 class="font-bold font-quicksand text-[#101955]" id="nickname"></h3>
               <!-- <p class="flex w-fit gap-2 items-center justify-center font-bold text-[13px] px-3 py-0.5 bg-[#ECFCF5] text-[#356C49] rounded-xl">
@@ -111,7 +111,7 @@
       </section>
       <section class="w-full max-w-full h-screen bg-gray-100 relative mr-[30%] flex flex-col">
         <div class="flex justify-center items-center h-full">
-          <iframe src="https://trinket.io/embed/python/016b1b55c4?outputOnly=true&runOption=run" width="100%" height="850" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
+          <img src="{% static 'images/map0.png' %}">
         </div>
         <footer class="flex gap-14 font-bold font-quicksand h-20 bg-gray-200 flex justify-center items-center w-full">
           <!-- <h3 class="font-semibold font-quicksand text-lg">Footer</h3> -->
@@ -129,4 +129,3 @@
     <script src="{% static 'js/chat.js' %}"></script>
   </body>
   </html>
-

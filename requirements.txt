@@ -4,3 +4,4 @@ jsonfield
 channels
 daphne
 channels_redis
+matplotlib
