@@ -1,37 +1,28 @@
-<!-- templates/base.html -->
 {% load static %}
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Base html{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
-  {% block css %}{% endblock %}
-</head>
-  <main>
-    <div class="navbar">
-        <div class="container">
-            <a class="logo" href="{% url 'home' %}">Logo<span>Template</span></a>
-            <nav>
-              <ul class="primary-nav">
-                {% if user.is_authenticated %}
-                <li><a href="{% url 'accounts:myaccount' %}">My Account</a></li>
-                {% else %}
-                <li><a href="{% url 'accounts:signup' %}">Create Account</a></li>
-                <li><a href="{% url 'accounts:login' %}">Log In</a></li>
-                {% endif %}
-              </ul>
-            </nav>
-        </div>
-    </div>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Base html{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    {% block css %}{% endblock %}
+  </head>
+  <body>
+    <main>
+      <div class="navbar">
+          <ul>
+            <li><a>Options...</a></li>
+            <li><a>Options...</a></li>
+            <li><a>Options...</a></li>
+          </ul>
+      </div>
 
-  <section class="page-content-wrapper">
-    <div class="center">
-    {% block content %}
-    {% endblock %}
-    </div>
-  </section>
-  </main>
-</body>
+      <div class="center">
+        {% block content %}
+        {% endblock %}
+      </div>
+
+    </main>
+  </body>
 </html>
