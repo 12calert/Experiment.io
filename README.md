@@ -19,6 +19,7 @@ TODO:
   - make a view where the actualy game takes place
   - other useful ones such as "about"
   - login for researchers and their view ( eg. statistics.html )
+  1.1. Decide on colour scheme, images, specific descrption text etc.
 2. Modify/Remake the chat in a way that is actually relevant to our needs
 3. Design db schema ( not only what we need to store, but it needs to be in depth, specifically naming tables and relations between them )
 4. Gameplay logic
