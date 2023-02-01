@@ -10,19 +10,50 @@
   </head>
   <body>
     <main>
-      <div class="navbar">
-          <ul>
-            <li><a>Options...</a></li>
-            <li><a>Options...</a></li>
-            <li><a>Options...</a></li>
-          </ul>
-      </div>
+      <header class="navbar">
+        <ul>
+          <!-- add the links to the other pages-->
+          <li><a href = "#">Home</a></li>
+          <li><a href = "#">About MapGame</a></li>
+          <li><a href = "#">Researcher Sign in</a></li>
+        </ul>
+      </header>
 
       <div class="center">
+        <!-- block for the rest of the content-->
         {% block content %}
         {% endblock %}
       </div>
 
+      <footer>
+        <div>
+          <img src="#" alt="Map Game logo">
+        </div>
+        <div class="footerflex">
+          <div class="footerflex-child">
+            <ul>
+              <li>
+                Contact us
+                <ul>
+                  <li>someEmail@email.com</li>
+                  <li>0123456789</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="footerflex-child">
+            <ul>
+              <li>
+                Something else here
+                <ul>
+                  <li>add something here</li>
+                  <li>hi</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
     </main>
   </body>
 </html>

@@ -1,6 +1,73 @@
+/* body styles to be changed according to website design */
 body {
   margin: 0;
   font-family: 'Josefin Sans';
   color: black;
   font-size: 20px;
+}
+
+/* center style sets margins for content of page (top is 56 so as not to overlap with navbar) */ 
+.center{
+  margin: 56px 5px 5px 5px;
+}
+
+/* styles for the navigation bar, can change colours according to colour scheme of website*/
+.navbar {
+  margin: 0;
+}
+.navbar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+.navbar li {
+  float: left;
+}
+.navbar li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+.navbar li a:hover:not(.active) {
+  background-color: #111;
+}
+
+/* styles for footer, font and colours can be changed*/
+footer {
+margin: 0;
+background-color: #333;
+color: white;
+}
+footer div{
+  margin: 5px;
+}
+.footerflex{
+  display: flex;
+  text-align: center;
+}
+.footerflex-child {
+  flex: 1;
+} 
+footer img {
+  margin: 5px;
+}
+footer ul {
+  padding: 0;
+  list-style-type: none;
+}
+footer ul li {
+  font-weight: bold;
+}
+footer ul li ul {
+  margin-top:10px;
+}
+footer ul li ul li{
+  font-weight: normal;
 }
