@@ -10,6 +10,7 @@
   </head>
   <body>
     <main>
+      <!-- header for every page-->
       <header class="navbar">
         <ul>
           <!-- add the links to the other pages-->
@@ -20,17 +21,18 @@
       </header>
 
       <div class="center">
-        <!-- block for the rest of the content-->
+        <!-- block for the rest of the content in the page-->
         {% block content %}
         {% endblock %}
       </div>
 
+      <!-- footer for every page-->
       <footer>
         <div>
           <img src="#" alt="Map Game logo">
         </div>
-        <div class="footerflex">
-          <div class="footerflex-child">
+        <div class="flex-container">
+          <div class="flex-container-child">
             <ul>
               <li>
                 Contact us
@@ -41,7 +43,7 @@
               </li>
             </ul>
           </div>
-          <div class="footerflex-child">
+          <div class="flex-container-child">
             <ul>
               <li>
                 Something else here

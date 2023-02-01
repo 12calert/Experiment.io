@@ -1,11 +1,17 @@
 /* body styles to be changed according to website design */
 body {
   margin: 0;
-  font-family: 'Josefin Sans';
+  font-family: "Poppins", sans-serif;
   color: black;
   font-size: 20px;
 }
 
+.flex-container{
+  display: flex;
+}
+.flex-container-child{
+  flex: 1;
+}
 /* center style sets margins for content of page (top is 56 so as not to overlap with navbar) */ 
 .center{
   margin: 56px 5px 5px 5px;
@@ -44,17 +50,11 @@ footer {
 margin: 0;
 background-color: #333;
 color: white;
+text-align: center;
 }
 footer div{
   margin: 5px;
 }
-.footerflex{
-  display: flex;
-  text-align: center;
-}
-.footerflex-child {
-  flex: 1;
-} 
 footer img {
   margin: 5px;
 }
