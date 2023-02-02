@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Game View{% endblock %}
+{% block content %}
+
+{% comment %} Collapsible "view information" {% endcomment %}
+<div>
+<button type="button" class="collapsible">View information</button>
+<div class="content">
+  <p>
+    This game consits of 2 players, both randomly assigned to either a Giver/Follower.
+    <br>This project was intented with researching how humans interact and try to guide each other with a disadvantage between each other.
+    <br>Both players must interact with the chat box and try to figure out how to guide each other in order to get from the starting path to the end path.
+    <br>It is recommended to explain each others maps at the start, and then go on from there, the Giver must pay attention to detail in order to guide the follower as much as they can.
+  </p>
+</div>
+{% comment %} Game map and chat {% endcomment %}
+<div class="row">
+    <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
+        Photo of the Game map! (probably embeded)
+    </div>
+    <div class="col-sm-4 chat"><br><br><br><br><br><br><br><br> 
+        Chat
+    </div>
+{% comment %} Buttons {% endcomment %}
+<div class="col-sm-8">
+    <button class="button button1">Complete</button>
+    <button class="button button2">Give up</button>
+</div>
+{% comment %} Collapsible "view information" Javascript function{% endcomment %}
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+    </script>
+{% endblock %}

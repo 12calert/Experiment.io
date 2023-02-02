@@ -5,24 +5,61 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Base html{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">
     {% block css %}{% endblock %}
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
   </head>
   <body>
     <main>
-      <div class="navbar">
-          <ul>
-            <li><a>Options...</a></li>
-            <li><a>Options...</a></li>
-            <li><a>Options...</a></li>
-          </ul>
-      </div>
+      <!-- header for every page-->
+      <header class="navbar">
+        <ul>
+          <!-- add the links to the other pages-->
+          <li><a href = "{% url 'home' %}">Home</a></li>
+          <!-- history of the game seems unneeded but will keep for now-->
+          <li><a href = "#">History of the MapGame</a></li>
+          <li><a href = "{% url 'researcher_login' %}">Researcher Sign in</a></li>
+        </ul>
+      </header>
 
       <div class="center">
+        <!-- block for the rest of the content in the page-->
         {% block content %}
         {% endblock %}
       </div>
 
+      <!-- footer for every page-->
+      <footer>
+        <div>
+          <img src="#" alt="Map Game logo">
+        </div>
+        <div class="flex-container">
+          <div class="flex-container-child">
+            <ul>
+              <li>
+                Contact us
+                <ul>
+                  <li>someEmail@email.com</li>
+                  <li>0123456789</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="flex-container-child">
+            <ul>
+              <li>
+                Something else here
+                <ul>
+                  <li>add something here</li>
+                  <li>hi</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
     </main>
   </body>
 </html>

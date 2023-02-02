@@ -4,4 +4,4 @@ jsonfield
 channels
 daphne
 channels_redis
-matplotlib
+django-bootstrap-v5

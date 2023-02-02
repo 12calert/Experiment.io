@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Researcher Login{% endblock %}
+{% block content %}
+<!-- form for email, and password-->
+<div class="flex-container">
+  <!-- initial form action empty, obviously fill in later-->
+  <form action="#">
+    <label for="email">Enter your email:</label>
+    <input type="email" id="email" name="email" required><br><br>
+    <label for="password">Enter your password:</label>
+    <input type="password" id="password" name="password" required><br><br>
+    <div class="flex-container">
+        <input type="submit" value="Submit">
+    </div>
+  </form>
+</div>
+{% endblock %}
