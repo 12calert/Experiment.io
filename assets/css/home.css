@@ -1,3 +1,12 @@
+/* IMPORTANT: Some of the styles between pages are not consistent, make sure they are consistent.
+when possible, try to resuse classes over webpages to keep a consistent design.
+base.html, home.html and researcher_login.html do not use bootstrap so feel free to adapt as 
+you wish and do not have a consistent design with game_view.html
+
+if any questions please ask
+
+-Alberto */
+
 /* body styles to be changed according to website design */
 /* general classes to be used for all pages */
 body {
@@ -90,4 +99,71 @@ footer ul li ul li{
   font-weight: normal;
 }
 
-/* classes specific to home.hmtl */
+/* classes specific to home.hmtl (currently none exclusive to this page)*/
+
+/* classes used in game_view.html */
+.collapsible {
+  background-color: #777;
+  color: white;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: center;
+  outline: none;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  text-align: center;
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+/* style of two boxes that they distinguish map and chat */
+.col-sm-8.map {
+  height: 550px;
+  border-color: #111;
+  border-style: solid;
+}
+
+.col-sm-4.chat {
+  height: 550px;
+  border-color: red;
+  border-style: solid;
+}
+
+/* style of the buttons */
+.button {
+  border: none;
+  color: white;
+  padding: 20px 32px; /* measurements of how big/small you want it */
+  text-align: center;
+  display: inline-block;
+  font-size: large;
+  font-weight: bold;
+  /* Position of buttons. Please always use 
+  % and not px to be responsive in all screens */
+  margin:5% 15% 5% 20% ;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+    
+.button1 {
+  background-color: green; 
+}
+    
+.button1:hover {
+  background-color: #abff8f;
+}
+    
+.button2 {
+  background-color: red;          
+}
+    
+.button2:hover {
+  background-color: #ff5959;
+}

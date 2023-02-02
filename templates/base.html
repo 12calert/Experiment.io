@@ -7,6 +7,9 @@
     <title>{% block title %}Base html{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     {% block css %}{% endblock %}
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
   </head>
   <body>
     <main>

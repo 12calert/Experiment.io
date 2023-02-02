@@ -4,3 +4,4 @@ jsonfield
 channels
 daphne
 channels_redis
+django-bootstrap-v5
