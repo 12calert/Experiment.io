@@ -3,10 +3,10 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <!-- About the map game (brief description)-->
-<div>
-  <h1>About the Map Game</h1>
+<div class="container.edit">
+  <h1 class="heading-edit">About the Map Game</h1>
   <!-- wall of text is uninituitive, possibly split it into "rules" list-->
-    <p>
+    <p class="paragraph-edit">
       Two players are paired together with identical maps while one player’s acts as the instruction giver and is given map has a randomly path 
       on it and the other player's does not. From there the first player must communicate to the other player the path that 
       they can see. The second player must try to draw the map on the map provided to them. Once the player's both decided they are finished they choose to complete
@@ -16,15 +16,17 @@
 <!-- photos of example maps from different players perspectives-->
 <div class = "flex-container">
   <div class = "flex-container-child flex-photo">
+    <p>(Brief explanation of what the givers role is)</p>
     <img src="#" alt="Map from the instruction giver's point of view">
   </div>
-  <div class="flex-container-child flex-photo">
-    <img src="#" alt="Map from the instruction follower's point of view">
-  </div>
 </div>
+  <div class="flex-container-child-2 flex-photo-2">
+    <img src="#" alt="Map from the instruction follower's point of view">
+    <p>(Brief explanation of what the followers role is)</p>
+  </div>
 <!-- buttons (to game, to sign in/up page)-->
 <div class = "flex-container">
         <!-- this may change depending on how we will get users to game rooms for now placeholder-->
-        <button onclick = "location.href='{% url 'game_view' %}'" type="button">Play Game</button>
+        <button class="button-home" onclick = "location.href='{% url 'game_view' %}'" type="button">Play Game</button>
 </div>
 {% endblock %}
