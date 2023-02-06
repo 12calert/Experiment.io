@@ -34,7 +34,6 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'chat',
     'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'bootstrap5',
-    'render.apps.RenderConfig', # for Render hosting
 ]
 
 MIDDLEWARE = [
