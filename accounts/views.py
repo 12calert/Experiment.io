@@ -3,7 +3,7 @@ from django.shortcuts import render
 from accounts.forms import RegisterForm
 from django.contrib.auth import login
 from django.contrib import messages
-from accounts.models import CustomUser
+from accounts.models import Researcher
 from django.shortcuts import redirect
 from uuid import uuid4
 
