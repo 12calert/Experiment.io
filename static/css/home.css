@@ -10,12 +10,13 @@ if any questions please ask
 /* body styles to be changed according to website design */
 /* general classes to be used for all pages */
 body {
+  font-family: 'Lato', sans-serif !important;
   margin: 0;
-  font-family: "Poppins", sans-serif;
   color: black;
   font-size: 20px;
+  min-height: 100vh;
 }
-/*button {
+button {
   border: none;
   color: white;
   padding: 15px 32px;
@@ -25,19 +26,67 @@ body {
   font-size: 20px;
   margin: 4px 2px;
   cursor: pointer;
-  background-color: red;
+  background-color: #ff5733;
   border-radius: 12px;
-}*/
+}
+
 .flex-container{
   display: flex;
+  flex-direction: row;
   justify-content: center;
+  padding-top: 70px;
+  padding-bottom: 50px;
 }
+
 .flex-container-child{
-  flex: 1;
+  display: flex;
+  flex-direction: row;
+  width: 45%;
+  margin: 0 10px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
 }
-.flex-photo{
-  padding:5px;
+
+.flex-container-child-2{
+  display: flex;
+  flex-direction: row;
+  width: 45%;
+  margin: 0 10px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
 }
+
+.flex-container-child img {
+  margin-left:400px;
+}
+
+.flex-container-child-2 img {
+  margin-right:400px;
+}
+
+.flex-photo p {
+  margin: 10px 0;
+}
+
+.flex-photo-2 p {
+  margin: 10px 0;
+}
+
+.flex-photo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-photo-2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* center style sets margins for content of page (top is 56 so as not to overlap with navbar) */ 
 .center{
   margin: 56px 5px 5px 5px;
@@ -52,7 +101,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
+  background-color: #ff5733;
   position: fixed;
   top: 0;
   width: 100%;
@@ -64,20 +113,27 @@ body {
   display: block;
   color: white;
   text-align: center;
-  padding: 14px 16px;
+  padding: 14px 20px;
   text-decoration: none;
 }
 .navbar li a:hover:not(.active) {
-  background-color: #111;
+  background-color: #333;
 }
 
 /* styles for footer, font and colours can be changed*/
 footer {
-margin: 0;
-background-color: #333;
-color: white;
-text-align: center;
+  margin: 0;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  width: 105vw;
+  margin-left: -11px;
+  position: static;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
+
 footer div{
   margin: 5px;
 }
@@ -100,16 +156,34 @@ footer ul li ul li{
 }
 
 /* classes specific to home.hmtl (currently none exclusive to this page)*/
+.container-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+}
+
+.heading-edit {
+  text-align: center;
+}
+
+.paragraph-edit {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 63vw;
+}
 
 /* classes used in game_view.html */
 .collapsible {
   background-color: #777;
   color: white;
   padding: 18px;
-  width: 100%;
+  width: 100vw;
   border: none;
   text-align: center;
   outline: none;
+  margin-left: -11px;
+  margin-top: -20px;
 }
 
 .active, .collapsible:hover {
@@ -123,16 +197,17 @@ footer ul li ul li{
   overflow: hidden;
   background-color: #f1f1f1;
 }
+
 /* style of two boxes that they distinguish map and chat */
 .col-sm-8.map {
   height: 550px;
-  border-color: #111;
+  border-color: #333;
   border-style: solid;
 }
 
 .col-sm-4.chat {
   height: 550px;
-  border-color: red;
+  border-color: #333;
   border-style: solid;
 }
 
@@ -150,6 +225,17 @@ footer ul li ul li{
   margin:5% 15% 5% 20% ;
   transition-duration: 0.4s;
   cursor: pointer;
+  border: 17px;
+}
+
+.button-home {
+  padding: 18px 150px;
+  border-radius: 5px;
+  border: 0;
+}
+
+.button-home:hover {
+  background-color: #333;
 }
     
 .button1 {
@@ -157,7 +243,7 @@ footer ul li ul li{
 }
     
 .button1:hover {
-  background-color: #abff8f;
+  background-color: #333;
 }
     
 .button2 {
@@ -165,5 +251,54 @@ footer ul li ul li{
 }
     
 .button2:hover {
-  background-color: #ff5959;
+  background-color: #333;
 }
+
+.button1, .button2 {
+  margin-right: -40px;
+  width: 250px;
+  border-radius: 5px;
+  border: 0;
+}
+
+/* classes used in researcher login */
+.login-container {
+  width: 500px;
+  margin: 100px auto;
+  }
+  
+  .form-group {
+  margin-bottom: 20px;
+  }
+  
+  label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  }
+  
+  input[type="email"], input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  }
+  
+  input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 20px;
+  border-radius: 5px;
+  border: 0;
+  background-color: #ff5733;
+  color: #fff;
+  cursor: pointer;
+  }
+
+  input[type="submit"]:hover {
+    background-color: #333;
+  }
+  

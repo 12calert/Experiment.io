@@ -19,14 +19,16 @@
     <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
         Photo of the Game map! (probably embeded)
     </div>
-    <div class="col-sm-4 chat"><br><br><br><br><br><br><br><br> 
-        Chat
+    <div class="col-sm-4 chat"><textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <input id="chat-message-input" type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send">
     </div>
 {% comment %} Buttons {% endcomment %}
 <div class="col-sm-8">
-    <button class="button button1">Complete</button>
-    <button class="button button2">Give up</button>
+  <button class="button button1">Complete</button>
+  <button class="button button2">Give up</button>
 </div>
+
 {% comment %} Collapsible "view information" Javascript function{% endcomment %}
 <script>
     var coll = document.getElementsByClassName("collapsible");
@@ -43,5 +45,6 @@
         }
       });
     }
-    </script>
+    
+  </script>
 {% endblock %}

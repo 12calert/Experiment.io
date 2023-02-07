@@ -5,3 +5,4 @@ channels
 daphne
 channels_redis
 django-bootstrap-v5
+whitenoise[brotli]
