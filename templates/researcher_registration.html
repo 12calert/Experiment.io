@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Researcher Registration{% endblock %}
+{% block content %}
+<!-- form for email, and password-->
+<div class="login-container">
+  <!-- initial form action empty, obviously fill in later-->
+  <form action="#">
+  <p style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </p>
+  <div class="form-group">
+  <label for="prefix_registration">Select your prefix:</label>
+  <select required class="form-control" class="form-group" style="text-align: center" id="prefix_registration" name="prefix_registration" >
+    <option selected disabled value="">Choose here</option>
+    <option value="Mr">Mr</option>
+    <option value="Mrs">Mrs</option>
+    <option value="Miss">Miss</option>
+    <option value="Ms">Ms</option>
+    <option value="Dr">Dr</option>
+  </select> 
+</div> 
+  <div class="form-group">
+        <label for="forename_registration">Forename:</label>
+        <input type="forename_registration" class="form-control" id="forename_registration" name="forename_registration" required>
+    </div>
+    <div class="form-group">
+      <label for="surname_registration">Surname:</label>
+      <input type="surname_registration" class="form-control" id="surname_registration" name="surname_registration" required>
+    </div>
+    <div class="form-group">
+        <label for="email_registration">Email:</label>
+        <input type="email_registration" class="form-control" id="email_registration" name="email_registration" required>
+    </div>
+    <div class="form-group">
+      <label for="password_registration">Password:</label>
+      <input type="password_registration" class="form-control" id="password_registration" name="password_registration" required>
+    </div>
+    <div class="form-group text-center">
+      <input type="submit" value="Register" class="btn btn-primary">
+    </div>
+  </form>
+</div>
+{% endblock %}

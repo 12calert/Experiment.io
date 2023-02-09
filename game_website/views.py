@@ -11,3 +11,7 @@ def researcher_login(request):
 def game_view(request):
     context = {}
     return render(request, 'game_view.html', context=context)
+
+def researcher_registration(request):
+    context = {}
+    return render(request, 'researcher_registration.html', context=context)
