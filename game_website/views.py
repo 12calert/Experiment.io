@@ -8,6 +8,5 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
-def game_view(request):
-    context = {}
-    return render(request, 'game_view.html', context=context)
+def game_view(request, room_name):
+    return render(request, 'game_view.html', {"room_name":room_name}) # dict to store room number

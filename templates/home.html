@@ -27,6 +27,15 @@
 <!-- buttons (to game, to sign in/up page)-->
 <div class = "flex-container">
         <!-- this may change depending on how we will get users to game rooms for now placeholder-->
-        <button class="button-home" onclick = "location.href='{% url 'game_view' %}'" type="button">Play Game</button>
+        <button class="button-home" id="go-to-game" type="button">Play Game</button>
 </div>
+
+<!-- script which redirects user to game-->
+<script>
+  document.getElementById("go-to-game").onclick = function(e) {
+    /* some logic to route user to the correct room */
+    var roomName = 1; 
+    window.location.pathname = '/game_view/' + roomName + '/';
+    };
+</script>
 {% endblock %}

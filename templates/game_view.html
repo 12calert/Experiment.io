@@ -22,7 +22,10 @@
     <div class="col-sm-4 chat"><textarea id="chat-log" cols="100" rows="20"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
+    <!-- below turns python dict of room name into json to be used in script (see context variable in views.py)-->
+    {{ room_name|json_script:"room-name" }}
     </div>
+
 {% comment %} Buttons {% endcomment %}
 <div class="col-sm-8">
   <button class="button button1">Complete</button>
@@ -31,20 +34,61 @@
 
 {% comment %} Collapsible "view information" Javascript function{% endcomment %}
 <script>
-    var coll = document.getElementsByClassName("collapsible");
-    var i;
+  var coll = document.getElementsByClassName("collapsible");
+  var i;
     
-    for (i = 0; i < coll.length; i++) {
-      coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var content = this.nextElementSibling;
-        if (content.style.display === "block") {
-          content.style.display = "none";
-        } else {
-          content.style.display = "block";
-        }
-      });
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+
+  /* read the current room name from context in views.py */
+  const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+  /* create new websocket for chat */
+  const chatSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/game_view/'
+    + roomName
+    + '/'
+  );
+
+  /* after every message, log it in a JSON chat log 
+  ---         can be changed later     ---*/
+  chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    document.querySelector('#chat-log').value += (data.message + '\n');
+  };
+
+  /* do something when the chat socket is closed */
+  chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+  };
+
+  /* allows for submitting messages via pressing enter*/
+  document.querySelector('#chat-message-input').focus();
+  document.querySelector('#chat-message-input').onkeyup = function(e) {
+    if (e.keyCode === 13) {  // enter, return
+        document.querySelector('#chat-message-submit').click();
     }
-    
+  };
+
+  /* submitting messages sends messages via web socket*/
+  document.querySelector('#chat-message-submit').onclick = function(e) {
+    const messageInputDom = document.querySelector('#chat-message-input');
+    const message = messageInputDom.value;
+    chatSocket.send(JSON.stringify({
+        'message': message
+    }));
+    messageInputDom.value = '';
+  };
   </script>
 {% endblock %}

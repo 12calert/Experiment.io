@@ -20,15 +20,10 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game_website.settings')
 # Initialize Django ASGI application early to ensure the AppRegistry
 # is populated before importing code that may import ORM models.
 
-application = get_asgi_application()
-
-"""import chat.routing
+#application = get_asgi_application()
 
 application = ProtocolTypeRouter(
     {
-        "http": django_asgi_app,
-        "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(URLRouter(chat.routing.websocket_urlpatterns))
-        ),
+        "http": get_asgi_application(),
     }
-)"""
+)
