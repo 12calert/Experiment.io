@@ -34,8 +34,11 @@
       <footer>
         <div class="flex-container">
           <div class="flex-container-child">
-            <!-- remember this is image is starting at the center of the div so need to play around with classes-->
-            <img src="{% static 'images/logo.png'%}" alt="Map Game logo">
+            <img src="{% static 'images/logo.png'%}" alt="Map Game logo" 
+                 style="width: 170px; height: 170px; 
+                        border-radius: 20px; 
+                        margin-left: 200px;
+                        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);">
           </div>
           <div class="flex-container-child">
             <ul>
@@ -48,7 +51,7 @@
               </li>
             </ul>
           </div>
-          <div class="flex-container-child">
+          <div class="flex-container-child" style="margin-left: 0px; margin-right: 300px;">
             <ul>
               <li>
                 Something else here
@@ -58,9 +61,9 @@
                 </ul>
               </li>
             </ul>
-          </div>
+          </div>          
         </div>
-      </footer>
+      </footer>      
     </main>
   </body>
 </html>
