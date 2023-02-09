@@ -136,3 +136,13 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 
 ASGI_APPLICATION = "game_website.asgi.application"
+
+#redis shinanigans
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
