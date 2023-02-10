@@ -2,10 +2,11 @@
 {% load static %}
 {% block title %}Home{% endblock %}
 {% block content %}
-<!-- About the map game (brief description)-->
+
+{# About the map game (brief description) #}
 <div class="container.edit">
   <h1 class="heading-edit">About the Map Game</h1>
-  <!-- wall of text is uninituitive, possibly split it into "rules" list-->
+  {# wall of text is uninituitive, possibly split it into "rules" list #}
     <p class="paragraph-edit">
       Two players are paired together with identical maps while one player’s acts as the instruction giver and is given map has a randomly path 
       on it and the other player's does not. From there the first player must communicate to the other player the path that 
@@ -13,7 +14,7 @@
       the game, the map with the correct path is shown along with the map that the instruction taker drew. Conversely one of the two players may give up, in which case the
       the map from both players are shown also.</p>
 </div>
-<!-- photos of example maps from different players perspectives-->
+{# photos of example maps from different players perspectives #}
 <div class = "flex-container">
   <div class = "flex-container-child flex-photo">
     <p>(Brief explanation of what the givers role is)</p>
@@ -24,18 +25,39 @@
     <img src="#" alt="Map from the instruction follower's point of view">
     <p>(Brief explanation of what the followers role is)</p>
   </div>
-<!-- buttons (to game, to sign in/up page)-->
+{# button to go to game #}
 <div class = "flex-container">
-        <!-- this may change depending on how we will get users to game rooms for now placeholder-->
         <button class="button-home" id="go-to-game" type="button">Play Game</button>
 </div>
 
-<!-- script which redirects user to game-->
+
+{{ rooms|json_script:"allrooms" }}
 <script>
+  // loading model as JSON
+  const mydata = JSON.parse(document.getElementById('allrooms').textContent);
+  // when button to play is clicked send to game
   document.getElementById("go-to-game").onclick = function(e) {
-    /* some logic to route user to the correct room */
-    var roomName = "1"; 
+    if (mydata.length != 0){
+      for (var i = 0; i < mydata.length; i++){
+        // if room already has 2 users, find a new room
+        console.log(mydata[i].fields.connected_user);
+        if (mydata[i].fields.connected_user < 2){
+          var roomName = mydata[i].fields.room_name;
+          window.location.pathname = '/game_view/' + roomName + '/';
+          return;
+        }
+    }
+  }
+  // if all rooms full create an empty one
+  if (mydata.length != 0){
+    lastAccessed = parseInt(mydata[mydata.length-1].fields.room_name);
+    var roomName = String(lastAccessed+1);
     window.location.pathname = '/game_view/' + roomName + '/';
-    };
+  }
+  else{
+    var roomName = 1;
+    window.location.pathname = '/game_view/' + roomName + '/';
+  }
+  };
 </script>
 {% endblock %}

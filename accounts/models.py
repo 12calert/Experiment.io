@@ -24,6 +24,7 @@ class Game(models.Model):
     final_map = models.TextField(default="")
     completed = models.BooleanField(default=False)
 
+# model to route users to correct room
 class Room(models.Model):
     room_name = models.TextField()
     connected_user = models.IntegerField()

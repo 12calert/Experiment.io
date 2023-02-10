@@ -3,9 +3,9 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from  django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Room
 
+""" currently synchronous, to be made asynchronous later """
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
@@ -14,7 +14,7 @@ class ChatConsumer(WebsocketConsumer):
             self.room = Room.objects.get(room_name=self.room_name)
         
         # this is the case in which the room does not exist
-        except ObjectDoesNotExist:
+        except Room.DoesNotExist:
             self.room = Room.objects.create(room_name=self.room_name, connected_user=1)
             self.room.save(update_fields=['connected_user'])
             async_to_sync(self.channel_layer.group_add)(

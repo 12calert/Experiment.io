@@ -3,7 +3,7 @@
 {% block title %}Game View{% endblock %}
 {% block content %}
 
-{% comment %} Collapsible "view information" {% endcomment %}
+{# Collapsible "view information" #}
 <div>
 <button type="button" class="collapsible">View information</button>
 <div class="content">
@@ -14,7 +14,7 @@
     <br>It is recommended to explain each others maps at the start, and then go on from there, the Giver must pay attention to detail in order to guide the follower as much as they can.
   </p>
 </div>
-{% comment %} Game map and chat {% endcomment %}
+{# Game map and chat #}
 <div class="row">
     <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
         Photo of the Game map! (probably embeded)
@@ -22,17 +22,18 @@
     <div class="col-sm-4 chat"><textarea id="chat-log" cols="100" rows="20"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
-    <!-- below turns python dict of room name into json to be used in script (see context variable in views.py)-->
+    
+    {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}
     </div>
 
-{% comment %} Buttons {% endcomment %}
+{# Buttons #}
 <div class="col-sm-8">
   <button class="button button1">Complete</button>
   <button class="button button2">Give up</button>
 </div>
 
-{% comment %} Collapsible "view information" Javascript function{% endcomment %}
+{# Collapsible "view information" Javascript function #}
 <script>
   var coll = document.getElementsByClassName("collapsible");
   var i;
@@ -49,10 +50,10 @@
     });
   }
 
-  /* read the current room name from context in views.py */
+  //read the current room name from context in views.py
   const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-  /* create new websocket for chat */
+  //create new websocket for chat
   const chatSocket = new WebSocket(
     'ws://'
     + window.location.host
