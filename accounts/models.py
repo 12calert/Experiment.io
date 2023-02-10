@@ -23,3 +23,7 @@ class Game(models.Model):
     game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE) # PK/FK
     final_map = models.TextField(default="")
     completed = models.BooleanField(default=False)
+
+class Room(models.Model):
+    room_name = models.TextField()
+    connected_user = models.IntegerField()

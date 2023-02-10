@@ -1,36 +1,63 @@
 # adapted from https://channels.readthedocs.io/en/stable/tutorial/part_3.html
 import json
 
-from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
+from  django.core.exceptions import ObjectDoesNotExist
+from accounts.models import Room
 
-
-class ChatConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = "chat_%s" % self.room_name
+        try:
+            self.room = Room.objects.get(room_name=self.room_name)
+        
+        # this is the case in which the room does not exist
+        except ObjectDoesNotExist:
+            self.room = Room.objects.create(room_name=self.room_name, connected_user=1)
+            self.room.save(update_fields=['connected_user'])
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name, self.channel_name
+            )
 
-        # Join room group
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            self.accept()
+            return
+        
+        if self.room.connected_user >= 2:
+            print(self.room.connected_user)
+            return self.close()
+        else:
+            self.room.connected_user += 1
+            self.room.save(update_fields=['connected_user'])
+            # Join room group
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name, self.channel_name
+            )
 
-        await self.accept()
+            self.accept()
 
-    async def disconnect(self, close_code):
+    def disconnect(self, close_code):
         # Leave room group
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        self.room.connected_user -= 1
+        self.room.save(update_fields=['connected_user'])
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name, self.channel_name
+        )
 
     # Receive message from WebSocket
-    async def receive(self, text_data):
+    def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
 
         # Send message to room group
-        await self.channel_layer.group_send(
+        async_to_sync(self.channel_layer.group_send)(
             self.room_group_name, {"type": "chat_message", "message": message}
         )
 
     # Receive message from room group
-    async def chat_message(self, event):
+    def chat_message(self, event):
         message = event["message"]
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message}))
+        self.send(text_data=json.dumps({"message": message}))
