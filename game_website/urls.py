@@ -32,6 +32,6 @@ urlpatterns = [
     path('home', views.homepage, name='home'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     path('researcher_login/', views.researcher_login, name='researcher_login'),
-    path('game_view/', views.game_view, name='game_view'),
+    path('game_view/<str:room_name>/', views.game_view, name='game_view'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -30,9 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
-# Application definition
-
 INSTALLED_APPS = [
     'daphne',
     'django.contrib.admin',
@@ -140,7 +137,7 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 ASGI_APPLICATION = "game_website.asgi.application"
 
-# Channels
+#redis shinanigans
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
