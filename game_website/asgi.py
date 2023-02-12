@@ -24,6 +24,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game_website.settings')
 #application = get_asgi_application()
 import game_website.routing
 
+
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
@@ -32,3 +33,4 @@ application = ProtocolTypeRouter(
         ),
     }
 )
+

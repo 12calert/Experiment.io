@@ -55,6 +55,7 @@
 
   //create new websocket for chat
   const chatSocket = new WebSocket(
+    // needs to be a wss connection to work over https
     'ws://'
     + window.location.host
     + '/ws/game_view/'
