@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+import dj_database_url
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -78,13 +80,10 @@ WSGI_APPLICATION = 'game_website.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'TEST': {
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3')},
-    }
+    # note that this is set up to use in production, you can set your own environment variable and it will link automatically
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"), conn_max_age=600)
 }
+
 
 
 # Password validation
