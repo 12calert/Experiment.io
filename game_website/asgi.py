@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/asgi/
 import os
 
 from channels.auth import AuthMiddlewareStack
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter, URLRouter, get_default_application
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
@@ -24,7 +24,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'game_website.settings')
 #application = get_asgi_application()
 import game_website.routing
 
-
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),
@@ -33,4 +32,4 @@ application = ProtocolTypeRouter(
         ),
     }
 )
-
+application = get_default_application()
