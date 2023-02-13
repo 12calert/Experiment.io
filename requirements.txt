@@ -1,5 +1,6 @@
 daphne
 gunicorn
+uvicorn
 django
 jsonfield
 channels
