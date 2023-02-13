@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'game_website.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    # note that this is set up to use in production, you can set your own environment variable and it will link automatically
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"), conn_max_age=600)
+    # note that this is set up to use in production
+    #'default': dj_database_url.config(default=os.getenv("DATABASE_URL"), conn_max_age=600)
+
+    #use this when testing locally
+    'default': dj_database_url.config(default="postgres://map_game_db_user:HHFx7vfbQrzbiOLlAeYwF6diZBbcRrqB@dpg-cfkeegpmbjsn9ebv614g-a.frankfurt-postgres.render.com/map_game_db", 
+                                      conn_max_age=600)
 }
 
 
