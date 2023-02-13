@@ -144,8 +144,9 @@ ASGI_APPLICATION = "game_website.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("red-cfkcs79a6gductmeqb10", 6379)],
-        },
+        "LOCATION": "redis://red-cfkcs79a6gductmeqb10:6379",
+        #"CONFIG": {
+        #    "hosts": [("red-cfkcs79a6gductmeqb10", 6379)],
+        #},
     },
 }
