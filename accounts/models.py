@@ -20,6 +20,17 @@ class Chat(models.Model):
     content = models.TextField(default="") # {"0": {"origin": leader/follower, "msg": msg, "timestamp": date}}
 
 class Game(models.Model):
-    game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE) # PK/FK
+    game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE, default = uuid.uuid4) # PK/FK
     final_map = models.TextField(default="")
     completed = models.BooleanField(default=False)
+    room_name = models.TextField(default = "")
+    users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
+
+# model to route users to correct room
+class Room(models.Model):
+    room_name = models.TextField()
+    connected_user = models.IntegerField()
+    uuid = models.UUIDField(primary_key = True,
+         default = uuid.uuid4,
+         editable = False),
+

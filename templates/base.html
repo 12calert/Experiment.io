@@ -13,24 +13,24 @@
   </head>
   <body>
     <main>
-      <!-- header for every page-->
+      {# header for every page #}
       <header class="navbar">
         <ul>
-          <!-- add the links to the other pages-->
+          {# add the links to the other pages #}
           <li><a href = "{% url 'home' %}">Home</a></li>
-          <!-- history of the game seems unneeded but will keep for now-->
+          {# history of the game seems unneeded but will keep for now #}
           <li><a href = "#">History of the MapGame</a></li>
           <li><a href = "{% url 'researcher_login' %}">Researcher Sign in</a></li>
         </ul>
       </header>
 
       <div class="center">
-        <!-- block for the rest of the content in the page-->
+        {# block for the rest of the content in the page #}
         {% block content %}
         {% endblock %}
       </div>
 
-      <!-- footer for every page-->
+      {# footer for every page #}
       <footer>
         <div class="flex-container">
           <div class="flex-container-child">

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,9 +30,6 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'daphne',
@@ -81,6 +79,7 @@ WSGI_APPLICATION = 'game_website.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
@@ -88,6 +87,7 @@ DATABASES = {
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3')},
     }
 }
+
 
 
 # Password validation
@@ -140,7 +140,7 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 ASGI_APPLICATION = "game_website.asgi.application"
 
-# Channels
+#Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
