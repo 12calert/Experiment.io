@@ -27,37 +27,7 @@
   </div>
 {# button to go to game #}
 <div class = "flex-container">
-        <button class="button-home" id="go-to-game" type="button">Play Game</button>
+        <button class="button-home" id="go-to-game" type="button" onclick ="window.location.pathname = '/all_rooms/'">Play Game</button>
 </div>
 
-
-{{ rooms|json_script:"allrooms" }}
-<script>
-  // loading model as JSON
-  const mydata = JSON.parse(document.getElementById('allrooms').textContent);
-  // when button to play is clicked send to game
-  document.getElementById("go-to-game").onclick = function(e) {
-    if (mydata.length != 0){
-      for (var i = 0; i < mydata.length; i++){
-        // if room already has 2 users, find a new room
-        console.log(mydata[i].fields.connected_user);
-        if (mydata[i].fields.connected_user < 2){
-          var roomName = mydata[i].fields.room_name;
-          window.location.pathname = '/game_view/' + roomName + '/';
-          return;
-        }
-    }
-  }
-  // if all rooms full create an empty one
-  if (mydata.length != 0){
-    lastAccessed = parseInt(mydata[mydata.length-1].fields.room_name);
-    var roomName = String(lastAccessed+1);
-    window.location.pathname = '/game_view/' + roomName + '/';
-  }
-  else{
-    var roomName = 1;
-    window.location.pathname = '/game_view/' + roomName + '/';
-  }
-  };
-</script>
 {% endblock %}

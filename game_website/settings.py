@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
-import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,12 +79,13 @@ WSGI_APPLICATION = 'game_website.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    # note that this is set up to use in production
-    #'default': dj_database_url.config(default=os.getenv("DATABASE_URL"), conn_max_age=600)
 
-    #use this when testing locally
-    'default': dj_database_url.config(default="postgres://map_game_db_user:HHFx7vfbQrzbiOLlAeYwF6diZBbcRrqB@dpg-cfkeegpmbjsn9ebv614g-a.frankfurt-postgres.render.com/map_game_db", 
-                                      conn_max_age=600)
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'TEST': {
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3')},
+    }
 }
 
 
@@ -140,7 +140,7 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 ASGI_APPLICATION = "game_website.asgi.application"
 
-#redis shinanigans
+#Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
