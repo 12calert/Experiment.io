@@ -5,8 +5,8 @@
 <!-- form for email, and password-->
 <div class="login-container">
   <!-- initial form action empty, obviously fill in later-->
-  <form action="#">
-  <p style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </p>
+  <form action="" method="post">  {% csrf_token %}  {{ form.as_p }}
+  {% comment %} <p style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </p>
   <div class="form-group">
   <label for="title_registration">Select your title:</label>
   <select required class="form-control" class="form-group" style="text-align: center" id="title_registration" name="title_registration" >
@@ -16,27 +16,24 @@
     <option value="Miss">Miss</option>
     <option value="Ms">Ms</option>
     <option value="Dr">Dr</option>
-  </select> 
-</div> 
+  </select>  {% endcomment %}
+ 
   <div class="form-group">
-        <label for="forename_registration">Forename:</label>
-        <input type="forename_registration" class="form-control" id="forename_registration" name="forename_registration" required>
-    </div>
-    <div class="form-group">
-      <label for="surname_registration">Surname:</label>
-      <input type="surname_registration" class="form-control" id="surname_registration" name="surname_registration" required>
-    </div>
-    <div class="form-group">
-        <label for="email_registration">Email:</label>
-        <input type="email_registration" class="form-control" id="email_registration" name="email_registration" required>
-    </div>
-    <div class="form-group">
-      <label for="password_registration">Password:</label>
-      <input type="password_registration" class="form-control" id="password_registration" name="password_registration" required>
-    </div>
-    <div class="form-group text-center">
+        <label for="name">Forename:</label>
+        <input type="name" class="form-control" id="name" name="name" required>
+     
+      <label for="surname">Surname:</label>
+      <input type="surname" class="form-control" id="surname" name="surname" required>
+     
+        <label for="email">Email:</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+     
+      <label for="password">Password:</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    
+     
       <input type="submit" value="Register" class="btn btn-primary">
-    </div>
+   
   </form>
 </div>
 {% endblock %}

@@ -12,6 +12,7 @@ class Researcher(models.Model):
     email = JSONField()
     name = models.TextField()
     surname = models.TextField()
+     
     approved = models.BooleanField(default=False)
 
 class Chat(models.Model):
