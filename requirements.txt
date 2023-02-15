@@ -1,11 +1,7 @@
 daphne
-gunicorn
-uvicorn
 django
 jsonfield
 channels
 channels_redis
 django-bootstrap-v5
 whitenoise[brotli]
-dj-database-url 
-psycopg2-binary

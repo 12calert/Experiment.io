@@ -57,7 +57,7 @@
   //let protocol = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
   const chatSocket = new WebSocket(
     // needs to be a wss connection to work over https
-    "wss://"
+    "ws://"
     + window.location.host
     + '/ws/game_view/'
     + roomName
