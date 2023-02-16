@@ -35,7 +35,7 @@ urlpatterns = [
     path('all_rooms/', views.all_rooms, name="all_rooms"),
 
     path('all_rooms/actionUrl', views.create_room),
-    path('game_view/<str:room_name>/', views.game_view, name='game_view'),
+    path('all_rooms/game_view/<str:room_name>/', views.game_view, name='game_view'),
     # tried with regex but need help
     #re_path(r'^all_rooms/game_view/(?P<room_name>)/$', views.game_view, name='game_view')
 ]
