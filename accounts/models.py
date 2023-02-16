@@ -26,11 +26,3 @@ class Game(models.Model):
     room_name = models.TextField(default = "")
     users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
 
-# model to route users to correct room
-class Room(models.Model):
-    room_name = models.TextField()
-    connected_user = models.IntegerField()
-    uuid = models.UUIDField(primary_key = True,
-         default = uuid.uuid4,
-         editable = False),
-
