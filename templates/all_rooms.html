@@ -4,43 +4,111 @@
 {% block content %}
 
 {% if rooms %}
-        <div id="rooms-list">
-            <ul>
-            {% for room in rooms%}
-                <li><a href="game_view/{{ room.room_name }}/">{{ room.room_name }}</a></li>
+    <table id="rooms-list">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+                <tr>
+                    <td><a href="game_view/{{ room.room_name }}/" class="room-link">{{ room.room_name }}</a></td>
+                </tr>
             {% endfor %}
-            </ul>
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <div class="message">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
         </div>
-
-        <div class="pagination">
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-
-            <span class="step-links">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}"><</a>
+        <div class="buttons">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"><</a>
+            {% endif %}
+            {% for page_num in page_obj.paginator.page_range %}
+                {% if page_num != page_obj.number %}
+                    <a href="?page={{ page_num }}">{{ page_num }}</a>
                 {% endif %}
-
-                {% for page_num in page_obj.paginator.page_range %}
-                    {% if page_num != page_obj.number %}
-                        <a href="?page={{ page_num }}">{{ page_num }}</a>
-                    {% endif %}
-                {% endfor %}
-
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">></a>
-                {% endif %}
-            </span>
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">></a>
+            {% endif %}
         </div>
-    {% else %}
-        <span id="no-rooms-found">No rooms found</span>
-    {% endif %}  
-    <div id="create-room">
-        <ul>
-            <form action='actionUrl' method='GET'>
-            <button class="button-home" id="create-room" type="submit" >Create a room</button>
-        </form>
-        </ul>
     </div>
-{% endblock content %}
+
+{% else %}
+    <span id="no-rooms-found">No rooms found</span>
+{% endif %}
+
+<div id="create-room">
+    <form action="actionUrl" method="GET">
+        <button class="button-home" type="submit">Create a room</button>
+    </form>
+</div>
+
+<style>
+    #create-room {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .room-link {
+        color: #0077be;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    .room-link:hover {
+        text-decoration: underline;
+    }
+    
+    #rooms-list {
+        margin: 20px auto;
+        border-collapse: collapse;
+        width: 50%;
+    }
+    
+    #rooms-list th, #rooms-list td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+    
+    #rooms-list th {
+        background-color: #f2f2f2;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .message {
+        font-size: 16px;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+    
+    .buttons {
+        display: flex;
+    }
+    
+    .buttons a {
+        display: block;
+        padding: 5px;
+        margin-right: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        color: #0077be;
+        text-decoration: none;
+    }
+    
+    .buttons a:hover {
+        background-color: #eee;
+    }
+</style>
+
+{% endblock %}
