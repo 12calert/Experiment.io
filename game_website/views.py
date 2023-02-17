@@ -1,6 +1,4 @@
 from django.shortcuts import render, redirect
-from django.core.serializers import serialize
-import uuid
 from accounts.models import Game, Chat
 import secrets
 
@@ -26,4 +24,5 @@ def create_room(request):
     # create the room
     chat = Chat.objects.create()
     new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat)
-    return redirect('game_view', room_name = new_room.room_name)
+    return redirect('game_view/'+new_room.room_name)
+    #return redirect('game_view', room_name = new_room.room_name)

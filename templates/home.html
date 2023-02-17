@@ -14,6 +14,10 @@
       the game, the map with the correct path is shown along with the map that the instruction taker drew. Conversely one of the two players may give up, in which case the
       the map from both players are shown also.</p>
 </div>
+{# button to go to game #}
+<div class = "flex-container">
+        <button class="button-home" id="go-to-game" type="button" onclick ="window.location.pathname = '/all_rooms/'">Play Game</button>
+</div>
 {# photos of example maps from different players perspectives #}
 <div class = "flex-container">
   <div class = "flex-container-child flex-photo">
@@ -25,9 +29,6 @@
     <img src="#" alt="Map from the instruction follower's point of view">
     <p>(Brief explanation of what the followers role is)</p>
   </div>
-{# button to go to game #}
-<div class = "flex-container">
-        <button class="button-home" id="go-to-game" type="button" onclick ="window.location.pathname = '/all_rooms/'">Play Game</button>
-</div>
+
 
 {% endblock %}
