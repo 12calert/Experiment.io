@@ -18,6 +18,17 @@
 <div class = "flex-container">
         <button class="button-home" id="go-to-game" type="button" onclick ="window.location.pathname = '/all_rooms/'">Play Game</button>
 </div>
+{# funcionality for selecting different games #}
+<div>
+  you are connected to:
+  <form method="POST">
+    <select name="game">
+    {% for game in games %}
+        <option value="{{ game.id }}">{{ game.name }}</option>
+    {% endfor %}
+    </select>
+    </form>
+</div>
 {# photos of example maps from different players perspectives #}
 <div class = "flex-container">
   <div class = "flex-container-child flex-photo">
