@@ -296,9 +296,9 @@ footer ul li ul li{
   cursor: pointer;
   }
 
-  input[type="submit"]:hover {
-    background-color: #333;
-  }
+input[type="submit"]:hover {
+  background-color: #333;
+ }
 
 /* STYLING FOR all_rooms.html */
 

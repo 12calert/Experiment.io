@@ -1,6 +1,4 @@
 from django.shortcuts import render, redirect
-from django.core.serializers import serialize
-import uuid
 from accounts.models import Game, Chat
 import secrets
 
