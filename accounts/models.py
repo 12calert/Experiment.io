@@ -7,11 +7,13 @@ import uuid
 
 class Researcher(models.Model):
 
-    userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK
+    # userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK UNCOMMENT LATER, IT IS COMMENTED OUT ONLY INITALLY
     researcher_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
-    email = JSONField()
+    
     name = models.TextField()
     surname = models.TextField()
+    email = JSONField()
+    password = models.TextField()
     approved = models.BooleanField(default=False)
 
 class Chat(models.Model):

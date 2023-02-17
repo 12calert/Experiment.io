@@ -296,6 +296,11 @@ footer ul li ul li{
   cursor: pointer;
   }
 
+.sign_in_instructions {
+  text-align: center;
+  font-weight: bold;
+}  
+
 input[type="submit"]:hover {
   background-color: #333;
  }
@@ -361,4 +366,21 @@ input[type="submit"]:hover {
 
 .buttons a:hover {
     background-color: #eee;
+}
+
+/* Register button in researcher_registration page */
+button[type="register"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 20px;
+  border-radius: 5px;
+  border: 0;
+  background-color: #ff5733;
+  color: #fff;
+  cursor: pointer;
+}
+
+button[type="register"]:hover {
+    background-color: #333;
 }
