@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat
+from accounts.models import Game, Chat, Researcher
+ 
 import secrets
 
 def homepage(request):
@@ -25,3 +26,22 @@ def create_room(request):
     chat = Chat.objects.create()
     new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat)
     return redirect('game_view', room_name = new_room.room_name)
+
+def researcher_registration(request):
+    context = {}
+    return render(request, 'researcher_registration.html', context=context)
+
+def researcher_registration(request):
+    if request.method == 'POST':
+        name = request.POST['name']
+        surname = request.POST['surname']
+        email = request.POST['email']
+        password = request.POST['password']
+        # just to test
+        print(name, surname, email, password)
+        Researcher.objects.create(name=name, email=email, surname=surname)
+        return redirect("/home")
+        
+        
+    context = { }
+    return render(request, 'researcher_registration.html', context)
