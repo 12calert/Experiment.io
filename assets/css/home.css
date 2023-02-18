@@ -227,7 +227,7 @@ footer ul li ul li{
 }
 
 .button-home {
-  padding: 18px 150px;
+  padding: 18px 50px;
   border-radius: 5px;
   border: 0;
 }
@@ -258,6 +258,23 @@ footer ul li ul li{
   border-radius: 5px;
   border: 0;
 }
+
+/* buttons in the all_rooms */
+.button3 {
+  background-color: #ff5733;;          
+}
+    
+.button3:hover {
+  background-color: #333;
+}
+
+.button3 {
+  margin-right: -40px;
+  width: 250px;
+  border-radius: 5px;
+  border: 0;
+}
+
 
 /* classes used in researcher login */
 .login-container {
@@ -383,4 +400,49 @@ button[type="register"] {
 
 button[type="register"]:hover {
     background-color: #333;
+}
+
+
+/* All_rooms unique room */
+input[type=unique_room], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+}
+
+input[type=unique_room] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+}
+
+input[type=unique_room]:hover {
+  background-color: #45a049;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+}
+
+.unique_room_box {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.unique_room_box {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
