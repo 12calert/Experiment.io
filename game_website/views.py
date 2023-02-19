@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher
-from django.http import HttpResponse
+
+from django.http import HttpResponse #why are these added?
 from django.template import loader
+
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
 import secrets
 
 def homepage(request):
@@ -30,10 +34,6 @@ def create_room(request):
     return redirect('game_view', room_name = new_room.room_name)
 
 def researcher_registration(request):
-    context = {}
-    return render(request, 'researcher_registration.html', context=context)
-
-def researcher_registration(request):
     if request.method == 'POST':
         name = request.POST['name']
         surname = request.POST['surname']
@@ -47,3 +47,11 @@ def researcher_registration(request):
         
     context = { }
     return render(request, 'researcher_registration.html', context)
+
+def data(request):
+    context = {}
+    return render(request, 'data.html', context=context)
+
+def conditions(request):
+    context = {}
+    return render(request, 'conditions.html', context=context)

@@ -1,7 +1,6 @@
 How to run:
 1. First, you might want to create venv
 2. pip install -r requirements.txt
-4. sudo service redis-server start (in linux)
 3. python manage.py runserver
 
 What works:

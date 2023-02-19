@@ -20,7 +20,16 @@
           <li><a href = "{% url 'home' %}">Home</a></li>
           {# history of the game seems unneeded but will keep for now #}
           <li><a href = "#">History of the MapGame</a></li>
-          <li><a href = "{% url 'researcher_login' %}">Researcher Sign in</a></li>
+          {% if request.user.is_authenticated %}
+            <li><a href="{% url 'research_data' %}"> View Data</a></li>
+	    	    <li><a href="{% url 'game_conditions' %}"> Set Conditions</a></li>
+            <!-- dont use styles use bootstrap classses-->
+		        <li style="float:right;">Hi {{request.user | title}}</a></li>
+	    	    <li style="float:right;"><a href="{% url 'logout' %}">Logout</a></li>
+	        {% else %}
+						<li style="float:right;"><a href="{% url 'researcher_login' %}">Login</a></li>
+	          <li style="float:right;"><a href="{% url 'researcher_registration' %}" >Register</a></li>
+	        {% endif %}
         </ul>
       </header>
 
