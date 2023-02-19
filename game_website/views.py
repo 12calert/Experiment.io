@@ -19,7 +19,7 @@ def researcher_login(request):
     return render(request, 'researcher_login.html', context=context)
 
 def game_view(request, room_name):
-    return render(request, 'game_view.html', {"room_name":room_name}) # dict to store room number
+    return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}" }) # dict to store room number
 
 def all_rooms(request):
     #rooms with one player waiting for another
@@ -55,3 +55,7 @@ def data(request):
 def conditions(request):
     context = {}
     return render(request, 'conditions.html', context=context)
+
+def gamelogic(request):
+    context = { "rect_img": "{% static 'images/logo.png' %}" }
+    return render(request, 'gamelogic.html', context=context)
