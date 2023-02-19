@@ -6,7 +6,7 @@
 <div class="login-container">
 <form action="" method="post">
   {% csrf_token %}  
-  {% comment %} csrf toke for security reasons {% endcomment %}
+  {% comment %} csrf token for security reasons {% endcomment %}
   {{ form.as_p }}
   <h6 style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </h6>
   {% comment %} <div class="form-group">
@@ -31,6 +31,10 @@
     <div class="form-group">
         <label for="email">Email:</label>
         <input value="{{ current_email }}" type="email_registration" class="form-control" id="email" name="email" required>
+    </div>
+    <div class = "form-group">
+      <label for="email">Username:</label>
+      <input value="{{ current_username }}" type="username_registration" class="form-control" id="username" name="username" required>
     </div>
     <div class="form-group">
       <label for="password">Password:</label>

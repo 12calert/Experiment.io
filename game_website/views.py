@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher
-from django.http import HttpResponse
+
+from django.http import HttpResponse #why are these added?
 from django.template import loader
+
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
 import secrets
 
 def homepage(request):
@@ -47,3 +51,16 @@ def researcher_registration(request):
         
     context = { }
     return render(request, 'researcher_registration.html', context)
+
+def login_view(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(request, username=username, password=password)
+    print(user)
+    if user is not None:
+        login(request, user)
+        # Redirect to a success page.
+        redirect("/home")
+    else:
+        # Return an 'invalid login' error message.
+        messages.error(request,'Invalid username or password')
