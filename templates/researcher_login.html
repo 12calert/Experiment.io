@@ -2,10 +2,8 @@
 {% load static %}
 {% block title %}Researcher Login{% endblock %}
 {% block content %}
-<!-- form for email, and password-->
 <div class="login-container">
-  <!-- initial form action empty, obviously fill in later-->
-  <form method = "POST" action="#">
+  <form method = "POST">
     {% csrf_token %}
     <div class="form-group">
       <h5 class="sign_in_instructions">  Please sign in: </h5>
@@ -20,11 +18,5 @@
       <input type="submit" value="Log in">
     </div>
   </form>
-  <div class="form-group text-center">
- <form action="{% url 'researcher_registration' %}">
-    <button type="register" value="register" >Register</button>
- </form> 
 
-  
-</div>
 {% endblock %}

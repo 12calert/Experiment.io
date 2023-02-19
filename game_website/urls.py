@@ -32,13 +32,15 @@ urlpatterns = [
     path('', views.homepage, name='home'),
     path('home', views.homepage, name='home'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
-    #path('researcher_login/', views.researcher_login, name='researcher_login'),
     path('all_rooms/', views.all_rooms, name="all_rooms"),
     path('all_rooms/actionUrl', views.create_room),
     path('all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
 
     path('researcher_login/', auth_views.LoginView.as_view(template_name="researcher_login.html"), name = "researcher_login"),
+    path('logout/', auth_views.LogoutView.as_view(next_page='researcher_login'),name='logout'),
+    path('data/', views.data, name='research_data'),
+    path('conditions/', views.conditions, name='game_conditions'),
     # when they put the unique private room key:
  
     # tried with regex but need help

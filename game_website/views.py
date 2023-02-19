@@ -34,10 +34,6 @@ def create_room(request):
     return redirect('game_view', room_name = new_room.room_name)
 
 def researcher_registration(request):
-    context = {}
-    return render(request, 'researcher_registration.html', context=context)
-
-def researcher_registration(request):
     if request.method == 'POST':
         name = request.POST['name']
         surname = request.POST['surname']
@@ -52,15 +48,10 @@ def researcher_registration(request):
     context = { }
     return render(request, 'researcher_registration.html', context)
 
-def login_view(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
-    print(user)
-    if user is not None:
-        login(request, user)
-        # Redirect to a success page.
-        redirect("/home")
-    else:
-        # Return an 'invalid login' error message.
-        messages.error(request,'Invalid username or password')
+def data(request):
+    context = {}
+    return render(request, 'data.html', context=context)
+
+def conditions(request):
+    context = {}
+    return render(request, 'conditions.html', context=context)
