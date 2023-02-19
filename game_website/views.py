@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher
- 
+from django.http import HttpResponse
+from django.template import loader
 import secrets
 
 def homepage(request):
@@ -19,6 +20,7 @@ def game_view(request, room_name):
 def all_rooms(request):
     #rooms with one player waiting for another
     rooms = Game.objects.filter(users=1)
+    # return response
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
 def create_room(request):

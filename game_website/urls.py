@@ -33,10 +33,11 @@ urlpatterns = [
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     path('researcher_login/', views.researcher_login, name='researcher_login'),
     path('all_rooms/', views.all_rooms, name="all_rooms"),
-
     path('all_rooms/actionUrl', views.create_room),
     path('all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
+    # when they put the unique private room key:
+ 
     # tried with regex but need help
     #re_path(r'^all_rooms/game_view/(?P<room_name>)/$', views.game_view, name='game_view')
 ]
