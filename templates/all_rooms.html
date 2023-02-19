@@ -3,26 +3,12 @@
 {% block title %}Rooms{% endblock %}
 {% block content %}
 
-{% if rooms %}
-    <table id="rooms-list">
-        <thead>
-            <tr>
-                <th>Room Number</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for room in rooms %}
-                <tr>
-                    <td><a href="game_view/{{ room.room_name }}/" class="room-link">{{ room.room_name }}</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
 
     <div class="pagination">
-        <div class="message">
+        {% comment %} <div class="message">
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-        </div>
+        </div> {% endcomment %}
         <div class="buttons">
             {% if page_obj.has_previous %}
                 <a href="?page={{ page_obj.previous_page_number }}"><</a>
@@ -37,17 +23,89 @@
             {% endif %}
         </div>
     </div>
-
-{% else %}
-    <span id="no-rooms-found">No rooms found</span>
-{% endif %}
-
-<div id="create-room">
-    <form action="actionUrl" method="GET">
-        <button class="button-home" type="submit">Create a room</button>
-    </form>
+{% comment %} rooms|length {% endcomment %}
+<div class="container">  
+    <div class="row justify-content-center">
+        <div class="col-sm-4">
+            <form action="actionUrl" method="GET">
+                <button class="button button3">Join a public room</button>
+            </form>
+        </div>
+        <div class="col-sm-4">
+          
+        {% if rooms %}
+            <form name="">
+                <select class="button button3" name="select" onchange="goto(this.form)">
+                    <option selected disabled value="">Join a private room</option>
+                        {% for room in rooms%}
+                            <option value="game_view/{{ room.room_name }}/" class="room-link"> Room number: {{ forloop.counter  }}  
+                        {% endfor %}
+                    </select>
+            </form>
+        </div>
+    </div>
+   </div>
 </div>
 
-<link rel="stylesheet" type="text/css" href="{% static 'css/rooms.css' %}">
+{% else %}
+<div class="form-group">
+    <select class="button button3" required class="form-control" class="form-group" style="text-align: center" id="title_registration" name="title_registration" >
+        <option selected disabled value="">Join a private room</option>
+        <option disabled value="">No available rooms</option>
+    </select> 
+</div>  
+{% endif %}   
+ 
+<br>   
+{% comment %} Entering unique private room key {% endcomment %}
+<div class="unique_room_box">
+    <div class="row">
+      <h5 style="text-align:center;">Please enter your private room key here: </h5>
+      <div class="unique_room_box" class="col order-12">
+        <form name="a">
+            <label for="fname">Private room key:</label>
+            <input type="text" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
+            <input onclick="go_to_private_room_key(this.form)" type="submit" value="Submit" /> 
+        </form>
+      </div> 
+    </div>
+</div>
 
-{% endblock %}
+ 
+
+ {% comment %}Albertos original code with table{% endcomment %}
+ {% comment %} {% if rooms %}
+    <table id="rooms-list">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+                <tr>
+                    <td><a href="game_view/{{ room.room_name }}/" class="room-link">{{ room.room_name }}</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <span id="no-rooms-found">No rooms found</span>
+{% endif %}    
+  {% endcomment %}
+
+{% comment %} Reference: https://www.web-source.net/javascript_redirect_box.htm {% endcomment %}
+<script language="JavaScript">    
+    function goto(form) { 
+        var index=form.select.selectedIndex
+        if (form.select.options[index].value != "0") {
+        location=form.select.options[index].value;}}
+
+    function go_to_private_room_key(form) { 
+        var input = document.getElementById("unique_room_box").value;
+        
+        window.open("game_view/"+input);
+       } 
+</script>
+
+{% endblock %} 

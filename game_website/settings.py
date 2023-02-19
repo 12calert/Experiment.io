@@ -132,8 +132,9 @@ STATICFILES_DIRS = (
 )
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # for Render hosting
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'home' # page which shows after login (researcher view)
+LOGOUT_REDIRECT_URL = 'home' # page which shows after logout
+LOGIN_URL = "researcher_login"
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
@@ -145,7 +146,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("rediss://red-cfkcs79a6gductmeqb10:6rIh0otNtRwUTuuyI7jKgMuOYmWQi4xY@frankfurt-redis.render.com:6379")],
         },
     },
 }

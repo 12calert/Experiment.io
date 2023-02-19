@@ -7,11 +7,13 @@ import uuid
 
 class Researcher(models.Model):
 
-    userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK
+    # userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK UNCOMMENT LATER, IT IS COMMENTED OUT ONLY INITALLY
     researcher_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
-    email = JSONField()
+    
     name = models.TextField()
     surname = models.TextField()
+    email = JSONField()
+    password = models.TextField()
     approved = models.BooleanField(default=False)
 
 class Chat(models.Model):
@@ -25,12 +27,4 @@ class Game(models.Model):
     completed = models.BooleanField(default=False)
     room_name = models.TextField(default = "")
     users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
-
-# model to route users to correct room
-class Room(models.Model):
-    room_name = models.TextField()
-    connected_user = models.IntegerField()
-    uuid = models.UUIDField(primary_key = True,
-         default = uuid.uuid4,
-         editable = False),
 
