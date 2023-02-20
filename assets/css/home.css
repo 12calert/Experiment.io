@@ -196,6 +196,46 @@ footer ul li ul li{
   background-color: #f1f1f1;
 }
 
+.chat {
+  background-color: #fff;
+  border-radius: 0px;
+  box-shadow: 0px 0px 10px #ccc;
+  height: 500px;
+  overflow-y: scroll;
+  padding: 20px;
+}
+
+#chat-log {
+  border: none;
+  height: 400px;
+  width: 100%;
+}
+
+#chat-message-input {
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
+#chat-message-submit {
+  background-color: #0084ff;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
+#chat-message-submit:hover {
+  background-color: #0066cc;
+}
+
+
 /* style of two boxes that they distinguish map and chat */
 .col-sm-8.map {
   height: 550px;
