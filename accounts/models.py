@@ -28,3 +28,8 @@ class Game(models.Model):
     room_name = models.TextField(default = "")
     users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
 
+class Condition(models.Model):
+    condition_id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    amount_item = models.IntegerField()
+    restriction = models.TextField()
+    active = models.BooleanField(default = True)
