@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat, Researcher
+from accounts.models import Game, Chat, Researcher, Condition
 
-from django.http import HttpResponse #why are these added?
-from django.template import loader
-
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
 import secrets
+from .forms import create_conditions
 
 def homepage(request):
     # create a session id for anonymous users and add
@@ -53,5 +49,16 @@ def data(request):
     return render(request, 'data.html', context=context)
 
 def conditions(request):
+    #filter by the researcher's ID
     context = {}
-    return render(request, 'conditions.html', context=context)
+    create = create_conditions(request.POST or None)
+    context['create'] = create
+    # currently is doing SELECT *, which is obviously bad
+    # later will filter by researcher ID
+    context['conditions'] = Condition.objects.all()
+    if request.POST:
+        if create.is_valid():
+            Condition.objects.create(amount_item = create.cleaned_data.get("amount_items"),
+                                    restriction = create.cleaned_data.get("restriction"))
+            
+    return render(request, 'conditions.html', context)

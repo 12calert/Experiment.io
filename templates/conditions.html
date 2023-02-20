@@ -7,4 +7,34 @@
 page so researchers can set conditions
 {% endcomment %}
 
+{% if conditions %}
+<table>
+    <tr>
+        <th>Condition ID</th>
+        <th>Amount of Items</th>
+        <th>Special Restrictions</th>
+    </tr>
+    {% for condition in conditions %}
+    <tr> 
+        <td>{{ condition.condition_id }}</td>
+        <td>{{ condition.amount_item }}</td>
+        <td>{{ condition.restriction }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% comment %}
+ make it apparent that this is to create a condition you can even keep this hidden and 
+    use a button to show this after the researcher decides to create one 
+{% endcomment %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{ create.as_p }}
+    <input type="submit" value="create"/>
+</form>
+
+{# perhaps functionality to delete/suspend conditions #}
+
 {% endblock %}
