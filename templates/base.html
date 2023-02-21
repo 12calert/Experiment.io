@@ -27,6 +27,8 @@
           <li><a href = "#">History of the MapGame</a></li>
           {% if user.is_superuser %}
             <li><a href="{% url 'admin:index' %}"> Admin Page</a></li>
+            <li style="float:right;">Hi {{request.user | title}}</a></li>
+	    	    <li style="float:right;"><a href="{% url 'logout' %}">Logout</a></li>
           {% elif user.is_superuser != True and user.is_authenticated %}
             <li><a href="{% url 'research_data' %}"> View Data</a></li>
 	    	    <li><a href="{% url 'game_conditions' %}"> Set Conditions</a></li>

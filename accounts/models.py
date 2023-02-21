@@ -6,13 +6,14 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Researcher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, default = "")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     # userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK UNCOMMENT LATER, IT IS COMMENTED OUT ONLY INITALLY
     researcher_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
     
     name = models.TextField()
     surname = models.TextField()
     email = JSONField()
+    username = models.TextField(default="")
     password = models.TextField()
     approved = models.BooleanField(default=False)
 
