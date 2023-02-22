@@ -34,10 +34,9 @@ def researcher_registration(request):
         name = request.POST['name']
         surname = request.POST['surname']
         email = request.POST['email']
+        username = request.POST['username']
         password = request.POST['password']
-        # just to test
-        print(name, surname, email, password)
-        Researcher.objects.create(name=name, email=email, surname=surname)
+        Researcher.objects.create(name=name, surname=surname, email = email, username = username, password=password)
         return redirect("/home")
         
         
