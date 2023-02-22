@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User 
+from accounts.models import Game
 from django import forms
-
 
 class RegisterForm(forms.ModelForm):
     name = forms.CharField(max_length=100)
@@ -11,3 +11,6 @@ class RegisterForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["name", "surname", "email", "password"]
+
+ 
+    

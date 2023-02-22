@@ -23,24 +23,46 @@
             {% endif %}
         </div>
     </div>
+
+
+
+<!--Form for user to create a public with multiple submit buttons-->    
 {% comment %} rooms|length {% endcomment %}
 <div class="container">  
     <div class="row justify-content-center">
         <div class="col-sm-4">
-            <form action="actionUrl" method="GET">
-                <button class="button button3">Join a public room</button>
+            <form action="actionUrl" method="POST">
+                {% csrf_token %}  
+                {% comment %} csrf token for security reasons {% endcomment %}
+                {{ form.as_p }}
+                <button class="button button3" type="submit" name="Public">Create a public room</button>
             </form>
         </div>
+
         <div class="col-sm-4">
-          
+            <form action="actionUrl" method="POST">
+                {% csrf_token %}  
+                {% comment %} csrf token for security reasons {% endcomment %}
+                {{ form.as_p }}
+                <button class="button button3" type="submit" name="Private">Create a private room</button>
+            </form>
+        </div>
+
+        <div class="col-sm-4">
         {% if rooms %}
             <form name="">
                 <select class="button button3" name="select" onchange="goto(this.form)">
-                    <option selected disabled value="">Join a private room</option>
+                    <option selected disabled value="">Join a public room</option>
                         {% for room in rooms%}
-                            <option value="game_view/{{ room.room_name }}/" class="room-link"> Room number: {{ forloop.counter  }}  
+                        {% comment %} show only public rooms {% endcomment %}
+                            {% if room.public_yes_or_no %}
+                            
+                                <option value="game_view/{{ room.room_name }}/" class="room-link"> Room number: {{ forloop.counter  }}  
+                            
+                            {% endif %}
+                           
                         {% endfor %}
-                    </select>
+                </select>
             </form>
         </div>
     </div>
@@ -53,6 +75,7 @@
         <option selected disabled value="">Join a private room</option>
         <option disabled value="">No available rooms</option>
     </select> 
+    </div>  
 </div>  
 {% endif %}   
  
@@ -70,8 +93,8 @@
       </div> 
     </div>
 </div>
-
- 
+</div>  
+</div>  
 
  {% comment %}Albertos original code with table{% endcomment %}
  {% comment %} {% if rooms %}
