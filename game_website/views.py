@@ -2,13 +2,19 @@ from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition
 
 import secrets
-from .forms import GameConditions
+from .forms import GameConditions, ChooseGame
 
 def homepage(request):
     # create a session id for anonymous users and add
     request.session['user_id'] = secrets.token_hex(8)
     context={}
-    return render(request, 'home.html', context=context)
+    chooseGame = ChooseGame(request.POST or None)
+    context['chooseGame'] = chooseGame
+    if request.POST:
+        if chooseGame.is_valid():
+            #send to appropriate game rooms page
+            return redirect("all_rooms", game = chooseGame.cleaned_data.get("game_choice"))
+    return render(request, 'home.html', context)
 
 def researcher_login(request):
     context = {}
@@ -17,17 +23,27 @@ def researcher_login(request):
 def game_view(request, room_name):
     return render(request, 'game_view.html', {"room_name":room_name}) # dict to store room number
 
-def all_rooms(request):
+def all_rooms(request, game):
     #rooms with one player waiting for another
-    rooms = Game.objects.filter(users=1)
+    rooms = Game.objects.filter(users=1, game_type=game)
     # return response
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
-def create_room(request):
+def create_room(request, game):
     # create the room
-    chat = Chat.objects.create()
-    new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat)
-    return redirect('game_view', room_name = new_room.room_name)
+    #choose a condition to apply to the game
+    conditions = Condition.objects.filter(game_type = game)
+    # some way to pick which condition randomly, or with some logic here:
+    condition = conditions.first()
+    #note that this will fail if there is no condition
+    if condition:
+        chat = Chat.objects.create()
+        new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, 
+                                   game_type=game, has_condition = condition)
+        return redirect('game_view', room_name = new_room.room_name)
+    else:
+        print("A condition is not specified")
+        return redirect("")
 
 def researcher_registration(request):
     if request.method == 'POST':

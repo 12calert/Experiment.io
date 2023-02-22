@@ -32,8 +32,8 @@ urlpatterns = [
     path('', views.homepage, name='home'),
     path('home', views.homepage, name='home'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
-    path('all_rooms/', views.all_rooms, name="all_rooms"),
-    path('all_rooms/actionUrl', views.create_room),
+    path('<game>/all_rooms/', views.all_rooms, name="all_rooms"),
+    path('<game>/all_rooms/actionUrl', views.create_room),
     path('all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
 
