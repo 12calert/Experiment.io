@@ -197,7 +197,8 @@ footer ul li ul li{
 }
 
 .game {
-  position: relative;
+  width: 1000px;
+  height: 1000px;
 }
 
 /* style of two boxes that they distinguish map and chat */
