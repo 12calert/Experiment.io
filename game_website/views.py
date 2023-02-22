@@ -52,14 +52,16 @@ def conditions(request):
     context = {}
     create = GameConditions(request.POST or None)
     context['create'] = create
-    # currently is doing SELECT *, which is obviously bad
-    # later will filter by researcher ID
-    context['conditions'] = Condition.objects.all()
+
+    current_researcher = Researcher.objects.filter(user=request.user).first()
+    context['conditions'] = Condition.objects.filter(created_by = current_researcher)
+
     if request.POST:
         if create.is_valid():
             Condition.objects.create(amount_item = create.cleaned_data.get("amount_of_items"),
                                     restriction = create.cleaned_data.get("restriction"),
                                     active = create.cleaned_data.get("active"),
-                                    game_type = create.cleaned_data.get("game_type"))
+                                    game_type = create.cleaned_data.get("game_type"),
+                                    created_by = current_researcher)
             
     return render(request, 'conditions.html', context)

@@ -34,6 +34,7 @@ class Condition(models.Model):
     amount_item = models.IntegerField()
     restriction = models.TextField(null=True)
     active = models.BooleanField(default = True)
+    created_by = models.ForeignKey(Researcher, on_delete=models.DO_NOTHING, null=False)
     MAPGAME = "MG"
     GAME_TYPE_CHOICES = [
         (MAPGAME, 'Map Game'),
