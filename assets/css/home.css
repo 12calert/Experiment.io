@@ -196,6 +196,12 @@ footer ul li ul li{
   background-color: #f1f1f1;
 }
 
+.game {
+  width: 1000px;
+  height: 1000px;
+}
+
+
 .chat {
   background-color: #fff;
   border-radius: 0px;

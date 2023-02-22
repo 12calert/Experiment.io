@@ -21,7 +21,7 @@ def researcher_login(request):
     return render(request, 'researcher_login.html', context=context)
 
 def game_view(request, room_name):
-    return render(request, 'game_view.html', {"room_name":room_name}) # dict to store room number
+    return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}" }) # dict to store room number
 
 def all_rooms(request, game):
     #rooms with one player waiting for another
@@ -37,13 +37,22 @@ def create_room(request, game):
     condition = conditions.first()
     #note that this will fail if there is no condition
     if condition:
-        chat = Chat.objects.create()
-        new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, 
+        # if the user selects a Public room:
+        if 'Public' in request.POST:
+            chat = Chat.objects.create()
+            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), 
+            game_id = chat, public_yes_or_no=True,
+            game_type=game, has_condition = condition)
+            return redirect('game_view', room_name = new_room.room_name)
+    # if the user selects a Private room:
+        elif 'Private' in request.POST:
+            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, public_yes_or_no=False, 
                                    game_type=game, has_condition = condition)
-        return redirect('game_view', room_name = new_room.room_name)
+            return redirect('game_view', room_name = new_room.room_name)
     else:
         print("A condition is not specified")
         return redirect("")
+
 
 def researcher_registration(request):
     if request.method == 'POST':
@@ -62,6 +71,10 @@ def researcher_registration(request):
 def data(request):
     context = {}
     return render(request, 'data.html', context=context)
+   
+def gamelogic(request):
+    context = { "rect_img": "{% static 'images/logo.png' %}" }
+    return render(request, 'gamelogic.html', context=context)
 
 def conditions(request):
     #filter by the researcher's ID
