@@ -26,8 +26,15 @@ def all_rooms(request):
 def create_room(request):
     # create the room
     chat = Chat.objects.create()
-    new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat)
-    return redirect('game_view', room_name = new_room.room_name)
+    # if the user selects a Public room:
+    if 'Public' in request.POST:
+        new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, public_yes_or_no=True)
+        return redirect('game_view', room_name = new_room.room_name)
+    # if the user selects a Private room:
+    if 'Private' in request.POST:
+        new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, public_yes_or_no=False)
+        return redirect('game_view', room_name = new_room.room_name)
+
 
 def researcher_registration(request):
     if request.method == 'POST':
