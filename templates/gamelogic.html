@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}GameLogic{% endblock %}
+{% block content %}
+<img id="dummy" hidden src="{% static 'images/logo.png' %}">
+<div class="game">
+    
+</div>
+
+<script>
+  
+  SpawnMap( 20 )
+  function intersect( r1, r2 ) {
+    if( r1.left < r2.left + r2.width && r1.left + r1.width > r2.left &&
+     r1.top < r2.top + r2.height && r1.top + r1.height > r2.top ) return true
+     return false
+  }
+ 
+  function SpawnMap( rectNumber ) {
+    if( rectNumber > 1000 ) rectNumber = 1000 
+
+    var gameWindow = document.getElementsByClassName( "game" );
+    var rects = []
+    var failCounter = 0
+
+    for( let i = 0; i < rectNumber; i++ ) {
+      rects.push( {
+        "top": Math.floor(Math.random() * 1000),
+        "left": Math.floor(Math.random() * 1000),
+        "width": 100,
+        "height": 100
+      } )
+
+      for( let j = 0; j < rects.length - 1; j++ ) {
+        if( intersect( rects[j], rects[rects.length - 1] ) ) {
+          rects.pop()
+          i -= 1
+          failCounter++
+          if( failCounter > 1000 ) i = 1000
+          break
+        }
+      }
+    }
+
+    let dummmy = document.getElementById( "dummy" );
+    for( let i = 0; i < rectNumber; i++ ) {
+      let img = document.createElement( 'img' )
+      img.src = dummy.src
+      img.style.position = "absolute"
+      img.style.top = rects[i].top + "px"
+      img.style.left = rects[i].left + "px"
+      img.style.width = rects[i].width + "px"
+      img.style.height = rects[i].height + "px"
+      img.style.zIndex = -1
+      gameWindow[0].appendChild( img ) 
+    }
+  }
+
+</script>
+{% endblock %}
+
