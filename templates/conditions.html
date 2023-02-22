@@ -13,12 +13,14 @@ page so researchers can set conditions
         <th>Condition ID</th>
         <th>Amount of Items</th>
         <th>Special Restrictions</th>
+        <th>Game Type</th>
     </tr>
     {% for condition in conditions %}
     <tr> 
         <td>{{ condition.condition_id }}</td>
         <td>{{ condition.amount_item }}</td>
         <td>{{ condition.restriction }}</td>
+        <td>{{ condition.game_type }}</td>
     </tr>
     {% endfor %}
 </table>

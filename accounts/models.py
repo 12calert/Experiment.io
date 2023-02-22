@@ -32,5 +32,15 @@ class Game(models.Model):
 class Condition(models.Model):
     condition_id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     amount_item = models.IntegerField()
-    restriction = models.TextField()
+    restriction = models.TextField(null=True)
     active = models.BooleanField(default = True)
+    MAPGAME = "MG"
+    GAME_TYPE_CHOICES = [
+        (MAPGAME, 'Map Game'),
+
+    ]
+    game_type = models.CharField(
+        max_length=2,
+        choices=GAME_TYPE_CHOICES,
+        default=MAPGAME,
+    )
