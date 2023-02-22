@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'game_website.wsgi.application'
 
 DATABASES = {
 
-    'default': dj_database_url.config(default='postgres://map_game_8ppr_user:zyfLnjTnrYCEHdVRldRs6pfkfWbqqmz8@dpg-cfr01shmbjsgn6t1dp3g-a.frankfurt-postgres.render.com/map_game_8ppr')
+    'default': dj_database_url.config(default='postgres://map_game_898y_user:PRnhM14xT9oTFNiW4I2p1cfaSB5ajxjj@dpg-cfr4u2un6mpirvus1vt0-a.frankfurt-postgres.render.com/map_game_898y')
 }
 
 
