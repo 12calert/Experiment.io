@@ -1,12 +1,8 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat, Researcher
+from accounts.models import Game, Chat, Researcher, Condition
 
-from django.http import HttpResponse #why are these added?
-from django.template import loader
-
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
 import secrets
+from .forms import GameConditions
 
 def homepage(request):
     # create a session id for anonymous users and add
@@ -38,10 +34,9 @@ def researcher_registration(request):
         name = request.POST['name']
         surname = request.POST['surname']
         email = request.POST['email']
+        username = request.POST['username']
         password = request.POST['password']
-        # just to test
-        print(name, surname, email, password)
-        Researcher.objects.create(name=name, email=email, surname=surname)
+        Researcher.objects.create(name=name, surname=surname, email = email, username = username, password=password)
         return redirect("/home")
         
         
@@ -51,11 +46,24 @@ def researcher_registration(request):
 def data(request):
     context = {}
     return render(request, 'data.html', context=context)
-
-def conditions(request):
-    context = {}
-    return render(request, 'conditions.html', context=context)
-
+   
 def gamelogic(request):
     context = { "rect_img": "{% static 'images/logo.png' %}" }
     return render(request, 'gamelogic.html', context=context)
+
+def conditions(request):
+    #filter by the researcher's ID
+    context = {}
+    create = GameConditions(request.POST or None)
+    context['create'] = create
+    # currently is doing SELECT *, which is obviously bad
+    # later will filter by researcher ID
+    context['conditions'] = Condition.objects.all()
+    if request.POST:
+        if create.is_valid():
+            Condition.objects.create(amount_item = create.cleaned_data.get("amount_of_items"),
+                                    restriction = create.cleaned_data.get("restriction"),
+                                    active = create.cleaned_data.get("active"),
+                                    game_type = create.cleaned_data.get("game_type"))
+            
+    return render(request, 'conditions.html', context)

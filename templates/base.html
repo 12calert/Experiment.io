@@ -5,11 +5,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Base html{% endblock %}</title>
-    <link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">   
+    <link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">  
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+    {% comment %} imported font for footer  {% endcomment %}
+	  <link href="http://fonts.googleapis.com/css?family=Cookie" rel="stylesheet" type="text/css">
+ 
     {% block css %}{% endblock %}
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    
   </head>
   <body>
     <main>
@@ -20,7 +25,11 @@
           <li><a href = "{% url 'home' %}">Home</a></li>
           {# history of the game seems unneeded but will keep for now #}
           <li><a href = "#">History of the MapGame</a></li>
-          {% if request.user.is_authenticated %}
+          {% if user.is_superuser %}
+            <li><a href="{% url 'admin:index' %}"> Admin Page</a></li>
+            <li style="float:right;">Hi {{request.user | title}}</a></li>
+	    	    <li style="float:right;"><a href="{% url 'logout' %}">Logout</a></li>
+          {% elif user.is_superuser != True and user.is_authenticated %}
             <li><a href="{% url 'research_data' %}"> View Data</a></li>
 	    	    <li><a href="{% url 'game_conditions' %}"> Set Conditions</a></li>
             <!-- dont use styles use bootstrap classses-->
@@ -38,41 +47,51 @@
         {% block content %}
         {% endblock %}
       </div>
-
-      {# footer for every page #}
-      <footer>
-        <div class="flex-container">
-          <div class="flex-container-child">
-            <img src="{% static 'images/logo.png'%}" alt="Map Game logo" 
-                 style="width: 170px; height: 170px; 
-                        border-radius: 20px; 
-                        margin-left: 200px;
-                        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);">
-          </div>
-          <div class="flex-container-child">
-            <ul>
-              <li>
-                Contact us
-                <ul>
-                  <li>someEmail@email.com</li>
-                  <li>0123456789</li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-          <div class="flex-container-child" style="margin-left: 0px; margin-right: 300px;">
-            <ul>
-              <li>
-                Something else here
-                <ul>
-                  <li>add something here</li>
-                  <li>hi</li>
-                </ul>
-              </li>
-            </ul>
-          </div>          
+     
+      {# footer for every page reference: https://blog.eduonix.com/web-programming-tutorials/build-responsive-website-footer-using-html-css/#}
+      <footer class="footer-distributed">
+        <div class="footer-left">
+          <img src="{% static 'images/logo.png'%}" alt="Map Game logo" >
+          <h3>About<span>MapTask</span></h3>
+          <p class="footer-links">
+            <a href="#">Home</a>
+            |
+            <a href="#">Blog</a>
+            |
+            <a href="#">About</a>
+            |
+            <a href="#">Contact</a>
+          </p>
+  
+          <p class="footer-company-name">© 2023 University of Aberdeen.</p>
         </div>
-      </footer>      
+        <div class="footer-center">
+          <div>
+            <i class="fa fa-map-marker"></i>
+              <p><span>Address</span>Postcode</p>
+          </div>
+          <div>
+            <i class="fa fa-phone"></i>
+            <p>Telephone number</p>
+          </div>
+          <div>
+            <i class="fa fa-envelope"></i>
+            <p><a href="mailto:support@eduonix.com">Email</a></p>
+          </div>
+        </div>
+        <div class="footer-right">
+          <p class="footer-company-about">
+            <span>About the company</span>
+            We offer research experiments.</p>
+          <div class="footer-icons">
+            <a href="#"><i class="fa fa-facebook"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-linkedin"></i></a>
+            <a href="#"><i class="fa fa-youtube"></i></a>
+          </div>
+        </div>
+      </footer>   
     </main>
   </body>
 </html>

@@ -27,7 +27,7 @@ from django.urls import include, path
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name="admin"),
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('gamelogic/', views.gamelogic, name='gamelogic'),
     path('', views.homepage, name='home'),
