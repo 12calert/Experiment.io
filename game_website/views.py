@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition
 
 import secrets
-from .forms import create_conditions
+from .forms import GameConditions
 
 def homepage(request):
     # create a session id for anonymous users and add
@@ -50,14 +50,16 @@ def data(request):
 def conditions(request):
     #filter by the researcher's ID
     context = {}
-    create = create_conditions(request.POST or None)
+    create = GameConditions(request.POST or None)
     context['create'] = create
     # currently is doing SELECT *, which is obviously bad
     # later will filter by researcher ID
     context['conditions'] = Condition.objects.all()
     if request.POST:
         if create.is_valid():
-            Condition.objects.create(amount_item = create.cleaned_data.get("amount_items"),
-                                    restriction = create.cleaned_data.get("restriction"))
+            Condition.objects.create(amount_item = create.cleaned_data.get("amount_of_items"),
+                                    restriction = create.cleaned_data.get("restriction"),
+                                    active = create.cleaned_data.get("active"),
+                                    game_type = create.cleaned_data.get("game_type"))
             
     return render(request, 'conditions.html', context)
