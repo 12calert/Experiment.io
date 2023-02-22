@@ -46,6 +46,7 @@ def create_room(request, game):
             return redirect('game_view', room_name = new_room.room_name)
     # if the user selects a Private room:
         elif 'Private' in request.POST:
+            chat = Chat.objects.create()
             new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, public_yes_or_no=False, 
                                    game_type=game, has_condition = condition)
             return redirect('game_view', room_name = new_room.room_name)
