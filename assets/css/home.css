@@ -336,6 +336,7 @@ footer ul li ul li{
   font-weight: bold;
   margin-bottom: 5px;
   display: block;
+  margin-top: 25px;
   }
   
   input[type="email"], input[type="password"] {
@@ -348,10 +349,12 @@ footer ul li ul li{
   }
   
   input[type="submit"] {
-  width: 100%;
+  width: 250px;
+  height: 50px;
+  display: block;
   padding: 10px;
   font-size: 16px;
-  margin-top: 20px;
+  margin: 20px auto;
   border-radius: 5px;
   border: 0;
   background-color: #ff5733;
@@ -451,7 +454,7 @@ button[type="register"]:hover {
 
 /* All_rooms unique room */
 input[type=unique_room], select {
-  width: 100%;
+  width: 250px;
   padding: 12px 20px;
   margin: 8px 0;
   display: inline-block;
@@ -499,6 +502,7 @@ input[type=unique_room]:hover {
 *{
 	padding:0;
 	margin:0;
+  text-align: center;
 }
 
 html{
@@ -672,3 +676,4 @@ body{
 	}
 }
 /* END OF FOOTER STYLE */
+
