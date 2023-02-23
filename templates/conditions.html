@@ -3,32 +3,56 @@
 {% block title %}Game Conditions{% endblock %}
 {% block content %}
 
+<link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">
+<style>
+    /* Center the condition table */
+    table, form {
+        margin: auto;
+    }
+
+    /* Center the fields */
+    form {
+        text-align: center;
+    }
+
+    /* Style the table */
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 70%;
+        border: 1px solid #ddd;
+    }
+</style>
 {% comment %}
 page so researchers can set conditions
 {% endcomment %}
 
 {% if conditions %}
+
 <table>
-    <tr>
-        <th>Condition ID</th>
-        <th>Amount of Items</th>
-        <th>Special Restrictions</th>
-        <th>Game Type</th>
-    </tr>
-    {% for condition in conditions %}
-    <tr> 
-        <td>{{ condition.condition_id }}</td>
-        <td>{{ condition.amount_item }}</td>
-        <td>{{ condition.restriction }}</td>
-        <td>{{ condition.game_type }}</td>
-    </tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>Condition ID</th>
+            <th>Amount of Items</th>
+            <th>Special Restrictions</th>
+            <th>Game Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for condition in conditions %}
+        <tr> 
+            <td>{{ condition.condition_id }}</td>
+            <td>{{ condition.amount_item }}</td>
+            <td>{{ condition.restriction }}</td>
+            <td>{{ condition.game_type }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endif %}
-
 {% comment %}
- make it apparent that this is to create a condition you can even keep this hidden and 
-    use a button to show this after the researcher decides to create one 
+make it apparent that this is to create a condition you can even keep this hidden and
+use a button to show this after the researcher decides to create one
 {% endcomment %}
 
 <form method="POST">
