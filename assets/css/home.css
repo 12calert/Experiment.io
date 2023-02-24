@@ -8,12 +8,13 @@ if any questions please ask
 /* body styles to be changed according to website design */
 /* general classes to be used for all pages */
 body {
-  font-family: 'Lato', sans-serif !important;
+  font-family: 'Poppins', sans-serif !important;
   margin: 0;
   color: black;
-  font-size: 20px;
+  font-size: 22px;
   min-height: 100vh;
-}
+  background: #f1f1f1;
+  }
 button {
   border: none;
   color: white;
@@ -99,7 +100,7 @@ button {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #ff5733;
+  background-color: #1e1e1e;
   position: fixed;
   top: 0;
   width: 100%;
@@ -124,7 +125,7 @@ footer {
   background-color: #333;
   color: white;
   text-align: center;
-  width: 105vw;
+  width: 100.4vw;
   margin-left: -11px;
   position: static;
   bottom: 0;
@@ -307,7 +308,7 @@ footer ul li ul li{
 
 /* buttons in the all_rooms */
 .button3 {
-  background-color: #ff5733;;          
+  background-color: #e0ac1c;          
 }
     
 .button3:hover {
@@ -321,6 +322,29 @@ footer ul li ul li{
   border: 0;
 }
 
+.mycolorfont {
+  color: black !important;
+}
+
+.btn-primary {
+  background-color: #e0ac1c !important;
+  border-color: #e0ac1c !important;
+}
+
+.card {
+  height: 100%;
+}
+
+.weightonfont {
+  font-weight: bold;
+  margin-right: 60px;
+  margin-left: 60px;
+}
+
+.btn:hover {
+  background-color: rgb(126, 126, 126) !important;
+  color: #fff;
+}
 
 /* classes used in researcher login */
 .login-container {
@@ -357,7 +381,7 @@ footer ul li ul li{
   margin: 20px auto;
   border-radius: 5px;
   border: 0;
-  background-color: #ff5733;
+  background-color: #e0ac1c;
   color: #fff;
   cursor: pointer;
   }
@@ -368,7 +392,7 @@ footer ul li ul li{
 }  
 
 input[type="submit"]:hover {
-  background-color: #333;
+  background-color: rgb(100, 100, 100);
  }
 
 /* STYLING FOR all_rooms.html */
@@ -511,6 +535,8 @@ html{
 
 body{
 	font:16px/1.6 Arial,  sans-serif;
+  background: #323232 !important;
+  color: white !important;
 }
 
 @media (max-height:800px){
@@ -518,7 +544,7 @@ body{
 }
 
 .footer-distributed{
-	background-color: #2c292f;
+	background-color: #1e1e1e;
 	box-sizing: border-box;
 	/* width: 100%; */
 	text-align: left;
@@ -676,4 +702,3 @@ body{
 	}
 }
 /* END OF FOOTER STYLE */
-
