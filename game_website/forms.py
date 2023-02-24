@@ -14,6 +14,7 @@ class GameConditions(forms.ModelForm):
         model = Condition
         fields = ('game_type','active')
 
+
     """"
     This is in case we want another model so that researchers can create
     their own game types (instead of us having to create and add them)
@@ -22,4 +23,4 @@ class GameConditions(forms.ModelForm):
         self.fields['game_type'].queryset = GameType.objects.all()"""
 
 class ChooseGame(forms.Form):
-    game_choice = forms.ChoiceField(choices = GAME_CHOICES)      
+    game_choice = forms.ChoiceField(choices = GAME_CHOICES)
