@@ -3,23 +3,27 @@
 {% block title %}GameLogic{% endblock %}
 {% block content %}
 <img id="dummy" hidden src="{% static 'images/logo.png' %}">
+<img id="dummy2" hidden src="{% static 'images/player.png' %}">
 <div class="game">
     
 </div>
 
 <script>
   
-  SpawnMap( 20 )
+  InitializeGame()
+
   function intersect( r1, r2 ) {
     if( r1.left < r2.left + r2.width && r1.left + r1.width > r2.left &&
      r1.top < r2.top + r2.height && r1.top + r1.height > r2.top ) return true
      return false
   }
  
+  // Some of it will be moved to the server side
   function SpawnMap( rectNumber ) {
+    
     if( rectNumber > 1000 ) rectNumber = 1000 
 
-    var gameWindow = document.getElementsByClassName( "game" );
+    var gameWindow = document.getElementsByClassName( "game" )
     var rects = []
     var failCounter = 0
 
@@ -42,7 +46,7 @@
       }
     }
 
-    let dummmy = document.getElementById( "dummy" );
+    let dummmy = document.getElementById( "dummy" )
     for( let i = 0; i < rectNumber; i++ ) {
       let img = document.createElement( 'img' )
       img.src = dummy.src
@@ -51,8 +55,76 @@
       img.style.left = rects[i].left + "px"
       img.style.width = rects[i].width + "px"
       img.style.height = rects[i].height + "px"
-      img.style.zIndex = -1
+      //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
+    }
+
+    return rects
+  }
+
+  // Some of it will be moved to the server side
+  function SpawnPlayer () {
+
+    var gameWindow = document.getElementsByClassName( "game" )
+
+    let img = document.createElement( 'img' )
+    img.src = dummy2.src
+    img.style.position = "absolute"
+    img.style.top = "0px"
+    img.style.left = "0px"
+    img.style.width = "32px"
+    img.style.height = "32px"
+    img.id = "player"
+    img.style.zIndex = 99
+    gameWindow[0].appendChild( img )
+
+    return {
+      "img": img
+    }
+  }
+
+  // Just for showcase, later send a message via WS with "left" or "right" etc.
+  function MoveLeft( amount ) {
+    console.log("Move left")
+    let player = document.getElementById( "player" )
+    player.style.left = parseInt( player.style.left, 10 ) - amount + "px";
+  }
+
+  function MoveRight( amount ) {
+    let player = document.getElementById( "player" )
+    player.style.left = parseInt( player.style.left, 10 ) + amount + "px";
+  }
+
+  function MoveUp( amount ) {
+    let player = document.getElementById( "player" )
+    player.style.top = parseInt( player.style.top, 10 ) - amount + "px";
+  }
+
+  function MoveDown( amount ) {
+    let player = document.getElementById( "player" )
+    player.style.top = parseInt( player.style.top, 10 ) + amount + "px";
+  }
+  
+
+  function InitializeGame() {
+
+    SpawnPlayer()
+    let rects = SpawnMap( 20 )
+    let speed = 10
+
+    document.addEventListener('keydown', function( event ) {
+      if( event.keyCode == 37 ) MoveLeft( speed )
+      else if( event.keyCode == 39 ) MoveRight( speed )
+      else if( event.keyCode == 38 ) MoveUp( speed )
+      else if( event.keyCode == 40 ) MoveDown( speed )
+
+      if( [ "Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight" ].indexOf( event.code ) > -1) {
+        event.preventDefault();
+      }
+    } );
+
+    return {
+      "rects": rects,
     }
   }
 

@@ -84,6 +84,13 @@ DATABASES = {
     'default': dj_database_url.config(default='postgres://map_game_8ppr_user:zyfLnjTnrYCEHdVRldRs6pfkfWbqqmz8@dpg-cfr01shmbjsgn6t1dp3g-a.frankfurt-postgres.render.com/map_game_8ppr')
 }
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': 'mydatabase', # This is where you put the name of the db file. 
+#                 # If one doesn't exist, it will be created at migration time.
+#    }
+#}
 
 
 # Password validation
