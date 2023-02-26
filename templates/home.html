@@ -1,48 +1,52 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Home{% endblock %}
+
 {% block content %}
 
-{# About the map game (brief description) #}
-<div class="container.edit">
-  <h1 class="heading-edit">About the Map Game</h1>
-  {# wall of text is uninituitive, possibly split it into "rules" list #}
-    <p class="paragraph-edit">
-      {% comment %} Two players are paired together with identical maps while one player’s acts as the instruction giver and is given map has a randomly path 
-      on it and the other player's does not. From there the first player must communicate to the other player the path that 
-      they can see. The second player must try to draw the map on the map provided to them. Once the player's both decided they are finished they choose to complete
-      the game, the map with the correct path is shown along with the map that the instruction taker drew. Conversely one of the two players may give up, in which case the
-      the map from both players are shown also.
-     {% endcomment %}
-      
-      Team up with a partner and communicate to traverse the map!<br>
-      
-      Giver role:
-      You're the Giver and only you can see the path. message your partner to help them reach the end<br>
-      
-      Follower role:
-      You're the Follower, your partner can see the path you need to take. Speak to them to try and reach the end!
-    </p>
-</div>
-{# button to go choose and go to game roomss #}
-<div>  
-  <form method="POST">
-    {% csrf_token %}
-    {{ chooseGame.as_p }}
-    <input type="submit" value="Play Game"/>
-</form>
-</div>
-{# photos of example maps from different players perspectives #}
-<div class = "flex-container">
-  <div class = "flex-container-child flex-photo">
-    <p>(Brief explanation of what the givers role is)</p>
-    <img src="#" alt="Map from the instruction giver's point of view">
+<style>
+  .card {
+    margin-left: 100px !important;
+  }
+
+  .text-center {
+    margin-left: 90px !important;
+  }
+</style>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <h1 class="mb-4">About the Map Game</h1>
+      <p class="lead mb-5">Team up with a partner and communicate to traverse the map! You'll either take on the role of the Giver or the Follower. The Giver can see the path and must message their partner to help them reach the end. The Follower can only see the map and must speak to their partner to try and reach the end.</p>
+      <form method="POST">
+        {% csrf_token %}
+        {{ chooseGame.as_p }}
+        <button class="btn btn-primary" type="submit">Play Game</button>
+      </form>
+    </div>
+    <div class="col-md-6 ml-auto">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <img src="{% static 'img/map-giver.png' %}" class="card-img-top" alt="Map from the instruction giver's point of view" style="height: 125px; width: 200px;">
+          </div>
+          <div class="text-center">
+            <h5 class="card-title">As the Giver</h5>
+            <p class="card-text">You can see the path and must message your partner to help them reach the end.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card mb-4">
+            <img src="{% static 'img/map-follower.png' %}" class="card-img-top" alt="Map from the instruction follower's point of view" style="height: 125px; width: 200px;">
+          </div>
+          <div class="text-center">
+            <h5 class="card-title">As the Follower</h5>
+            <p class="card-text">You can only see the map and must speak to your partner to try and reach the end.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-  <div class="flex-container-child-2 flex-photo-2">
-    <img src="#" alt="Map from the instruction follower's point of view">
-    <p>(Brief explanation of what the followers role is)</p>
-  </div>
-
-
 {% endblock %}
