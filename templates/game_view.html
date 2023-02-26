@@ -14,6 +14,15 @@
     <br>It is recommended to explain each others maps at the start, and then go on from there, the Giver must pay attention to detail in order to guide the follower as much as they can.
   </p>
 </div>
+<div>
+  your role is:
+  {{player.role}}
+  {% if player.role == "follower"%}
+    you will receive instructions, etc.
+  {% else %}
+    you will give instructions to the follower, etc.
+  {% endif %}
+</div>
 {# Game map and chat #}
 <div class="row">
     <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
@@ -59,7 +68,7 @@
     // needs to be a wss connection to work over https
     "ws://"
     + window.location.host
-    + '/ws/game_view/'
+    + '/ws/all_rooms/game_view/'
     + roomName
     + '/'
   );
