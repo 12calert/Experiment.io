@@ -58,3 +58,17 @@ class Game(models.Model):
         choices=GAME_TYPE_CHOICES,
         default=MAPGAME,
     )
+
+class Player(models.Model):
+    FOLLOWER = "follower"
+    GIVER = "giver"
+    ROLE_CHOICES = [
+        (FOLLOWER, "Follower"),
+        (GIVER, "Giver")
+    ]
+    role = models.CharField(
+        max_length=8,
+        choices=ROLE_CHOICES
+    )
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null = False)
+    user_session = models.CharField(max_length = 10, null = False)

@@ -34,6 +34,7 @@
             <form action="actionUrl" method="POST">
                 {% csrf_token %}  
                 {% comment %} csrf token for security reasons {% endcomment %}
+                {# there is no form in forms.py or in the context, fix this #}
                 {{ form.as_p }}
                 <button class="button button3" type="submit" name="Public">Create a public room</button>
             </form>
@@ -43,6 +44,7 @@
             <form action="actionUrl" method="POST">
                 {% csrf_token %}  
                 {% comment %} csrf token for security reasons {% endcomment %}
+                {# there is no form in forms.py or in the context, fix this #}
                 {{ form.as_p }}
                 <button class="button button3" type="submit" name="Private">Create a private room</button>
             </form>
@@ -50,14 +52,15 @@
 
         <div class="col-sm-4">
         {% if rooms %}
-            <form name="">
-                <select class="button button3" name="select" onchange="goto(this.form)">
+            <form action = "joinRoom" method = "POST" name="">
+                {% csrf_token %}
+                <select class="button button3" name="room" onchange="this.form.submit()">
                     <option selected disabled value="">Join a public room</option>
                         {% for room in rooms%}
                         {% comment %} show only public rooms {% endcomment %}
                             {% if room.public_yes_or_no %}
                             
-                                <option value="game_view/{{ room.room_name }}/" class="room-link"> Room number: {{ forloop.counter  }}  
+                                <option value="{{ room.room_name }}" class="room-link"> Room number: {{ forloop.counter  }}  
                             
                             {% endif %}
                            
