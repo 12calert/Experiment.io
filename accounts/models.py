@@ -22,12 +22,19 @@ class Chat(models.Model):
     chat_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
     content = models.TextField(default="") # {"0": {"origin": leader/follower, "msg": msg, "timestamp": date}}
 
+class Experiment(models.Model):
+    experiment_id = models.UUIDField(default = uuid.uuid4, primary_key = True)
+    name = models.TextField(null = False)
+    created_by = models.ForeignKey(Researcher, on_delete = models.DO_NOTHING, null = False)
+
 class Condition(models.Model):
     condition_id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     amount_item = models.IntegerField()
     restriction = models.TextField(null=True)
     active = models.BooleanField(default = True)
     created_by = models.ForeignKey(Researcher, on_delete=models.DO_NOTHING, null=False)
+    name = models.TextField(default = "name not set", null = False)
+    experiment = models.ForeignKey(Experiment, on_delete = models.DO_NOTHING, null = True)
     MAPGAME = "MG"
     GAME_TYPE_CHOICES = [
         (MAPGAME, 'Map Game'),

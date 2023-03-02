@@ -26,6 +26,24 @@
 page so researchers can set conditions
 {% endcomment %}
 
+{% if experiments %}
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for experiment in experiments %}
+        <tr> 
+            <td>{{ experiment.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+<!--
+
 {% if conditions %}
 
 <table>
@@ -49,15 +67,22 @@ page so researchers can set conditions
     </tbody>
 </table>
 {% endif %}
+-->
+
 {% comment %}
 make it apparent that this is to create a condition you can even keep this hidden and
 use a button to show this after the researcher decides to create one
 {% endcomment %}
-
+<form method = "POST">
+    {% csrf_token %}
+    {{ create_experiment.as_p }}
+    <input type = "submit" value = "create experiment" name="create_experiment"/>
+</form>
+<br><br>
 <form method="POST">
     {% csrf_token %}
-    {{ create.as_p }}
-    <input type="submit" value="create"/>
+    {{ create_condition.as_p }}
+    <input type="submit" value="create condition" name = "create_condition"/>
 </form>
 
 {# perhaps functionality to delete/suspend conditions #}

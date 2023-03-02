@@ -1,8 +1,21 @@
 from django import forms
-from accounts.models import Condition
+from accounts.models import Condition, Experiment
 
 # bad but we can make a model to store each game later
 GAME_CHOICES = [("MG", "Map Game")]
+
+class ExperimentForm(forms.Form):
+    experiment_name = forms.CharField(
+        max_length = 50,
+        required = True,
+        widget = forms.TextInput(
+        attrs = {
+        'class': 'form-control',
+        'placeholder': 'Enter a name for the experiment',
+        'style': 'width 500px; margin: auto;'
+        }
+        )
+    )
 
 class GameConditions(forms.ModelForm):
     amount_of_items = forms.IntegerField(
@@ -25,10 +38,22 @@ class GameConditions(forms.ModelForm):
             }
         )
     )
+    condition_name = forms.CharField(
+        max_length = 50,
+        required = True,
+        widget = forms.TextInput(
+        attrs = {
+        'class': 'form-control',
+        'placeholder': 'Enter a name for the condition',
+        'style': 'width 500px; margin: auto;'
+        }
+        )
+    )
 
     class Meta:
         model = Condition
-        fields = ('game_type', 'active')
+        # need to change experiment widget styles
+        fields = ('game_type', 'active','experiment')
         widgets = {
             'game_type': forms.Select(
                 attrs={

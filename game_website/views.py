@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat, Researcher, Condition, Player
+from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
 
 import secrets
-from .forms import GameConditions, ChooseGame
+from .forms import GameConditions, ChooseGame, ExperimentForm
 from random import choice
 
 ROLE_CHOICES = ["follower", "giver"]
@@ -113,18 +113,27 @@ def gamelogic(request):
 def conditions(request):
     #filter by the researcher's ID
     context = {}
-    create = GameConditions(request.POST or None)
-    context['create'] = create
+    create_condition = GameConditions(request.POST or None)
+    create_experiment = ExperimentForm(request.POST or None)
+    context['create_experiment'] = create_experiment
+    context['create_condition'] = create_condition
 
-    current_researcher = Researcher.objects.filter(user=request.user).first()
+
+    current_researcher = Researcher.objects.get(user=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
-
+    context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
     if request.POST:
-        if create.is_valid():
-            Condition.objects.create(amount_item = create.cleaned_data.get("amount_of_items"),
-                                    restriction = create.cleaned_data.get("restriction"),
-                                    active = create.cleaned_data.get("active"),
-                                    game_type = create.cleaned_data.get("game_type"),
-                                    created_by = current_researcher)
-            
+        if "create_condition" in request.POST and create_condition.is_valid():
+            Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
+                                    restriction = create_condition.cleaned_data.get("restriction"),
+                                    active = create_condition.cleaned_data.get("active"),
+                                    game_type = create_condition.cleaned_data.get("game_type"),
+                                    created_by = current_researcher,
+                                    name = create_condition.cleaned_data.get("condition_name"),
+                                    experiment = create_condition.cleaned_data.get("experiment"))
+        elif "create_experiment" in request.POST and not create_condition.is_valid() and create_experiment.is_valid():
+            #do stuff from the experiment form
+            Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                      created_by = current_researcher)
+
     return render(request, 'conditions.html', context)
