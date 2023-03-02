@@ -79,10 +79,13 @@ WSGI_APPLICATION = 'game_website.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
+#getting errors so changed this for now
+DATABASES ={}
+"""DATABASES = {
 
     'default': dj_database_url.config(default='postgres://map_game_898y_user:PRnhM14xT9oTFNiW4I2p1cfaSB5ajxjj@dpg-cfr4u2un6mpirvus1vt0-a.frankfurt-postgres.render.com/map_game_898y')
-}
+}"""
+DATABASES['default'] = dj_database_url.parse('postgres://map_game_898y_user:PRnhM14xT9oTFNiW4I2p1cfaSB5ajxjj@dpg-cfr4u2un6mpirvus1vt0-a.frankfurt-postgres.render.com/map_game_898y', conn_max_age=600)
 
 
 

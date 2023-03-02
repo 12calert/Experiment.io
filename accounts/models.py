@@ -26,6 +26,9 @@ class Experiment(models.Model):
     experiment_id = models.UUIDField(default = uuid.uuid4, primary_key = True)
     name = models.TextField(null = False)
     created_by = models.ForeignKey(Researcher, on_delete = models.DO_NOTHING, null = False)
+    active = models.BooleanField(default = True)
+    def __str__(self):
+        return self.name
 
 class Condition(models.Model):
     condition_id = models.UUIDField(default=uuid.uuid4, primary_key=True)
@@ -45,6 +48,8 @@ class Condition(models.Model):
         choices=GAME_TYPE_CHOICES,
         default=MAPGAME,
     )
+    def __str__(self):
+        return self.name
 
 class Game(models.Model):
     game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE, default = uuid.uuid4) # PK/FK

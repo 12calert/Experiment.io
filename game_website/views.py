@@ -122,6 +122,8 @@ def conditions(request):
     current_researcher = Researcher.objects.get(user=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
+
+    """ move to different views
     if request.POST:
         if "create_condition" in request.POST and create_condition.is_valid():
             Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
@@ -135,5 +137,28 @@ def conditions(request):
             #do stuff from the experiment form
             Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
                                       created_by = current_researcher)
+    """
 
     return render(request, 'conditions.html', context)
+
+def createExperiment(request):
+    create_experiment = ExperimentForm(request.POST or None)
+    if request.POST and create_experiment.is_valid():
+        #do stuff from the experiment form
+        current_researcher = Researcher.objects.get(user=request.user)
+        Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                created_by = current_researcher)
+    return redirect('game_conditions')
+
+def createCondition(request):
+    create_condition = GameConditions(request.POST or None)
+    if request.POST and create_condition.is_valid():
+        current_researcher = Researcher.objects.get(user=request.user)
+        Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
+                                restriction = create_condition.cleaned_data.get("restriction"),
+                                active = create_condition.cleaned_data.get("active"),
+                                game_type = create_condition.cleaned_data.get("game_type"),
+                                created_by = current_researcher,
+                                name = create_condition.cleaned_data.get("condition_name"),
+                                experiment = create_condition.cleaned_data.get("experiment"))
+    return redirect('game_conditions')

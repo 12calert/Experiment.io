@@ -9,11 +9,20 @@ class ExperimentForm(forms.Form):
         max_length = 50,
         required = True,
         widget = forms.TextInput(
-        attrs = {
-        'class': 'form-control',
-        'placeholder': 'Enter a name for the experiment',
-        'style': 'width 500px; margin: auto;'
-        }
+            attrs = {
+            'class': 'form-control',
+            'placeholder': 'Enter a name for the experiment',
+            'style': 'width 500px; margin: auto;'
+            }
+        )
+    )
+    active = forms.BooleanField(
+        required = True,
+        widget = forms.CheckboxInput(
+            attrs={
+                'class': 'form-check-input',
+                'id': 'active'
+            }
         )
     )
 
