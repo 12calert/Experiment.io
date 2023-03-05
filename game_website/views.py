@@ -54,22 +54,22 @@ def create_room(request, game):
     if condition:
         # if the user selects a Public room:
         if 'Public' in request.POST:
-            chat = Chat.objects.create()
-            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), 
-            game_id = chat, public_yes_or_no=True,
+            #chat = Chat.objects.create()
+            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public_yes_or_no=True,
             game_type=game, has_condition = condition)
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
 
             return redirect('game_view',  game = game, room_name = new_room.room_name)
     # if the user selects a Private room:
         elif 'Private' in request.POST:
-            chat = Chat.objects.create()
-            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), game_id = chat, public_yes_or_no=False, 
+            #chat = Chat.objects.create()
+            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public_yes_or_no=False, 
                                    game_type=game, has_condition = condition)
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
             return redirect('game_view', game = game, room_name = new_room.room_name)
     else:
         print("A condition is not specified")
+        # do stuff, let user know there was error
         return redirect("home")
 
 def joinRoom(request, game):
@@ -83,10 +83,6 @@ def joinRoom(request, game):
         Player.objects.create(role = choice(new_roles), game = foundGame, user_session = request.session.get("user_id"))
 
         return redirect('game_view', game = game, room_name = foundGame.room_name)
-
-    
-
-
 
 def researcher_registration(request):
     if request.method == 'POST':
@@ -122,22 +118,6 @@ def conditions(request):
     current_researcher = Researcher.objects.get(user=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
-
-    """ move to different views
-    if request.POST:
-        if "create_condition" in request.POST and create_condition.is_valid():
-            Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
-                                    restriction = create_condition.cleaned_data.get("restriction"),
-                                    active = create_condition.cleaned_data.get("active"),
-                                    game_type = create_condition.cleaned_data.get("game_type"),
-                                    created_by = current_researcher,
-                                    name = create_condition.cleaned_data.get("condition_name"),
-                                    experiment = create_condition.cleaned_data.get("experiment"))
-        elif "create_experiment" in request.POST and not create_condition.is_valid() and create_experiment.is_valid():
-            #do stuff from the experiment form
-            Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
-                                      created_by = current_researcher)
-    """
 
     return render(request, 'conditions.html', context)
 
