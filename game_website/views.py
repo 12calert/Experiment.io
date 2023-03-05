@@ -78,6 +78,15 @@ def joinRoom(request, game):
         room_name = request.POST['room']
         foundGame = Game.objects.get(room_name = room_name)
         # find what role the player already assigned is
+        num_players = Player.objects.filter(game=foundGame).count()
+        # if there are more than 2 users in the same game, then reload the page.
+        if (num_players >= 2):
+            # rooms with one player waiting for another
+            rooms = Game.objects.filter(users=1, game_type=game)
+            # return response
+            return render(request, 'all_rooms.html', {'rooms':rooms})
+            
+            
         assignedRole = Player.objects.get(game = foundGame).role
         new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
         Player.objects.create(role = choice(new_roles), game = foundGame, user_session = request.session.get("user_id"))
