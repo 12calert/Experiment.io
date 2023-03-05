@@ -41,9 +41,10 @@ page so researchers can set conditions
 					<td>{{ experiment.name }}</td>
 					<td>{{ experiment.active }}</td>
 
-					{# I would strongly suggest adding some logic which will hide the conditions until the user requests to see them #}
-					{# need some logic to hide the headers if there are no conditions for each experiment 
-						probably something like: loop through, check if experiment exists, possibly using javascript#}
+					{% comment %} I would strongly suggest adding some logic which will hide the conditions until the user requests to see them 
+						need some logic to hide the headers if there are no conditions for each experiment 
+						probably something like: loop through, check if experiment exists, possibly using javascript
+					{% endcomment %}
 					{% if conditions %}
 						<td>    
 							<table>

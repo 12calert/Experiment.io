@@ -2,19 +2,10 @@
 {% load static %}
 {% block title %}Game View{% endblock %}
 {% block content %}
-<style>
-.giver-message   {
-  font-weight: bold;
-  color: #fff;
-  background-color: #0084ff;
-  border-radius: 10px;
-  padding: 8px;
-  margin-bottom: 10px;
-  max-width: 100%;
-  display: block;
-}
 
-.follower-message {
+{# move this into css file or create a new css file for this page #}
+<style>
+.message   {
   font-weight: bold;
   color: #fff;
   background-color: #0084ff;
@@ -75,7 +66,6 @@
 {# Collapsible "view information" Javascript function #}
 <script>
   // read the player's role from the Django template 
-  const playerRole = "{{ player.role }}";
   var coll = document.getElementsByClassName("collapsible");
   var i;
     
@@ -109,25 +99,16 @@
   ---         can be changed later     ---*/
   chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    console.log('message received');
-    const message = data.message;
     
     // Get the current time
     const time = new Date();
     const hours = time.getHours().toString().padStart(2, '0');
     const minutes = time.getMinutes().toString().padStart(2, '0');
     const formattedTime = hours + ':' + minutes;    
-    document.querySelector('#chat-log').value += (data.message + '\n');
+    // document.querySelector('#chat-log').value += (playerRole + ": " + data.message + '\n'); -> since we are no longer using a textarea this is not needed
 
-    /* add the appropriate CSS class based on the player's role */
-    if (playerRole === 'giver')
-    {
-      document.getElementById('chat-log').innerHTML += "<span class='giver-message'>" + playerRole+ message +" (" + formattedTime + ")"+"<br></span>";
-    } 
-    else 
-    {
-      document.getElementById('chat-log').innerHTML += "<span class='follower-message'>" +playerRole+ message+" (" + formattedTime + ")" +"<br></span>";
-    }
+    document.getElementById('chat-log').innerHTML += "<span class='message'>" + data.role +": "+ data.message + " (" + formattedTime + ")"+"<br></span>";
+
   };
  
   /* do something when the chat socket is closed */
@@ -146,6 +127,7 @@
   /* submitting messages sends messages via web socket*/
   document.querySelector('#chat-message-submit').onclick = function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
+    const playerRole = "{{player.role}}";
     const message = messageInputDom.value;
     /* modify the message object to include the player's role */
     chatSocket.send(JSON.stringify({
