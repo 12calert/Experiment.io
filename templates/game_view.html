@@ -107,7 +107,7 @@
     const formattedTime = hours + ':' + minutes;    
     // document.querySelector('#chat-log').value += (playerRole + ": " + data.message + '\n'); -> since we are no longer using a textarea this is not needed
 
-    document.getElementById('chat-log').innerHTML += "<span class='message'>" + data.role +": "+ data.message + " (" + formattedTime + ")"+"<br></span>";
+    document.getElementById('chat-log').innerHTML += "<span class='message'>" + data.role +": "+ data.message +"<br></span>";
 
   };
  

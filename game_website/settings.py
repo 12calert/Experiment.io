@@ -85,7 +85,7 @@ DATABASES ={}
 
     'default': dj_database_url.config(default='postgres://map_game_898y_user:PRnhM14xT9oTFNiW4I2p1cfaSB5ajxjj@dpg-cfr4u2un6mpirvus1vt0-a.frankfurt-postgres.render.com/map_game_898y')
 }"""
-DATABASES['default'] = dj_database_url.parse('postgres://map_game_898y_user:PRnhM14xT9oTFNiW4I2p1cfaSB5ajxjj@dpg-cfr4u2un6mpirvus1vt0-a.frankfurt-postgres.render.com/map_game_898y', conn_max_age=600)
+DATABASES['default'] = dj_database_url.parse('postgres://map_game_us3g_user:v2eGa2v12vF9LAcGR1zdNXgBnOwC8iR2@dpg-cg2ep682qv24hdl42pb0-a.frankfurt-postgres.render.com/map_game_us3g', conn_max_age=600)
 
 
 

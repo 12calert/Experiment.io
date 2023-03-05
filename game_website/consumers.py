@@ -2,7 +2,7 @@
 import json
 
 from asgiref.sync import sync_to_async
-from accounts.models import Game
+from accounts.models import Game, Chat
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -38,6 +38,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event["message"]
         role = event["role"]
+        # after sending a message create entry in DB and connect it to the specific game
+        await Chat.objects.acreate(game = self.room, content = message, role = role)
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message, "role": role}))

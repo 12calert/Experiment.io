@@ -55,6 +55,7 @@ page so researchers can set conditions
 										<th>Amount of Items</th>
 										<th>Special Restrictions</th>
 										<th>Game Type</th>
+										<th>Active</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -66,6 +67,7 @@ page so researchers can set conditions
 												<td>{{ condition.amount_item }}</td>
 												<td>{{ condition.restriction }}</td>
 												<td>{{ condition.game_type }}</td>
+												<td>{{ condition.active}} </td>
 											</tr>
 										{% endif %}
 									{% endfor %}

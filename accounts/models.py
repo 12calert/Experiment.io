@@ -17,10 +17,6 @@ class Researcher(models.Model):
     password = models.TextField()
     approved = models.BooleanField(default=False)
 
-class Chat(models.Model):
-    game_id = models.UUIDField(default=uuid.uuid4) # FK
-    chat_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
-    content = models.TextField(default="") # {"0": {"origin": leader/follower, "msg": msg, "timestamp": date}}
 
 class Experiment(models.Model):
     experiment_id = models.UUIDField(default = uuid.uuid4, primary_key = True)
@@ -52,7 +48,8 @@ class Condition(models.Model):
         return self.name
 
 class Game(models.Model):
-    game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE, default = uuid.uuid4) # PK/FK
+    #game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE, default = uuid.uuid4) # PK/FK
+    game = models.UUIDField(default=uuid.uuid4, primary_key=True)
     final_map = models.TextField(default="")
     completed = models.BooleanField(default=False)
     room_name = models.TextField(default = "")
@@ -70,6 +67,13 @@ class Game(models.Model):
         choices=GAME_TYPE_CHOICES,
         default=MAPGAME,
     )
+
+class Chat(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.DO_NOTHING, null = False)
+    chat_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
+    content = models.TextField(default="") # {"0": {"origin": leader/follower, "msg": msg, "timestamp": date}}
+    role = models.TextField(default="")
+    created = models.DateTimeField(auto_now_add=True, editable=False)
 
 class Player(models.Model):
     FOLLOWER = "follower"
