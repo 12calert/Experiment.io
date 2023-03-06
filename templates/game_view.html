@@ -73,8 +73,8 @@
 
 {# Buttons #}
 <div class="col-sm-8">
-  <button class="button button1">Complete</button>
-  <button class="button button2">Give up</button>
+  <button class="button button1" onclick="complete()">Complete</button>
+  <button class="button button2" onclick="giveUp()">Give up</button>
 </div>
 
 {# Collapsible "view information" Javascript function #}
@@ -111,16 +111,47 @@
     + '/'
   );
 
+  function complete(){
+    // do stuff when game complete:
+    // save DB, close room, other stuff, redirect both players
+    chatSocket.send(JSON.stringify({
+        'message': null,
+        'role': null,
+        'finished' : true
+    }));
+
+    /* ajax to redirect to view to update game as complete */
+    
+    window.location.replace("/home");
+  }
+  function giveUp(){
+    // do stuff when giving up:
+    // save DB, close room, other stuff. redirect both players
+    chatSocket.send(JSON.stringify({
+        'message': null,
+        'role': null,
+        'finished' : true
+    }));
+    
+    /* ajax to redirect to view to update game as complete */
+
+    window.location.replace("/home");
+  }
   /* after every message, log it in a JSON chat log 
   ---         can be changed later     ---*/
   chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    
+    // do some more stuff when game finished
+    // both see a finished map, either as popup or redirect to new page
+    if (data.finished == true){
+      window.location.replace("/home");
+      return;
+    }
     // Get the current time
     const time = new Date();
     const hours = time.getHours().toString().padStart(2, '0');
     const minutes = time.getMinutes().toString().padStart(2, '0');
-    const formattedTime = hours + ':' + minutes;    
+    const formattedTime = hours + ':' + minutes;
 
     // Check if message was sent by current player or other player
     if (data.role === playerRole) {
@@ -134,9 +165,9 @@
  
   /* do something when the chat socket is closed */
   chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
+    console.log('Socket closed unexpectedly');
   };
-
+  
   /* allows for submitting messages via pressing enter*/
   document.querySelector('#chat-message-input').focus();
   document.querySelector('#chat-message-input').onkeyup = function(e) {
@@ -153,7 +184,8 @@
     /* modify the message object to include the player's role */
     chatSocket.send(JSON.stringify({
         'message': message,
-        'role': playerRole
+        'role': playerRole,
+        'finished' : false
     }));
     messageInputDom.value = '';
   };

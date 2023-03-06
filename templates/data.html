@@ -7,4 +7,143 @@
 page so researchers can view data on games
 {% endcomment %}
 
+<div><p>click an experiment to see further information</p></div>
+
+<!--
+    possibly some ajax for responsiveness idk
+{% if experiments %}
+<form method = "GET" action="viewExperiment">
+    {% csrf_token %}
+    <input type = "submit" value = "{{ experiment }}" name="view_experiment"/>
+</form>
+{% endif %}
+-->
+
+{% if experiments %}
+	<table>
+		<thead>
+			<tr>
+				<th>Experiment Name</th>
+				<th>Active</th>
+				<th>Conditions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for experiment in experiments %}
+				<tr> 
+					<td>{{ experiment.name }}</td>
+					<td>{{ experiment.active }}</td>
+
+					{% comment %} I would strongly suggest adding some logic which will hide the conditions until the user requests to see them 
+						need some logic to hide the headers if there are no conditions for each experiment 
+						probably something like: loop through, check if experiment exists, possibly using javascript
+					{% endcomment %}
+					{% if conditions %}
+						<td>    
+							<table>
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Condition ID</th>
+										<th>Amount of Items</th>
+										<th>Special Restrictions</th>
+										<th>Game Type</th>
+										<th>Active</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for condition in conditions %}
+										{% if condition.experiment == experiment %}
+											<tr> 
+												<td>{{ condition.name }}</td>
+												<td>{{ condition.condition_id }}</td>
+												<td>{{ condition.amount_item }}</td>
+												<td>{{ condition.restriction }}</td>
+												<td>{{ condition.game_type }}</td>
+												<td>{{ condition.active}} </td>
+											</tr>
+										{% endif %}
+									{% endfor %}
+								</tbody>
+							</table>
+						</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+
+    {% if games %}
+    <table>
+		<thead>
+			<tr>
+				<th>Game ID</th>
+				<th>Completed</th>
+				<th>Game Type</th>
+                <th>Chat Log</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for game in games %}
+				<tr> 
+					<td>{{ game.game }}</td>
+					<td>{{ game.completed }}</td>
+                    <td>{{ game.game_type }}</td>
+
+					{% if chats %}
+						<td>    
+							<table>
+								<thead>
+									<tr>
+										<th>Message</th>
+										<th>Role</th>
+										<th>Created</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for chat in chats %}
+										{% if chat.game == game %}
+											<tr> 
+												<td>{{ chat.content }}</td>
+												<td>{{ chat.role }}</td>
+												<td>{{ chat.created }}</td>
+											</tr>
+										{% endif %}
+									{% endfor %}
+								</tbody>
+							</table>
+						</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+    {% endif %}
+    {% comment %}
+
+	{% if conditions %}
+
+	<table>
+		<thead>
+			<tr>
+				<th>Condition ID</th>
+				<th>Amount of Items</th>
+				<th>Special Restrictions</th>
+				<th>Game Type</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for condition in conditions %}
+			<tr> 
+				<td>{{ condition.condition_id }}</td>
+				<td>{{ condition.amount_item }}</td>
+				<td>{{ condition.restriction }}</td>
+				<td>{{ condition.game_type }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endif %}
+{% endcomment %}
 {% endblock %}
