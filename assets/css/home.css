@@ -219,7 +219,7 @@ footer ul li ul li{
 }
 
 #chat-message-input {
-  border: none;
+  border: solid;
   border-radius: 5px;
   margin-top: 10px;
   padding: 10px;

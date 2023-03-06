@@ -29,7 +29,8 @@
       <div class="row">
         <div class="col-md-6">
           <div class="card mb-4">
-            <img src="{% static 'img/map-giver.png' %}" class="card-img-top" alt="Map from the instruction giver's point of view" style="height: 125px; width: 200px;">
+            {% comment %} include another existing image when you have one, because otherwise testing fails {% endcomment %}
+            <img src="{% static 'images/logo.png' %}" class="card-img-top" alt="Map from the instruction giver's point of view" style="height: 125px; width: 200px;">
           </div>
           <div class="text-center">
             <h5 class="card-title">As the Giver</h5>
@@ -38,7 +39,8 @@
         </div>
         <div class="col-md-6">
           <div class="card mb-4">
-            <img src="{% static 'img/map-follower.png' %}" class="card-img-top" alt="Map from the instruction follower's point of view" style="height: 125px; width: 200px;">
+            {% comment %} include another existing image when you have one, because otherwise testing fails {% endcomment %}
+            <img src="{% static 'images/logo.png' %}" class="card-img-top" alt="Map from the instruction follower's point of view" style="height: 125px; width: 200px;">
           </div>
           <div class="text-center">
             <h5 class="card-title">As the Follower</h5>
