@@ -7,23 +7,12 @@
 IMPORTANT: Make this in forms.py and then link in to it!!
 -->
 <div class="login-container">
-<form action="" method="post">
+<h6 style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </h6>
+<form action="" method="POST" class="form-group">
   {% csrf_token %}  
   {% comment %} csrf token for security reasons {% endcomment %}
-  {{ form.as_p }}
-  <h6 style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </h6>
-  {% comment %} <div class="form-group">
-  <label for="title_registration">Select your title:</label>
-  <select required class="form-control" class="form-group" style="text-align: center" id="title_registration" name="title_registration" >
-    <option selected disabled value="">Choose here</option>
-    <option value="Mr">Mr</option>
-    <option value="Mrs">Mrs</option>
-    <option value="Miss">Miss</option>
-    <option value="Ms">Ms</option>
-    <option value="Dr">Dr</option>
-  </select> 
-</div>  {% endcomment %}
-  <div class="form-group">
+  {{ register.as_p }}
+  <!--<div class="form-group">
         <label for="name">Forename:</label>
         <input value="{{ current_name }}" type="forename_registration" class="form-control" id="name" name="name" required>
     </div>
@@ -42,7 +31,7 @@ IMPORTANT: Make this in forms.py and then link in to it!!
     <div class="form-group">
       <label for="password">Password:</label>
       <input value="{{ current_password}}" type="password_registration" class="form-control" id="password" name="password" required>
-    </div>
+    </div>-->
     <div class="form-group text-center">
       <input type="submit" value="Register" class="btn btn-primary">
     </div>

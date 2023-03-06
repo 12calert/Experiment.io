@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
+from accounts.models import Game, Researcher, Condition, Player, Experiment
 
 import secrets
-from .forms import GameConditions, ChooseGame, ExperimentForm
+from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
 
 ROLE_CHOICES = ["follower", "giver"]
@@ -45,7 +45,7 @@ def all_rooms(request, game):
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
 def create_room(request, game):
-    # create the room
+
     #choose a condition to apply to the game
     conditions = Condition.objects.filter(game_type = game)
     # some way to pick which condition randomly, or with some logic here:
@@ -93,20 +93,6 @@ def joinRoom(request, game):
 
         return redirect('game_view', game = game, room_name = foundGame.room_name)
 
-def researcher_registration(request):
-    if request.method == 'POST':
-        name = request.POST['name']
-        surname = request.POST['surname']
-        email = request.POST['email']
-        username = request.POST['username']
-        password = request.POST['password']
-        Researcher.objects.create(name=name, surname=surname, email = email, username = username, password=password)
-        return redirect("home")
-        
-        
-    context = { }
-    return render(request, 'researcher_registration.html', context)
-
 def data(request):
     context = {}
     return render(request, 'data.html', context=context)
@@ -151,3 +137,19 @@ def createCondition(request):
                                 name = create_condition.cleaned_data.get("condition_name"),
                                 experiment = create_condition.cleaned_data.get("experiment"))
     return redirect('game_conditions')
+
+def researcher_registration(request):
+    create_researcher_registration = ResearcherRegisterForm(request.POST or None)
+    context = {}
+    context["register"] = create_researcher_registration
+    if request.POST and create_researcher_registration.is_valid():
+        name = request.POST['name']
+        surname = request.POST['surname']
+        email = request.POST['email']
+        username = request.POST['username']
+        password = request.POST['password']
+        Researcher.objects.create(name=name, surname=surname, email = email, username = username, password=password)
+        return redirect("home")
+ 
+    return render(request, 'researcher_registration.html', context)
+
