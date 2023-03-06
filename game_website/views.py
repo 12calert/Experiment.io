@@ -36,8 +36,6 @@ def game_view(request, game, room_name):
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
                                               "game":game, "player":foundPlayer}) # dict to store room number
 
-
-
 def all_rooms(request, game):
     #rooms with one player waiting for another
     rooms = Game.objects.filter(users=1, game_type=game)
@@ -100,7 +98,12 @@ def researcher_registration(request):
 
 def data(request):
     context = {}
-    return render(request, 'data.html', context=context)
+    current_researcher = Researcher.objects.get(user=request.user)
+    context['conditions'] = Condition.objects.filter(created_by = current_researcher)
+    context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
+    context['games'] = Game.objects.all() # very bad change later only for prototype
+    context['chats'] = Chat.objects.all() # very bad change later only for prototype
+    return render(request, 'data.html', context)
    
 def gamelogic(request):
     context = { "rect_img": "{% static 'images/logo.png' %}" }

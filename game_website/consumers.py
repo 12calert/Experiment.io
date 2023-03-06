@@ -42,6 +42,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         finished = event["finished"]
         # after sending a message create entry in DB and connect it to the specific game
         if (not finished):
+            # NOTE: this creates two entries in the database since there are two websocket connections, this needs to be made using ajax in game_view.html
             await Chat.objects.acreate(game = self.room, content = message, role = role)
 
         # Send message to WebSocket
