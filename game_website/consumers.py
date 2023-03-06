@@ -30,16 +30,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         role = text_data_json["role"]
+        finished = text_data_json["finished"]
 
         # Send message to room group
-        await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": message, "role": role})
+        await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": message, "role": role, "finished":finished})
 
     # Receive message from room group
     async def chat_message(self, event):
         message = event["message"]
         role = event["role"]
+        finished = event["finished"]
         # after sending a message create entry in DB and connect it to the specific game
-        await Chat.objects.acreate(game = self.room, content = message, role = role)
+        if (not finished):
+            await Chat.objects.acreate(game = self.room, content = message, role = role)
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message, "role": role}))
+        await self.send(text_data=json.dumps({"message": message, "role": role, "finished":finished}))
