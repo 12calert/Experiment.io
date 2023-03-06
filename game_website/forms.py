@@ -3,6 +3,43 @@ from accounts.models import Condition, Experiment
 
 # bad but we can make a model to store each game later
 GAME_CHOICES = [("MG", "Map Game")]
+# class RegisterForm(forms.ModelForm):
+#     name = forms.CharField(max_length=100)
+#     surname = forms.CharField(max_length=100)
+#     email = forms.CharField(widget=forms.EmailInput())
+#     password = forms.CharField(widget=forms.PasswordInput())
+
+
+class ResearcherRegisterForm(forms.Form):
+    forename = forms.CharField(
+        max_length = 50,
+        required = True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})            
+    )
+    
+    surname = forms.CharField(
+        max_length = 50,
+        required = True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    username = forms.CharField(
+        max_length = 50,
+        required = True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})            
+    )
+    
+   
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        required = True
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        required = True
+    )
+
 
 class ExperimentForm(forms.Form):
     experiment_name = forms.CharField(

@@ -5,17 +5,30 @@
 
 {# move this into css file or create a new css file for this page #}
 <style>
-.message   {
-  font-weight: bold;
-  color: #fff;
-  background-color: #0084ff;
-  border-radius: 10px;
-  padding: 8px;
-  margin-bottom: 10px;
-  max-width: 100%;
-  display: block;
-}
-
+  .chat-sent {
+    color: black;
+    background-color: lightgrey;
+    border-radius: 10px;
+    padding: 8px;
+    margin-bottom: 10px;
+    margin-left: 50px;
+    align-self: flex-end;
+    display: block;
+    word-wrap: break-word; /* Add this line */
+  }
+  
+  .chat-received {
+    color: white;
+    display: block;
+    background-color: #3333ff;
+    border-radius: 10px;
+    padding: 8px;
+    margin-bottom: 10px;
+    margin-right:50px;
+    align-self: flex-start;
+    word-wrap: break-word; /* Add this line */
+  }
+  
 .chat-log {
   max-height: 600px;
   overflow-y: scroll;
@@ -23,6 +36,7 @@
   flex-direction: column;
   justify-content: flex-end;
 }
+
 </style>
 {# Collapsible "view information" #}
 <div>
@@ -49,9 +63,9 @@
     <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
         Photo of the Game map! (probably embeded)
     </div>
-    <div class="col-sm-4 chat"><div id="chat-log" cols="100" rows="20"></div><br>
-    <input id="chat-message-input" type="text" size="100"><br>
-    <input id="chat-message-submit" type="button" value="Send">
+    <div class="col-sm-4 chat"><div textarea id="chat-log" cols="100" rows="20"></div><br>
+    <input id="chat-message-input" placeholder="Type in here ... " type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send"> 
     
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}
@@ -65,6 +79,8 @@
 
 {# Collapsible "view information" Javascript function #}
 <script>
+  // read the player's role from the Django template 
+  var playerRole = "{{ player.role }}";
   // read the player's role from the Django template 
   var coll = document.getElementsByClassName("collapsible");
   var i;
@@ -135,9 +151,15 @@
     const time = new Date();
     const hours = time.getHours().toString().padStart(2, '0');
     const minutes = time.getMinutes().toString().padStart(2, '0');
-    const formattedTime = hours + ':' + minutes;    
-    // document.querySelector('#chat-log').value += (playerRole + ": " + data.message + '\n'); -> since we are no longer using a textarea this is not needed
-    document.getElementById('chat-log').innerHTML += "<span class='message'>" + data.role +": "+ data.message +"<br></span>";
+    const formattedTime = hours + ':' + minutes;
+
+    // Check if message was sent by current player or other player
+    if (data.role === playerRole) {
+      document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
+    } 
+    else {
+      document.getElementById('chat-log').innerHTML += "<span class='message chat-received'>" + data.role + ": " + data.message + "<br></span>";
+    }
 
   };
  
