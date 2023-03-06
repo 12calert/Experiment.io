@@ -143,12 +143,12 @@ def researcher_registration(request):
     context = {}
     context["register"] = create_researcher_registration
     if request.POST and create_researcher_registration.is_valid():
-        name = request.POST['name']
+        forename = request.POST['forename']
         surname = request.POST['surname']
         email = request.POST['email']
         username = request.POST['username']
         password = request.POST['password']
-        Researcher.objects.create(name=name, surname=surname, email = email, username = username, password=password)
+        Researcher.objects.create(forename=forename, surname=surname, email = email, username = username, password=password)
         return redirect("home")
  
     return render(request, 'researcher_registration.html', context)

@@ -11,7 +11,7 @@ GAME_CHOICES = [("MG", "Map Game")]
 
 
 class ResearcherRegisterForm(forms.Form):
-    name = forms.CharField(
+    forename = forms.CharField(
         max_length = 50,
         required = True,
         widget=forms.TextInput(attrs={'class': 'form-control'})            

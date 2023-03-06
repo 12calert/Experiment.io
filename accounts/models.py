@@ -10,7 +10,7 @@ class Researcher(models.Model):
     # userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK UNCOMMENT LATER, IT IS COMMENTED OUT ONLY INITALLY
     researcher_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
     
-    name = models.CharField(max_length=50, null = False)
+    forename = models.CharField(max_length=50, null = False)
     surname = models.CharField(max_length=50, null = False)
     email = models.EmailField(max_length = 254, null = False)
     username = models.TextField(null = False)
