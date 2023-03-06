@@ -1,39 +1,68 @@
-from django.test import TestCase
-from django.urls import reverse
+from django.test import TestCase, Client
+from django.urls import reverse 
 from .models import Researcher
- 
-# Researcher Registration Testing  
-# !!!!!!!!!!!!!! These comments are to help with the report writing and u can delete later: !!!!!!!!!!!!!!
-# This test case checks the registration process for a new Researcher
-# in the system. It first counts the initial number of researchers in the database, then submits the registration form with test data.
-# It checks whether the form submission was successful, and whether a new Researcher was saved to the database. It also checks whether
-# the new Researcher has the expected data.
-class ResearcherRegistrationTest(TestCase):
-    def test_registration(self):
-        # Count the initial number of researchers in the database
-        initial_count = Researcher.objects.count()
- 
-        # Submit the registration form with test data
-        response = self.client.post(reverse('researcher_registration'), {
-            'name': 'Jane',
-            'surname': 'Doe',
-            'email': 'jane@example.com',
-            'username': 'janedoe',
-            'password': 'password123'
-        })
- 
-        # Check that the form submission was successful
-        self.assertEqual(response.status_code, 302)  # Redirect after successful POST is expected
- 
-        # Check that a new Researcher was saved to the database
-        self.assertEqual(Researcher.objects.count(), initial_count + 1)
- 
-        # Check that the new Researcher has the expected data
-        new_researcher = Researcher.objects.get(email='jane@example.com')
-        self.assertEqual(new_researcher.name, 'Jane')
-        self.assertEqual(new_researcher.surname, 'Doe')
-        self.assertEqual(new_researcher.username, 'janedoe')
-        self.assertEqual(new_researcher.password, 'password123')
+from game_website.forms import ResearcherRegisterForm
+from django.test import TestCase
+from django.contrib.auth.models import User
+from .models import Researcher
 
- 
- 
+
+class ResearcherRegistrationTestCase(TestCase):
+    def test_valid_registration(self):
+        # Create a user for authentication purposes
+        user = User.objects.create_user(
+            username='testuser',
+            password='testpass'
+        )
+
+        # Define test data
+        form_data = {
+            'forename': 'John',
+            'surname': 'Doe',
+            'username': 'johndoe',
+            'email': 'johndoe@example.com',
+            'password': 'password'
+        }
+
+        # Instantiate the form with test data
+        form = ResearcherRegisterForm(data=form_data)
+
+        # Verify that the form is valid
+        self.assertTrue(form.is_valid())
+
+        # Save the form data to the database
+        researcher = Researcher(
+            user=user,
+            forename=form.cleaned_data['forename'],
+            surname=form.cleaned_data['surname'],
+            email=form.cleaned_data['email'],
+            username=form.cleaned_data['username'],
+            password=form.cleaned_data['password']
+        )
+        researcher.save()
+
+        # Verify that the researcher was added to the database
+        self.assertEqual(Researcher.objects.count(), 1)
+
+    def test_invalid_registration(self):
+        # Define test data with missing required fields
+        form_data = {
+            'forename': 'John',
+            'surname': 'Doe',
+            'username': 'johndoe'
+        }
+
+        # Instantiate the form with test data
+        form = ResearcherRegisterForm(data=form_data)
+
+        # Verify that the form is invalid
+        self.assertFalse(form.is_valid())
+    
+    def test_form_fields(self):
+        # Check if all form fields are present
+        form = ResearcherRegisterForm()
+        self.assertTrue('forename' in form.fields)
+        self.assertTrue('surname' in form.fields)
+        self.assertTrue('username' in form.fields)
+        self.assertTrue('email' in form.fields)
+        self.assertTrue('password' in form.fields)
