@@ -128,7 +128,8 @@
     // both see a finished map, either as popup or redirect to new page
     // this will have to change depending on if the game is given up or completed
     if (data.finished != false){
-      document.getElementById("complete").submit();
+      // this isn't amazing, we need to have a way to show them both the comparison of the maps
+      window.location.replace("/home");
       return;
     }
     // Get the current time
@@ -193,11 +194,6 @@
 $("#complete").submit(function (e) {
   // tell the group the game has ended
   // NOTE: this has to be changed depending if the game is either given up or completed
-  chatSocket.send(JSON.stringify({
-        'message': "",
-        'role': "",
-        'finished' : true
-    }));
     // serialize the data for sending the form data.
     // make POST ajax call
     $.ajax({
@@ -214,6 +210,13 @@ $("#complete").submit(function (e) {
           console.log(response["responseJSON"]["error"]);
         }
     })
-  })
+  // game completed, let other players know
+  chatSocket.send(JSON.stringify({
+      'message': "",
+      'role': "",
+      'finished' : true
+  }));
+})
+ 
   </script>
 {% endblock javascript %}
