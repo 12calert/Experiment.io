@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.core import serializers
 
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
+
+# helper methods
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 ROLE_CHOICES = ["follower", "giver"]
 def homepage(request):
@@ -126,6 +131,7 @@ def createExperiment(request):
         #do stuff from the experiment form
         current_researcher = Researcher.objects.get(user=request.user)
         Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                  active = create_experiment.cleaned_data.get("active"),
                                 created_by = current_researcher)
     return redirect('game_conditions')
 
@@ -159,7 +165,7 @@ def researcher_registration(request):
 
 def gameComplete(request):
     # request should be ajax and method should be POST.
-    if request.method == "POST":
+    if request.method == "POST" and is_ajax(request):
         # get the room name from JSON
         room_name = request.POST["roomName"]
         game = Game.objects.get(room_name=room_name)
@@ -169,3 +175,19 @@ def gameComplete(request):
     else:
         print("something went wrong")
         return HttpResponse('')
+
+def viewConditions(request):
+    if request.method == "POST" and is_ajax(request):
+        # get the experiment and find all its conditions
+        experiment = request.POST.get("experiment_name", None)
+        if not experiment:
+            print("something went wrong")
+            return HttpResponse("")
+        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment)))
+        # i.e. there exists some conditions for the experiment
+        if conditions:
+            serialisedConditions = serializers.serialize('json', conditions )
+            return JsonResponse({"exist": True, "conditions": serialisedConditions}, status=200)
+        else:
+            return JsonResponse({"exist": False}, status = 200)
+    return HttpResponse("")
