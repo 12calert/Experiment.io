@@ -126,6 +126,7 @@ def createExperiment(request):
         #do stuff from the experiment form
         current_researcher = Researcher.objects.get(user=request.user)
         Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                  active = create_experiment.cleaned_data.get("active"),
                                 created_by = current_researcher)
     return redirect('game_conditions')
 

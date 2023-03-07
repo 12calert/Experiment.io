@@ -9,16 +9,16 @@ page so researchers can view data on games
 
 <div><p>click an experiment to see further information</p></div>
 
-<!--
-    possibly some ajax for responsiveness idk
 {% if experiments %}
-<form method = "GET" action="viewExperiment">
+<form id="experiment">
     {% csrf_token %}
-    <input type = "submit" value = "{{ experiment }}" name="view_experiment"/>
+	{% for experiment in experiments %}
+    	<input type = "submit" value = "{{ experiment }}" name="view_experiment"/>
+	{% endfor %}
 </form>
 {% endif %}
--->
 
+{% comment %}
 {% if experiments %}
 	<table>
 		<thead>
@@ -33,11 +33,7 @@ page so researchers can view data on games
 				<tr> 
 					<td>{{ experiment.name }}</td>
 					<td>{{ experiment.active }}</td>
-
-					{% comment %} I would strongly suggest adding some logic which will hide the conditions until the user requests to see them 
-						need some logic to hide the headers if there are no conditions for each experiment 
-						probably something like: loop through, check if experiment exists, possibly using javascript
-					{% endcomment %}
+					
 					{% if conditions %}
 						<td>    
 							<table>
@@ -120,6 +116,7 @@ page so researchers can view data on games
 		</tbody>
 	</table>
     {% endif %}
+{% endcomment %}
     {% comment %}
 
 	{% if conditions %}
@@ -146,4 +143,25 @@ page so researchers can view data on games
 	</table>
 {% endif %}
 {% endcomment %}
-{% endblock %}
+{% endblock content %}
+
+{% block javascript %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+	return cookieValue;
+}
+//some ajax
+</script>
+{% endblock javascript %}
