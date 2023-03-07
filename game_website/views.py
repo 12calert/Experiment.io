@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
+from django.http import HttpResponse
 
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm
@@ -145,3 +146,16 @@ def createCondition(request):
                                 name = create_condition.cleaned_data.get("condition_name"),
                                 experiment = create_condition.cleaned_data.get("experiment"))
     return redirect('game_conditions')
+
+def gameComplete(request):
+    # request should be ajax and method should be POST.
+    if request.method == "POST":
+        # get the room name from JSON
+        room_name = request.POST["roomName"]
+        game = Game.objects.get(room_name=room_name)
+        game.completed = True
+        game.save()
+        return HttpResponse('')
+    else:
+        print("something went wrong")
+        return HttpResponse('')

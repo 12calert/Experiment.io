@@ -59,8 +59,15 @@
 
 {# Buttons #}
 <div class="col-sm-8">
-  <button class="button button1" onclick="complete()">Complete</button>
-  <button class="button button2" onclick="giveUp()">Give up</button>
+  {# input types need to be changed when we implement the different behaviour for finishing the game #}
+  <form id = "complete">
+    {% csrf_token %}
+    <input type="submit" class="btn btn-primary" value="Complete" />
+  </form>
+  <form id = "complete">
+    {% csrf_token %}
+    <input type="submit" class="btn btn-primary" value="Give Up" />
+  </form>
 </div>
 {% endblock content %}
 
@@ -97,40 +104,15 @@
     + '/'
   );
 
-  function complete(){
-    // do stuff when game complete:
-    // save DB, close room, other stuff, redirect both players
-    chatSocket.send(JSON.stringify({
-        'message': null,
-        'role': null,
-        'finished' : true
-    }));
-
-    /* ajax to redirect to view to update game as complete */
-    
-    window.location.replace("/home");
-  }
-  function giveUp(){
-    // do stuff when giving up:
-    // save DB, close room, other stuff. redirect both players
-    chatSocket.send(JSON.stringify({
-        'message': null,
-        'role': null,
-        'finished' : true
-    }));
-    
-    /* ajax to redirect to view to update game as complete */
-
-    window.location.replace("/home");
-  }
   /* after every message, log it in a JSON chat log 
   ---         can be changed later     ---*/
   chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     // do some more stuff when game finished
     // both see a finished map, either as popup or redirect to new page
-    if (data.finished == true){
-      window.location.replace("/home");
+    // this will have to change depending on if the game is given up or completed
+    if (data.finished != false){
+      document.getElementById("complete").submit();
       return;
     }
     // Get the current time
@@ -169,5 +151,47 @@
     }));
     messageInputDom.value = '';
   };
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$("#complete").submit(function (e) {
+  // tell the group the game has ended
+  // NOTE: this has to be changed depending if the game is either given up or completed
+  chatSocket.send(JSON.stringify({
+        'message': "",
+        'role': "",
+        'finished' : true
+    }));
+    // serialize the data for sending the form data.
+    // make POST ajax call
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'complete_game' %}",
+        data: {"roomName":roomName},
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+          window.location.replace("/home");
+          // show them the map drawn compared to the initial map
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          console.log(response["responseJSON"]["error"]);
+        }
+    })
+  })
   </script>
 {% endblock javascript %}
