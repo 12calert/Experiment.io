@@ -41,7 +41,7 @@ class ResearcherRegisterForm(forms.Form):
     )
 
 
-class ExperimentForm(forms.Form):
+class ExperimentForm(forms.ModelForm):
     experiment_name = forms.CharField(
         max_length = 50,
         required = True,
@@ -53,15 +53,18 @@ class ExperimentForm(forms.Form):
             }
         )
     )
-    active = forms.BooleanField(
-        required = True,
-        widget = forms.CheckboxInput(
-            attrs={
-                'class': 'form-check-input',
-                'id': 'active'
-            }
-        )
-    )
+    class Meta:
+        model = Experiment
+        fields = ("active",)
+        widgets = {
+            'active': forms.CheckboxInput(
+                attrs={
+                    'class': 'form-check-input',
+                    'id': 'active'
+                }
+            )
+        }
+
 
 class GameConditions(forms.ModelForm):
     amount_of_items = forms.IntegerField(

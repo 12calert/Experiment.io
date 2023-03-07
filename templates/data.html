@@ -9,16 +9,21 @@ page so researchers can view data on games
 
 <div><p>click an experiment to see further information</p></div>
 
-<!--
-    possibly some ajax for responsiveness idk
+{# needs to change from form to something else #}
 {% if experiments %}
-<form method = "GET" action="viewExperiment">
+<form id = "viewConditions" value="{{ experiment }}">
     {% csrf_token %}
-    <input type = "submit" value = "{{ experiment }}" name="view_experiment"/>
+	{% for experiment in experiments %}
+    	<input id="experiment" type = "submit" value = "{{ experiment }}"/>
+		{# figure something out here I hate this#}
+		<div id = "conditions_{{experiment}}"></div>
+	{% endfor %}
+
+	
 </form>
 {% endif %}
--->
 
+{% comment %}
 {% if experiments %}
 	<table>
 		<thead>
@@ -34,10 +39,6 @@ page so researchers can view data on games
 					<td>{{ experiment.name }}</td>
 					<td>{{ experiment.active }}</td>
 
-					{% comment %} I would strongly suggest adding some logic which will hide the conditions until the user requests to see them 
-						need some logic to hide the headers if there are no conditions for each experiment 
-						probably something like: loop through, check if experiment exists, possibly using javascript
-					{% endcomment %}
 					{% if conditions %}
 						<td>    
 							<table>
@@ -120,6 +121,7 @@ page so researchers can view data on games
 		</tbody>
 	</table>
     {% endif %}
+{% endcomment %}
     {% comment %}
 
 	{% if conditions %}
@@ -146,4 +148,57 @@ page so researchers can view data on games
 	</table>
 {% endif %}
 {% endcomment %}
-{% endblock %}
+{% endblock content %}
+
+{% block javascript %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+	return cookieValue;
+}
+//some ajax
+// I hate this works but needs some heavy additions
+$('#experiment').click(function(e){
+	e.preventDefault();
+	var experiment_name = $(this).attr('value');
+	$.ajax({
+        type: 'POST',
+        url: "{% url 'view_conditions' %}",
+        data: {"experiment_name":experiment_name},
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+			// take the gathered query data and display
+			if (response.exist){
+				var conditions = response["conditions"]
+				// convert to JSON object
+				var instance = JSON.parse(conditions);
+				var id = "conditions_"+experiment_name;
+				console.log(id);
+				for (let i = 0; i<instance.length; i++){
+					fields = instance[i]["fields"]
+					$("#"+id).append(
+					// change this to something we can use
+                    `${fields["name"]||""}<br>`
+                )
+				}
+			}
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          alert(response["responseJSON"]["error"]);
+        }
+    })
+});
+</script>
+{% endblock javascript %}
