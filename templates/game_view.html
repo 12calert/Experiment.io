@@ -62,8 +62,10 @@
   <button class="button button1" onclick="complete()">Complete</button>
   <button class="button button2" onclick="giveUp()">Give up</button>
 </div>
+{% endblock content %}
 
 {# Collapsible "view information" Javascript function #}
+{% block javascript %}
 <script>
   // read the player's role from the Django template 
   var coll = document.getElementsByClassName("collapsible");
@@ -168,4 +170,4 @@
     messageInputDom.value = '';
   };
   </script>
-{% endblock %}
+{% endblock javascript %}

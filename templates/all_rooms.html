@@ -119,8 +119,10 @@
     <span id="no-rooms-found">No rooms found</span>
 {% endif %}    
   {% endcomment %}
+{% endblock content %}
 
 {% comment %} Reference: https://www.web-source.net/javascript_redirect_box.htm {% endcomment %}
+{% block javascript %}
 <script language="JavaScript">    
     function goto(form) { 
         var index=form.select.selectedIndex
@@ -134,4 +136,5 @@
        } 
 </script>
 
-{% endblock %} 
+
+{% endblock javascript%} 
