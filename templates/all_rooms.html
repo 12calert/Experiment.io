@@ -2,139 +2,84 @@
 {% load static %}
 {% block title %}Rooms{% endblock %}
 {% block content %}
-
-
-
-    <div class="pagination">
-        {% comment %} <div class="message">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-        </div> {% endcomment %}
-        <div class="buttons">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}"><</a>
-            {% endif %}
-            {% for page_num in page_obj.paginator.page_range %}
-                {% if page_num != page_obj.number %}
-                    <a href="?page={{ page_num }}">{{ page_num }}</a>
-                {% endif %}
-            {% endfor %}
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}">></a>
-            {% endif %}
-        </div>
-    </div>
-
-
-
-<!--Form for user to create a public with multiple submit buttons-->    
-{% comment %} rooms|length {% endcomment %}
-<div class="container">  
-    <div class="row justify-content-center">
-        <div class="col-sm-4">
-            <form action="actionUrl" method="POST">
-                {% csrf_token %}  
-                {% comment %} csrf token for security reasons {% endcomment %}
-                {# there is no form in forms.py or in the context, fix this #}
-                {{ form.as_p }}
-                <button class="button button3" type="submit" name="Public">Create a public room</button>
-            </form>
-        </div>
-
-        <div class="col-sm-4">
-            <form action="actionUrl" method="POST">
-                {% csrf_token %}  
-                {% comment %} csrf token for security reasons {% endcomment %}
-                {# there is no form in forms.py or in the context, fix this #}
-                {{ form.as_p }}
-                <button class="button button3" type="submit" name="Private">Create a private room</button>
-            </form>
-        </div>
-
-        <div class="col-sm-4">
-        {% if rooms %}
-            <form action = "joinRoom" method = "POST" name="">
-                {% csrf_token %}
-                <select class="button button3" name="room" onchange="this.form.submit()">
-                    <option selected disabled value="">Join a public room</option>
-                        {% for room in rooms%}
-                        {% comment %} show only public rooms {% endcomment %}
-                            {% if room.public %}
-                            
-                                <option value="{{ room.room_name }}" class="room-link"> Room number: {{ forloop.counter  }}  
-                            
-                            {% endif %}
-                           
-                        {% endfor %}
-                </select>
-            </form>
-        </div>
-    </div>
-   </div>
-</div>
-
-{% else %}
-<div class="form-group">
-    <select class="button button3" required class="form-control" class="form-group" style="text-align: center" id="title_registration" name="title_registration" >
-        <option selected disabled value="">Join a private room</option>
-        <option disabled value="">No available rooms</option>
-    </select> 
-    </div>  
-</div>  
-{% endif %}   
- 
-<br>   
-{% comment %} Entering unique private room key {% endcomment %}
-<div class="unique_room_box">
-    <div class="row">
-      <h5 style="text-align:center;">Please enter your private room key here: </h5>
-      <div class="unique_room_box" class="col order-12">
-        <form name="a">
-            <label for="fname">Private room key:</label>
-            <input type="text" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
-            <input onclick="go_to_private_room_key(this.form)" type="submit" value="Submit" /> 
-        </form>
-      </div> 
-    </div>
-</div>
-</div>  
-</div>  
-
- {% comment %}Albertos original code with table{% endcomment %}
- {% comment %} {% if rooms %}
-    <table id="rooms-list">
-        <thead>
+<div class="container">
+  <div class="row">
+    <!--Table for creating public or private rooms-->
+    <div class="col-sm-6">
+      <div class="table-responsive">
+        <table class="table table-bordered" style="background-color: #f0f0f0;">
+          <thead>
             <tr>
-                <th>Room Number</th>
+              <th>Create Room</th>
             </tr>
-        </thead>
-        <tbody>
-            {% for room in rooms %}
-                <tr>
-                    <td><a href="game_view/{{ room.room_name }}/" class="room-link">{{ room.room_name }}</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <span id="no-rooms-found">No rooms found</span>
-{% endif %}    
-  {% endcomment %}
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <form action="actionUrl" method="POST">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+                  <button class="btn btn-primary" type="submit" name="Public">Create a public room</button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <form action="actionUrl" method="POST">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+                  <button class="btn btn-primary" type="submit" name="Private">Create a private room</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!--Table for selecting a public room or entering a private room key-->
+    <div class="col-sm-6">
+      <div class="table-responsive">
+        <table class="table table-bordered" style="background-color: #f0f0f0;">
+          <thead>
+            <tr>
+              <th>Join Room</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if rooms %}
+            <tr>
+              <td>
+                <form action="joinRoom" method="POST" name="">
+                  {% csrf_token %}
+                  <select class="form-select" name="room" onchange="this.form.submit()">
+                    <option selected disabled value="">Join a public room</option>
+                    {% for room in rooms %}
+                    {% if room.public %}
+                    <option value="{{ room.room_name }}">Room number: {{ forloop.counter }}</option>
+                    {% endif %}
+                    {% endfor %}
+                  </select>
+                </form>
+              </td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td>
+                <form>
+                  <div class="form-group">
+                    <label for="unique_room_box">Private room key:</label>
+                    <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
+                  </div>
+                  <button class="btn btn-primary" type="submit">Join a private room</button>
+                </form>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}
-
-{% comment %} Reference: https://www.web-source.net/javascript_redirect_box.htm {% endcomment %}
-{% block javascript %}
-<script language="JavaScript">    
-    function goto(form) { 
-        var index=form.select.selectedIndex
-        if (form.select.options[index].value != "0") {
-        location=form.select.options[index].value;}}
-
-    function go_to_private_room_key(form) { 
-        var input = document.getElementById("unique_room_box").value;
-        
-        window.open("game_view/"+input);
-       } 
-</script>
-
-
-{% endblock javascript%} 
