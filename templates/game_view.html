@@ -174,12 +174,24 @@
     const messageInputDom = document.querySelector('#chat-message-input');
     const playerRole = "{{player.role}}";
     const message = messageInputDom.value;
-    /* modify the message object to include the player's role */
-    chatSocket.send(JSON.stringify({
-        'message': message,
-        'role': playerRole,
-        'finished' : false
-    }));
+    // some ajax to save the message to database asynchronously
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'save_message' %}",
+        data: {"message":message, "role": playerRole, "room_name":roomName},
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+          chatSocket.send(JSON.stringify({
+          'message': message,
+          'role': playerRole,
+          'finished' : false
+        }));
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          alert(response["responseJSON"]["error"]);
+        }
+    })
     messageInputDom.value = '';
   };
 

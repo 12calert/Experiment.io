@@ -219,3 +219,14 @@ def viewChats(request):
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
+
+# this can potentially be made async
+def saveMessage(request):
+    if request.method == "POST" and is_ajax(request):
+        # get the variables from post data
+        role = request.POST["role"]
+        message = request.POST["message"]
+        room_name = request.POST["room_name"]
+        Chat.objects.create(role=role, game = Game.objects.get(room_name=room_name), content = message)
+        return JsonResponse({},status = 200)
+    return HttpResponse("")

@@ -5,6 +5,7 @@ from asgiref.sync import sync_to_async
 from accounts.models import Game, Chat
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+# this whole file needs refactoring
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
@@ -43,12 +44,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         finished = event["finished"]
         # after sending a message create entry in DB and connect it to the specific game
         if role != "announcement":
-            if (not finished):
-                # NOTE: this creates two entries in the database since there are two websocket connections, this needs to be made using ajax in game_view.html
-                await Chat.objects.acreate(game = self.room, content = message, role = role)
-
             # Send message to WebSocket
-            await self.send(text_data=json.dumps({"message": message, "role": role, "finished":finished}))
+            await self.send(text_data=json.dumps({"type": "chat_message", "message": message, "role": role, "finished":finished}))
         else:
             await self.send(text_data=json.dumps({"type":"announcement", "message":message, "finished":False}))
     
