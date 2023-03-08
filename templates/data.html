@@ -91,7 +91,7 @@ function viewGames(condition_name){
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
-					// change this to something we can use
+					// ADD ONCLICK EVENT FOR CHATS/PLAYERS
                     `<button id = "game_${fields["room_name"]}" value="${fields["room_name"]}">${fields["room_name"]}</button><br>
 					<div id = "chats_${fields["room_name"]}"></div>`
                 )
@@ -104,5 +104,7 @@ function viewGames(condition_name){
         }
     })
 };
+// need function to view chat conversations for each game
+// frontend -> need to have a nice way to view all the data for each entry
 </script>
 {% endblock javascript %}
