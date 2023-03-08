@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %}Game Conditions{% endblock %}
 {% block content %}
+
 <link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">
 <style>
 	/* Center the condition table */
@@ -84,7 +85,7 @@ page so researchers can set conditions
 	{% comment %}
 
 	{% if conditions %}
-
+	
 	<table>
 		<thead>
 			<tr>
@@ -110,21 +111,29 @@ page so researchers can set conditions
 {% endcomment %}
 
 {% comment %}
+
 make it apparent that this is to create a condition you can even keep this hidden and
 use a button to show this after the researcher decides to create one.
 
 Make it look pretty. Don't care how, add some javascript to keep the form hidden initially then show after researcher 
 confirms they want to add one for example. Do as your heart desires
 {% endcomment %}
-<form method = "POST" action="createExperiment">
-	{% csrf_token %}
-	{{ create_experiment.as_p }}
-	<input type = "submit" value = "create experiment" name="create_experiment"/>
-</form>
-<form method="POST" action="createCondition">
-	{% csrf_token %}
-	{{ create_condition.as_p }}
-	<input type="submit" value="create condition" name = "create_condition"/>
-</form>
+<div class="container-fluid">
+	<div class="row">
+	  <div class="col-md-6" >
+		<form method = "POST" action="createExperiment">
+			{% csrf_token %}
+			{{ create_experiment.as_p }}
+			<input type = "submit" value = "create experiment" name="create_experiment"/>
+		</form>
+	  </div> 
+	  <div class="col-md-6" >
+		<form method="POST" action="createCondition">
+			{% csrf_token %}
+			{{ create_condition.as_p }}
+			<input type="submit" value="create condition" name = "create_condition"/>
+		</form>
+	  </div> 
+
 
 {% endblock %}
