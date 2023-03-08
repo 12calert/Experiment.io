@@ -196,12 +196,26 @@ def viewGames(request):
     if request.method == "POST" and is_ajax(request):
         condition = request.POST.get("condition_name", None)
         if not condition:
-            print("something went wrong here")
+            print("something went wrong")
             return HttpResponse("")
         games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition)))
         if games:
             serialisedGames = serializers.serialize('json', games )
             return JsonResponse({"exist": True, "games": serialisedGames }, status=200)
+        else:
+            return JsonResponse({"exist": False}, status = 200)
+    return HttpResponse("")
+
+def viewChats(request):
+    if request.method == "POST" and is_ajax(request):
+        room_name = request.POST.get("room_name", None)
+        if not room_name:
+            print("something went wrong")
+            return HttpResponse("")
+        chats = list(Chat.objects.filter(game = Game.objects.get(room_name = room_name)))
+        if chats:
+            serialisedChats = serializers.serialize('json', chats )
+            return JsonResponse({"exist": True, "chats": serialisedChats }, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
