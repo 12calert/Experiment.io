@@ -191,3 +191,17 @@ def viewConditions(request):
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
+
+def viewGames(request):
+    if request.method == "POST" and is_ajax(request):
+        condition = request.POST.get("condition_name", None)
+        if not condition:
+            print("something went wrong here")
+            return HttpResponse("")
+        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition)))
+        if games:
+            serialisedGames = serializers.serialize('json', games )
+            return JsonResponse({"exist": True, "games": serialisedGames }, status=200)
+        else:
+            return JsonResponse({"exist": False}, status = 200)
+    return HttpResponse("")
