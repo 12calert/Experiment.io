@@ -1,139 +1,124 @@
 {% extends 'base.html' %}
-{% load static %}
+
 {% block title %}Game Conditions{% endblock %}
+
 {% block content %}
 
-<link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">
 <style>
 	/* Center the condition table */
-	table, form {
-		margin: auto;
+	table {
+	  margin: auto;
 	}
-
+  
 	/* Center the fields */
 	form {
-		text-align: center;
+	  text-align: center;
 	}
-
+  
 	/* Style the table */
 	table {
-		border-collapse: collapse;
-		border-spacing: 0;
-		width: 70%;
-		border: 1px solid #ddd;
+	  border-collapse: collapse;
+	  border-spacing: 0;
+	  width: 70%;
+	  border: 1px solid #ddd;
 	}
-</style>
-{% comment %}
-page so researchers can set conditions
-{% endcomment %}
+  
+	/* Style the form container */
+	.form-container {
+	  background-color: #f1f1f1;
+	  border: 1px solid #ccc;
+	  border-radius: 5px;
+	  padding: 10px;
+	  margin-bottom: 20px;
+	}
 
-{% if experiments %}
-	<table>
-		<thead>
-			<tr>
-				<th>Experiment Name</th>
-				<th>Active</th>
-				<th>Conditions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for experiment in experiments %}
-				<tr> 
-					<td>{{ experiment.name }}</td>
-					<td>{{ experiment.active }}</td>
-
-					{% comment %} I would strongly suggest adding some logic which will hide the conditions until the user requests to see them 
-						need some logic to hide the headers if there are no conditions for each experiment 
-						probably something like: loop through, check if experiment exists, possibly using javascript
-					{% endcomment %}
-					{% if conditions %}
-						<td>    
-							<table>
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Condition ID</th>
-										<th>Amount of Items</th>
-										<th>Special Restrictions</th>
-										<th>Game Type</th>
-										<th>Active</th>
-									</tr>
-								</thead>
-								<tbody>
-									{% for condition in conditions %}
-										{% if condition.experiment == experiment %}
-											<tr> 
-												<td>{{ condition.name }}</td>
-												<td>{{ condition.condition_id }}</td>
-												<td>{{ condition.amount_item }}</td>
-												<td>{{ condition.restriction }}</td>
-												<td>{{ condition.game_type }}</td>
-												<td>{{ condition.active}} </td>
-											</tr>
-										{% endif %}
-									{% endfor %}
-								</tbody>
-							</table>
-						</td>
-					{% endif %}
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	{% endif %}
+	.form-container, table, th, td {
+		color: black;
+	  }
 	
-	{% comment %}
+  </style>
+  
 
-	{% if conditions %}
-	
-	<table>
-		<thead>
-			<tr>
-				<th>Condition ID</th>
-				<th>Amount of Items</th>
-				<th>Special Restrictions</th>
-				<th>Game Type</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for condition in conditions %}
-			<tr> 
-				<td>{{ condition.condition_id }}</td>
-				<td>{{ condition.amount_item }}</td>
-				<td>{{ condition.restriction }}</td>
-				<td>{{ condition.game_type }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-{% endif %}
-
-{% endcomment %}
-
-{% comment %}
-
-make it apparent that this is to create a condition you can even keep this hidden and
-use a button to show this after the researcher decides to create one.
-
-Make it look pretty. Don't care how, add some javascript to keep the form hidden initially then show after researcher 
-confirms they want to add one for example. Do as your heart desires
-{% endcomment %}
 <div class="container-fluid">
-	<div class="row">
-	  <div class="col-md-6" >
-		<form method = "POST" action="createExperiment">
-			{% csrf_token %}
-			{{ create_experiment.as_p }}
-			<input type = "submit" value = "create experiment" name="create_experiment"/>
-		</form>
-	  </div> 
-	  <div class="col-md-6" >
-		<form method="POST" action="createCondition">
-			{% csrf_token %}
-			{{ create_condition.as_p }}
-			<input type="submit" value="create condition" name = "create_condition"/>
-		</form>
-	  </div> 
+  <div class="row">
+    <div class="col-md-6">
+      <!-- form for creating experiments -->
+      <div class="form-container">
+        <h4>Create Experiment</h4>
+        <form method="POST" action="createExperiment">
+          {% csrf_token %}
+          {{ create_experiment.as_p }}
+          <input type="submit" value="Create Experiment" name="create_experiment" class="btn btn-primary">
+        </form>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <!-- form for creating game conditions -->
+      <div class="form-container">
+        <h4>Create Condition</h4>
+        <form method="POST" action="createCondition">
+          {% csrf_token %}
+          {{ create_condition.as_p }}
+          <input type="submit" value="Create Condition" name="create_condition" class="btn btn-primary">
+        </form>
+      </div>
+    </div>
+  </div>
 
+  <!-- table for displaying experiment and condition data -->
+  <div class="row" style="background-color: white;">
+    <div class="col-md-12">
+      {% if experiments %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Experiment Name</th>
+            <th>Active</th>
+            <th>Conditions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for experiment in experiments %}
+          <tr>
+            <td>{{ experiment.name }}</td>
+            <td>{{ experiment.active }}</td>
+            <td>
+              {% if conditions %}
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Condition ID</th>
+                    <th>Amount of Items</th>
+                    <th>Special Restrictions</th>
+                    <th>Game Type</th>
+                    <th>Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for condition in conditions %}
+                  {% if condition.experiment == experiment %}
+                  <tr>
+                    <td>{{ condition.name }}</td>
+                    <td>{{ condition.condition_id }}</td>
+                    <td>{{ condition.amount_item }}</td>
+                    <td>{{ condition.restriction }}</td>
+                    <td>{{ condition.game_type }}</td>
+                    <td>{{ condition.active }}</td>
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+</div
 
 {% endblock %}
