@@ -144,7 +144,10 @@
     const formattedTime = hours + ':' + minutes;
 
     // Check if message was sent by current player or other player
-    if (data.role === playerRole) {
+    if (data.type == "announcement"){
+      document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.message + "<br></span>";
+    }
+    else if (data.role === playerRole) {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
     } 
     else {

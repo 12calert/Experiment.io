@@ -16,6 +16,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await sync_to_async(self.room.save)()
         # Join room group
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_send(self.room_group_name, {"type": "announcement", "message": "A user has connected!" , "finished":False})
 
         await self.accept()
 
@@ -41,9 +42,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         role = event["role"]
         finished = event["finished"]
         # after sending a message create entry in DB and connect it to the specific game
-        if (not finished):
-            # NOTE: this creates two entries in the database since there are two websocket connections, this needs to be made using ajax in game_view.html
-            await Chat.objects.acreate(game = self.room, content = message, role = role)
+        if role != "announcement":
+            if (not finished):
+                # NOTE: this creates two entries in the database since there are two websocket connections, this needs to be made using ajax in game_view.html
+                await Chat.objects.acreate(game = self.room, content = message, role = role)
 
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": message, "role": role, "finished":finished}))
+            # Send message to WebSocket
+            await self.send(text_data=json.dumps({"message": message, "role": role, "finished":finished}))
+        else:
+            await self.send(text_data=json.dumps({"type":"announcement", "message":message, "finished":False}))
+    
+    async def announcement(self,event):
+        message = event["message"]
+        finished = event["finished"]
+
+        await self.send(text_data=json.dumps({"type":"announcement", "message":message, "finished":finished}))
