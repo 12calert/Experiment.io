@@ -16,7 +16,7 @@ def register(request):
 	if request.method == "POST":
 		form = RegisterForm(request.POST)
 		if form.is_valid():
-			user = form.save()
+			user = form.save(zz)
 			user.set_password(request.POST['password'])
 			user.save()
 			our_user = CustomUser(name=form.cleaned_data['name'], surname=form.cleaned_data['surname'], user_id=uuid4(), username=user, email=form.cleaned_data['email'])
