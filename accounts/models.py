@@ -55,7 +55,7 @@ class Game(models.Model):
     room_name = models.TextField(default = "")
     users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
     has_condition = models.ForeignKey(Condition, on_delete=models.DO_NOTHING, null=False)
-    public_yes_or_no = models.BooleanField()
+    public = models.BooleanField()
     # used to filter what rooms the user sees depending on the game they choose to play
     MAPGAME = "MG"
     GAME_TYPE_CHOICES = [

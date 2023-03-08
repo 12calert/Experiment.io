@@ -58,6 +58,11 @@
     you will give instructions to the follower, etc.
   {% endif %}
 </div>
+
+{# for now just use the room name as the key, can be changed later #}
+{% if not public %}
+<div> Your private key is: {{room_name}}. Share this with someone else to play together.</div>
+{% endif %}
 {# Game map and chat #}
 <div class="row">
     <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
