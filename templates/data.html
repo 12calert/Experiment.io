@@ -87,12 +87,11 @@ function viewGames(condition_name){
 				// convert to JSON object
 				var instance = JSON.parse(games);
 				var id = "games_"+condition_name;
-				console.log(id);
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
 					// ADD ONCLICK EVENT FOR CHATS/PLAYERS
-                    `<button id = "game_${fields["room_name"]}" value="${fields["room_name"]}">${fields["room_name"]}</button><br>
+                    `<button id = "game_${fields["room_name"]}" value="${fields["room_name"]}" onclick="viewChats('${fields["room_name"]}')">${fields["room_name"]}</button><br>
 					<div id = "chats_${fields["room_name"]}"></div>`
                 )
 				}
@@ -104,7 +103,33 @@ function viewGames(condition_name){
         }
     })
 };
-// need function to view chat conversations for each game
+function viewChats(room_name){
+	$.ajax({
+        type: 'POST',
+        url: "{% url 'view_chats' %}",
+        data: {"room_name":room_name},
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+			// take the gathered query data and display
+			if (response.exist){
+				var chats = response["chats"]
+				// convert to JSON object
+				var instance = JSON.parse(chats);
+				var id = "chats_"+room_name;
+				for (let i = 0; i<instance.length; i++){
+					fields = instance[i]["fields"]
+					$("#"+id).append(
+                    `<p>${fields["role"]}: ${fields["content"]} -- ${fields["created"]}</p><br>`
+                )
+				}
+			}
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          alert(response["responseJSON"]["error"]);
+        }
+    })
+};
 // frontend -> need to have a nice way to view all the data for each entry
 </script>
 {% endblock javascript %}

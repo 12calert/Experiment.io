@@ -54,6 +54,8 @@ urlpatterns = [
     path('post/ajax/gameDone', views.gameComplete, name = "complete_game"),
     path('post/ajax/viewConditions', views.viewConditions, name="view_conditions"),
     path('post/ajax/viewGames', views.viewGames, name="view_games"),
+    path('post/ajax/viewChats', views.viewChats, name="view_chats"),
+    path('post/ajax/saveMessage', views.saveMessage, name="save_message"),
     # when they put the unique private room key:
  
     # tried with regex but need help
