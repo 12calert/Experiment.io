@@ -40,7 +40,7 @@ def game_view(request, game, room_name):
     # FOR CONSISTENT ALLOCATION USE TWO DIFFERENT BROWSERS
     foundPlayer = Player.objects.filter(game = foundGame, user_session = request.session.get("user_id")).first()
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
-                                              "game":game, "player":foundPlayer}) # dict to store room number
+                                              "game":game, "player":foundPlayer, "public":foundGame.public}) # dict to store room number
 
 def all_rooms(request, game):
     #rooms with one player waiting for another
@@ -59,7 +59,7 @@ def create_room(request, game):
         # if the user selects a Public room:
         if 'Public' in request.POST:
             #chat = Chat.objects.create()
-            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public_yes_or_no=True,
+            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=True,
             game_type=game, has_condition = condition)
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
 
@@ -67,7 +67,7 @@ def create_room(request, game):
     # if the user selects a Private room:
         elif 'Private' in request.POST:
             #chat = Chat.objects.create()
-            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public_yes_or_no=False, 
+            new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=False, 
                                    game_type=game, has_condition = condition)
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
             return redirect('game_view', game = game, room_name = new_room.room_name)
@@ -188,6 +188,20 @@ def viewConditions(request):
         if conditions:
             serialisedConditions = serializers.serialize('json', conditions )
             return JsonResponse({"exist": True, "conditions": serialisedConditions}, status=200)
+        else:
+            return JsonResponse({"exist": False}, status = 200)
+    return HttpResponse("")
+
+def viewGames(request):
+    if request.method == "POST" and is_ajax(request):
+        condition = request.POST.get("condition_name", None)
+        if not condition:
+            print("something went wrong here")
+            return HttpResponse("")
+        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition)))
+        if games:
+            serialisedGames = serializers.serialize('json', games )
+            return JsonResponse({"exist": True, "games": serialisedGames }, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")

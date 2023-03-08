@@ -11,143 +11,19 @@ page so researchers can view data on games
 
 {# needs to change from form to something else #}
 {% if experiments %}
-<form id = "viewConditions" value="{{ experiment }}">
+<div id = "viewConditions">
     {% csrf_token %}
 	{% for experiment in experiments %}
-    	<input id="experiment" type = "submit" value = "{{ experiment }}"/>
+    	<button id = "experiment" value = "{{ experiment }}" onclick = "viewConditions('{{experiment}}')">{{ experiment }}</button>
 		{# figure something out here I hate this#}
-		<div id = "conditions_{{experiment}}"></div>
+		<div id = "conditions_{{experiment}}">
+		</div>
 	{% endfor %}
 
 	
-</form>
+</div>
 {% endif %}
 
-{% comment %}
-{% if experiments %}
-	<table>
-		<thead>
-			<tr>
-				<th>Experiment Name</th>
-				<th>Active</th>
-				<th>Conditions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for experiment in experiments %}
-				<tr> 
-					<td>{{ experiment.name }}</td>
-					<td>{{ experiment.active }}</td>
-
-					{% if conditions %}
-						<td>    
-							<table>
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Condition ID</th>
-										<th>Amount of Items</th>
-										<th>Special Restrictions</th>
-										<th>Game Type</th>
-										<th>Active</th>
-									</tr>
-								</thead>
-								<tbody>
-									{% for condition in conditions %}
-										{% if condition.experiment == experiment %}
-											<tr> 
-												<td>{{ condition.name }}</td>
-												<td>{{ condition.condition_id }}</td>
-												<td>{{ condition.amount_item }}</td>
-												<td>{{ condition.restriction }}</td>
-												<td>{{ condition.game_type }}</td>
-												<td>{{ condition.active}} </td>
-											</tr>
-										{% endif %}
-									{% endfor %}
-								</tbody>
-							</table>
-						</td>
-					{% endif %}
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-	{% endif %}
-
-    {% if games %}
-    <table>
-		<thead>
-			<tr>
-				<th>Game ID</th>
-				<th>Completed</th>
-				<th>Game Type</th>
-                <th>Chat Log</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for game in games %}
-				<tr> 
-					<td>{{ game.game }}</td>
-					<td>{{ game.completed }}</td>
-                    <td>{{ game.game_type }}</td>
-
-					{% if chats %}
-						<td>    
-							<table>
-								<thead>
-									<tr>
-										<th>Message</th>
-										<th>Role</th>
-										<th>Created</th>
-									</tr>
-								</thead>
-								<tbody>
-									{% for chat in chats %}
-										{% if chat.game == game %}
-											<tr> 
-												<td>{{ chat.content }}</td>
-												<td>{{ chat.role }}</td>
-												<td>{{ chat.created }}</td>
-											</tr>
-										{% endif %}
-									{% endfor %}
-								</tbody>
-							</table>
-						</td>
-					{% endif %}
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-    {% endif %}
-{% endcomment %}
-    {% comment %}
-
-	{% if conditions %}
-
-	<table>
-		<thead>
-			<tr>
-				<th>Condition ID</th>
-				<th>Amount of Items</th>
-				<th>Special Restrictions</th>
-				<th>Game Type</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for condition in conditions %}
-			<tr> 
-				<td>{{ condition.condition_id }}</td>
-				<td>{{ condition.amount_item }}</td>
-				<td>{{ condition.restriction }}</td>
-				<td>{{ condition.game_type }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
-{% endif %}
-{% endcomment %}
 {% endblock content %}
 
 {% block javascript %}
@@ -169,9 +45,7 @@ function getCookie(name) {
 }
 //some ajax
 // I hate this works but needs some heavy additions
-$('#experiment').click(function(e){
-	e.preventDefault();
-	var experiment_name = $(this).attr('value');
+function viewConditions(experiment_name){
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_conditions' %}",
@@ -184,12 +58,11 @@ $('#experiment').click(function(e){
 				// convert to JSON object
 				var instance = JSON.parse(conditions);
 				var id = "conditions_"+experiment_name;
-				console.log(id);
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
-					// change this to something we can use
-                    `${fields["name"]||""}<br>`
+                    `<button id = "condition_${fields["name"]}" value="${fields["name"]}" onclick="viewGames('${fields["name"]}')">${fields["name"]}</button><br>
+					<div id = "games_${fields["name"]}"></div>`
                 )
 				}
 			}
@@ -199,6 +72,39 @@ $('#experiment').click(function(e){
           alert(response["responseJSON"]["error"]);
         }
     })
-});
+};
+
+function viewGames(condition_name){
+	$.ajax({
+        type: 'POST',
+        url: "{% url 'view_games' %}",
+        data: {"condition_name":condition_name},
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+			// take the gathered query data and display
+			if (response.exist){
+				var games = response["games"]
+				// convert to JSON object
+				var instance = JSON.parse(games);
+				var id = "games_"+condition_name;
+				console.log(id);
+				for (let i = 0; i<instance.length; i++){
+					fields = instance[i]["fields"]
+					$("#"+id).append(
+					// ADD ONCLICK EVENT FOR CHATS/PLAYERS
+                    `<button id = "game_${fields["room_name"]}" value="${fields["room_name"]}">${fields["room_name"]}</button><br>
+					<div id = "chats_${fields["room_name"]}"></div>`
+                )
+				}
+			}
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          alert(response["responseJSON"]["error"]);
+        }
+    })
+};
+// need function to view chat conversations for each game
+// frontend -> need to have a nice way to view all the data for each entry
 </script>
 {% endblock javascript %}

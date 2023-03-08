@@ -58,7 +58,7 @@
                     <option selected disabled value="">Join a public room</option>
                         {% for room in rooms%}
                         {% comment %} show only public rooms {% endcomment %}
-                            {% if room.public_yes_or_no %}
+                            {% if room.public %}
                             
                                 <option value="{{ room.room_name }}" class="room-link"> Room number: {{ forloop.counter  }}  
                             
