@@ -28,6 +28,7 @@ page so researchers can view data on games
 
 {% block javascript %}
 <script>
+var current_researcher = "{{ researcher.researcher_id }}"
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -49,7 +50,7 @@ function viewConditions(experiment_name){
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_conditions' %}",
-        data: {"experiment_name":experiment_name},
+        data: {"experiment_name":experiment_name, "current_researcher": current_researcher},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
         success: function (response) {
 			// take the gathered query data and display
@@ -61,8 +62,8 @@ function viewConditions(experiment_name){
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
-                    `<button id = "condition_${fields["name"]}" value="${fields["name"]}" onclick="viewGames('${fields["name"]}')">${fields["name"]}</button><br>
-					<div id = "games_${fields["name"]}"></div>`
+                    `<button id = "condition_${fields["name"]}" value="${fields["name"]}" onclick="viewGames('${fields["name"]}', '${experiment_name}')">${fields["name"]}</button><br>
+					<div id = "games_${fields["name"]}_${experiment_name}"></div>`
                 )
 				}
 			}
@@ -74,11 +75,19 @@ function viewConditions(experiment_name){
     })
 };
 
-function viewGames(condition_name){
+function viewGames(condition_name, experiment_name){
+    /* You need to make it so the researcher cannot click the button again, or you make it so the researcher can
+    click the button again to remove the elements that were just added, do the same for the other button events.
+    To remove and add different onclick events using jquery use something like
+    $('#id').unbind('click'); -- to remove the event, you can also directly change the attribute of the element if you have the id (which we do)
+    $('#id').click(function(){ -- to add a click event
+    // your code here
+    });
+    */
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_games' %}",
-        data: {"condition_name":condition_name},
+        data: {"condition_name":condition_name,"experiment_name":experiment_name, "current_researcher":current_researcher},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
         success: function (response) {
 			// take the gathered query data and display
@@ -86,7 +95,7 @@ function viewGames(condition_name){
 				var games = response["games"]
 				// convert to JSON object
 				var instance = JSON.parse(games);
-				var id = "games_"+condition_name;
+				var id = "games_"+condition_name+"_"+experiment_name;
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
