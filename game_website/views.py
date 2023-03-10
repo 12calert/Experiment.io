@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-
+from django.db import IntegrityError
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
+from django.contrib.auth.models import User
 
 # helper methods
 def is_ajax(request):
@@ -50,10 +51,13 @@ def all_rooms(request, game):
 
 def create_room(request, game):
 
-    #choose a condition to apply to the game
+    # choose a random condition, can be extended to choose a condition fairly
+    # (choose the condition with the least amount of games, etc...)
+
+    #first filter the conditions we can user for our game
     conditions = Condition.objects.filter(game_type = game)
-    # some way to pick which condition randomly, or with some logic here:
-    condition = conditions.first()
+    condition = choice(list(conditions))
+    print(condition)
     #note that this will fail if there is no condition
     if condition:
         # if the user selects a Public room:
@@ -99,11 +103,9 @@ def joinRoom(request, game):
 
 def data(request):
     context = {}
-    current_researcher = Researcher.objects.get(user=request.user)
-    context['conditions'] = Condition.objects.filter(created_by = current_researcher)
+    current_researcher = Researcher.objects.get(userkey=request.user)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
-    context['games'] = Game.objects.all() # very bad change later only for prototype
-    context['chats'] = Chat.objects.all() # very bad change later only for prototype
+    context['researcher'] = current_researcher
     return render(request, 'data.html', context)
    
 def gamelogic(request):
@@ -119,7 +121,7 @@ def conditions(request):
     context['create_condition'] = create_condition
 
 
-    current_researcher = Researcher.objects.get(user=request.user)
+    current_researcher = Researcher.objects.get(userkey=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
 
@@ -129,23 +131,32 @@ def createExperiment(request):
     create_experiment = ExperimentForm(request.POST or None)
     if request.POST and create_experiment.is_valid():
         #do stuff from the experiment form
-        current_researcher = Researcher.objects.get(user=request.user)
-        Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
-                                  active = create_experiment.cleaned_data.get("active"),
-                                created_by = current_researcher)
+        try:
+            current_researcher = Researcher.objects.get(userkey=request.user)
+            Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                    active = create_experiment.cleaned_data.get("active"),
+                                    created_by = current_researcher)
+        except IntegrityError:
+            # tell the user the experiment they created was not unique
+            # move validation to client side is an option
+            print("not unique tell the user")
     return redirect('game_conditions')
 
 def createCondition(request):
     create_condition = GameConditions(request.POST or None)
     if request.POST and create_condition.is_valid():
-        current_researcher = Researcher.objects.get(user=request.user)
-        Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
-                                restriction = create_condition.cleaned_data.get("restriction"),
-                                active = create_condition.cleaned_data.get("active"),
-                                game_type = create_condition.cleaned_data.get("game_type"),
-                                created_by = current_researcher,
-                                name = create_condition.cleaned_data.get("condition_name"),
-                                experiment = create_condition.cleaned_data.get("experiment"))
+        try:
+            current_researcher = Researcher.objects.get(userkey=request.user)
+            Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
+                                    restriction = create_condition.cleaned_data.get("restriction"),
+                                    active = create_condition.cleaned_data.get("active"),
+                                    game_type = create_condition.cleaned_data.get("game_type"),
+                                    created_by = current_researcher,
+                                    name = create_condition.cleaned_data.get("condition_name"),
+                                    experiment = create_condition.cleaned_data.get("experiment"))
+        except IntegrityError:
+            # tell the user the condition is not unique
+            print("The condition is not unique")
     return redirect('game_conditions')
 
 def researcher_registration(request):
@@ -158,11 +169,14 @@ def researcher_registration(request):
         email = request.POST['email']
         username = request.POST['username']
         password = request.POST['password']
-        Researcher.objects.create(forename=forename, surname=surname, email = email, username = username, password=password)
+        # is_active set to false until we authenticate them
+        user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
+        Researcher.objects.create(userkey = user)
         return redirect("home")
  
     return render(request, 'researcher_registration.html', context)
 
+# --- start of ajax views ---
 def gameComplete(request):
     # request should be ajax and method should be POST.
     if request.method == "POST" and is_ajax(request):
@@ -183,7 +197,7 @@ def viewConditions(request):
         if not experiment:
             print("something went wrong")
             return HttpResponse("")
-        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment)))
+        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment, created_by = request.POST["current_researcher"])))
         # i.e. there exists some conditions for the experiment
         if conditions:
             serialisedConditions = serializers.serialize('json', conditions )
@@ -198,7 +212,9 @@ def viewGames(request):
         if not condition:
             print("something went wrong")
             return HttpResponse("")
-        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition)))
+        #kinda bad
+        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition, 
+                                experiment = Experiment.objects.get(name = request.POST["experiment_name"], created_by = request.POST["current_researcher"]))))
         if games:
             serialisedGames = serializers.serialize('json', games )
             return JsonResponse({"exist": True, "games": serialisedGames }, status=200)
@@ -230,3 +246,4 @@ def saveMessage(request):
         Chat.objects.create(role=role, game = Game.objects.get(room_name=room_name), content = message)
         return JsonResponse({},status = 200)
     return HttpResponse("")
+# --- end of ajax views ---
