@@ -67,3 +67,47 @@ class ResearcherRegistrationTests(TestCase):
         self.assertFalse(User.objects.filter(username=self.invalid_data['username']).exists())
         self.assertFalse(Researcher.objects.filter(userkey__username=self.invalid_data['username']).exists())
 
+# Testing of Researcher login
+class ResearcherLoginTestCase(TestCase):
+    # Test that the registration page loads successfully:
+    def test_registration_page_loads_successfully(self):
+        url = reverse('researcher_login')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        
+    def setUp(self):
+        self.username = "testuser"
+        self.password = "testpass"
+        self.user = User.objects.create_user(
+            username=self.username,
+            password=self.password,
+            is_active=True
+        )
+        
+    def test_researcher_login_successful(self):
+        # Log in as an existing user
+        response = self.client.post(reverse('researcher_login'), {
+            'username': self.username,
+            'password': self.password
+        })
+        self.assertEqual(response.status_code, 302) # should redirect to home page
+        self.assertRedirects(response, reverse('home'))
+
+    def test_researcher_login_invalid_username(self):
+        # Attempt to log in with an invalid username
+        response = self.client.post(reverse('researcher_login'), {
+            'username': 'invaliduser',
+            'password': self.password
+        })
+        self.assertEqual(response.status_code, 200) # should remain on login page
+
+    def test_researcher_login_invalid_password(self):
+        # Attempt to log in with an invalid password
+        response = self.client.post(reverse('researcher_login'), {
+            'username': self.username,
+            'password': 'invalidpass'
+        })
+        self.assertEqual(response.status_code, 200) # should remain on login page
+  
+    def tearDown(self):
+        self.user.delete()
