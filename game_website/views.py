@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-
+from django.db import IntegrityError
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
@@ -100,10 +100,8 @@ def joinRoom(request, game):
 def data(request):
     context = {}
     current_researcher = Researcher.objects.get(user=request.user)
-    context['conditions'] = Condition.objects.filter(created_by = current_researcher)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
-    context['games'] = Game.objects.all() # very bad change later only for prototype
-    context['chats'] = Chat.objects.all() # very bad change later only for prototype
+    context['researcher'] = current_researcher
     return render(request, 'data.html', context)
    
 def gamelogic(request):
@@ -129,23 +127,32 @@ def createExperiment(request):
     create_experiment = ExperimentForm(request.POST or None)
     if request.POST and create_experiment.is_valid():
         #do stuff from the experiment form
-        current_researcher = Researcher.objects.get(user=request.user)
-        Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
-                                  active = create_experiment.cleaned_data.get("active"),
-                                created_by = current_researcher)
+        try:
+            current_researcher = Researcher.objects.get(user=request.user)
+            Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                    active = create_experiment.cleaned_data.get("active"),
+                                    created_by = current_researcher)
+        except IntegrityError:
+            # tell the user the experiment they created was not unique
+            # move validation to client side is an option
+            print("not unique tell the user")
     return redirect('game_conditions')
 
 def createCondition(request):
     create_condition = GameConditions(request.POST or None)
     if request.POST and create_condition.is_valid():
-        current_researcher = Researcher.objects.get(user=request.user)
-        Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
-                                restriction = create_condition.cleaned_data.get("restriction"),
-                                active = create_condition.cleaned_data.get("active"),
-                                game_type = create_condition.cleaned_data.get("game_type"),
-                                created_by = current_researcher,
-                                name = create_condition.cleaned_data.get("condition_name"),
-                                experiment = create_condition.cleaned_data.get("experiment"))
+        try:
+            current_researcher = Researcher.objects.get(user=request.user)
+            Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
+                                    restriction = create_condition.cleaned_data.get("restriction"),
+                                    active = create_condition.cleaned_data.get("active"),
+                                    game_type = create_condition.cleaned_data.get("game_type"),
+                                    created_by = current_researcher,
+                                    name = create_condition.cleaned_data.get("condition_name"),
+                                    experiment = create_condition.cleaned_data.get("experiment"))
+        except IntegrityError:
+            # tell the user the condition is not unique
+            print("The condition is not unique")
     return redirect('game_conditions')
 
 def researcher_registration(request):

@@ -3,6 +3,7 @@ from django.conf import settings
 from jsonfield import JSONField
 import uuid
 from django.contrib.auth.models import User
+from django.db.models.functions import Lower
 # Create your models here.
 
 class Researcher(models.Model):
@@ -13,7 +14,7 @@ class Researcher(models.Model):
     forename = models.CharField(max_length=50, null = False)
     surname = models.CharField(max_length=50, null = False)
     email = models.EmailField(max_length = 254, null = False)
-    username = models.TextField(null = False)
+    username = models.TextField(null = False, unique = True)
     password = models.CharField(max_length=50, null = False)
     approved = models.BooleanField(default=False)
 
@@ -23,6 +24,17 @@ class Experiment(models.Model):
     name = models.TextField(null = False)
     created_by = models.ForeignKey(Researcher, on_delete = models.DO_NOTHING, null = False)
     active = models.BooleanField(default = True)
+
+    class Meta:
+        # ensure Researcher's set a unique name for their experiment
+        constraints = [
+            models.UniqueConstraint(
+                Lower('name'),
+                'created_by',
+                name='researcher_and_name_unique',
+            ),
+        ]
+
     def __str__(self):
         return self.name
 
@@ -32,7 +44,7 @@ class Condition(models.Model):
     restriction = models.TextField(null=True)
     active = models.BooleanField(default = True)
     created_by = models.ForeignKey(Researcher, on_delete=models.DO_NOTHING, null=False)
-    name = models.TextField(default = "name not set", null = False)
+    name = models.TextField(null = False)
     experiment = models.ForeignKey(Experiment, on_delete = models.DO_NOTHING, null = True)
     MAPGAME = "MG"
     GAME_TYPE_CHOICES = [
@@ -44,6 +56,15 @@ class Condition(models.Model):
         choices=GAME_TYPE_CHOICES,
         default=MAPGAME,
     )
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower('name'),
+                'experiment',
+                name='name_and_experiment_unique',
+            ),
+        ]
+    
     def __str__(self):
         return self.name
 
@@ -52,7 +73,7 @@ class Game(models.Model):
     game = models.UUIDField(default=uuid.uuid4, primary_key=True)
     final_map = models.TextField(default="")
     completed = models.BooleanField(default=False)
-    room_name = models.TextField(default = "")
+    room_name = models.TextField(default = "", unique = True)
     users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
     has_condition = models.ForeignKey(Condition, on_delete=models.DO_NOTHING, null=False)
     public = models.BooleanField()
