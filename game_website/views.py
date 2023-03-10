@@ -170,6 +170,7 @@ def researcher_registration(request):
  
     return render(request, 'researcher_registration.html', context)
 
+# --- start of ajax views ---
 def gameComplete(request):
     # request should be ajax and method should be POST.
     if request.method == "POST" and is_ajax(request):
@@ -190,7 +191,7 @@ def viewConditions(request):
         if not experiment:
             print("something went wrong")
             return HttpResponse("")
-        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment)))
+        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment, created_by = request.POST["current_researcher"])))
         # i.e. there exists some conditions for the experiment
         if conditions:
             serialisedConditions = serializers.serialize('json', conditions )
@@ -205,7 +206,8 @@ def viewGames(request):
         if not condition:
             print("something went wrong")
             return HttpResponse("")
-        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition)))
+        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition, 
+                                                    experiment = Experiment.objects.get(name = request.POST["experiment_name"], created_by = request.POST["current_researcher"]))))
         if games:
             serialisedGames = serializers.serialize('json', games )
             return JsonResponse({"exist": True, "games": serialisedGames }, status=200)
@@ -237,3 +239,4 @@ def saveMessage(request):
         Chat.objects.create(role=role, game = Game.objects.get(room_name=room_name), content = message)
         return JsonResponse({},status = 200)
     return HttpResponse("")
+# --- end of ajax views ---
