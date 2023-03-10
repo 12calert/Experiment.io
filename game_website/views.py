@@ -171,7 +171,7 @@ def researcher_registration(request):
         password = request.POST['password']
         # is_active set to false until we authenticate them
         user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
-        Researcher.objects.create(userkey = user, forename=forename, surname=surname, email = email, username = username)
+        Researcher.objects.create(userkey = user)
         return redirect("home")
  
     return render(request, 'researcher_registration.html', context)
@@ -214,7 +214,7 @@ def viewGames(request):
             return HttpResponse("")
         #kinda bad
         games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition, 
-                                                    experiment = Experiment.objects.get(name = request.POST["experiment_name"], created_by = request.POST["current_researcher"]))))
+                                experiment = Experiment.objects.get(name = request.POST["experiment_name"], created_by = request.POST["current_researcher"]))))
         if games:
             serialisedGames = serializers.serialize('json', games )
             return JsonResponse({"exist": True, "games": serialisedGames }, status=200)

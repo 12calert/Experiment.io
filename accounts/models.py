@@ -5,15 +5,9 @@ from django.db.models.functions import Lower
 # Create your models here.
 
 class Researcher(models.Model):
-    #user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    # all the details for each Researcher is stored in the User model, no point duplicating data
     userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="")
     researcher_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
-    
-    forename = models.CharField(max_length=50, null = False)
-    surname = models.CharField(max_length=50, null = False)
-    email = models.EmailField(max_length = 254, null = False)
-    username = models.TextField(null = False, unique = True)
-    password = models.CharField(max_length=50, null = False)
 
     # removes the need to store this as a field now we just call this
     def is_approved(self):
