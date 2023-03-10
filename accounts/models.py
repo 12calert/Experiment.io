@@ -7,8 +7,8 @@ from django.db.models.functions import Lower
 # Create your models here.
 
 class Researcher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    # userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="") # FK UNCOMMENT LATER, IT IS COMMENTED OUT ONLY INITALLY
+    #user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    userkey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default="")
     researcher_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
     
     forename = models.CharField(max_length=50, null = False)
@@ -16,7 +16,10 @@ class Researcher(models.Model):
     email = models.EmailField(max_length = 254, null = False)
     username = models.TextField(null = False, unique = True)
     password = models.CharField(max_length=50, null = False)
-    approved = models.BooleanField(default=False)
+
+    # removes the need to store this as a field now we just call this
+    def is_approved(self):
+        return self.userkey.is_active if self.userkey else None
 
 
 class Experiment(models.Model):

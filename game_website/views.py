@@ -6,6 +6,7 @@ from django.db import IntegrityError
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
+from django.contrib.auth.models import User
 
 # helper methods
 def is_ajax(request):
@@ -165,7 +166,9 @@ def researcher_registration(request):
         email = request.POST['email']
         username = request.POST['username']
         password = request.POST['password']
-        Researcher.objects.create(forename=forename, surname=surname, email = email, username = username, password=password)
+        # is_active set to false until we authenticate them
+        user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
+        Researcher.objects.create(userkey = user, forename=forename, surname=surname, email = email, username = username)
         return redirect("home")
  
     return render(request, 'researcher_registration.html', context)
@@ -206,6 +209,7 @@ def viewGames(request):
         if not condition:
             print("something went wrong")
             return HttpResponse("")
+        #kinda bad
         games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition, 
                                                     experiment = Experiment.objects.get(name = request.POST["experiment_name"], created_by = request.POST["current_researcher"]))))
         if games:
