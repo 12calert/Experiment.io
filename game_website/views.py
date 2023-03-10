@@ -51,10 +51,13 @@ def all_rooms(request, game):
 
 def create_room(request, game):
 
-    #choose a condition to apply to the game
+    # choose a random condition, can be extended to choose a condition fairly
+    # (choose the condition with the least amount of games, etc...)
+
+    #first filter the conditions we can user for our game
     conditions = Condition.objects.filter(game_type = game)
-    # some way to pick which condition randomly, or with some logic here:
-    condition = conditions.first()
+    condition = choice(list(conditions))
+    print(condition)
     #note that this will fail if there is no condition
     if condition:
         # if the user selects a Public room:
@@ -100,7 +103,7 @@ def joinRoom(request, game):
 
 def data(request):
     context = {}
-    current_researcher = Researcher.objects.get(user=request.user)
+    current_researcher = Researcher.objects.get(userkey=request.user)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
     context['researcher'] = current_researcher
     return render(request, 'data.html', context)
@@ -118,7 +121,7 @@ def conditions(request):
     context['create_condition'] = create_condition
 
 
-    current_researcher = Researcher.objects.get(user=request.user)
+    current_researcher = Researcher.objects.get(userkey=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
 
@@ -129,7 +132,7 @@ def createExperiment(request):
     if request.POST and create_experiment.is_valid():
         #do stuff from the experiment form
         try:
-            current_researcher = Researcher.objects.get(user=request.user)
+            current_researcher = Researcher.objects.get(userkey=request.user)
             Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
                                     active = create_experiment.cleaned_data.get("active"),
                                     created_by = current_researcher)
@@ -143,7 +146,7 @@ def createCondition(request):
     create_condition = GameConditions(request.POST or None)
     if request.POST and create_condition.is_valid():
         try:
-            current_researcher = Researcher.objects.get(user=request.user)
+            current_researcher = Researcher.objects.get(userkey=request.user)
             Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
                                     restriction = create_condition.cleaned_data.get("restriction"),
                                     active = create_condition.cleaned_data.get("active"),

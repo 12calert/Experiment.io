@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
-from jsonfield import JSONField
 import uuid
-from django.contrib.auth.models import User
 from django.db.models.functions import Lower
 # Create your models here.
 

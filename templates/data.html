@@ -76,6 +76,13 @@ function viewConditions(experiment_name){
 };
 
 function viewGames(condition_name, experiment_name){
+    /* You need to make it so the researcher cannot click the button again, or you make it so the researcher can
+    click the button again to remove the elements that were just added, do the same for the other button events.
+    To remove and add different onclick events using jquery use something like
+    $('#id').unbind('click'); -- to remove the event, you can also directly change the attribute of the element if you have the id (which we do)
+    $('#id').click(function(){ -- to add a click event
+    // your code here
+    });
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_games' %}",
