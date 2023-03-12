@@ -247,3 +247,7 @@ def saveMessage(request):
         return JsonResponse({},status = 200)
     return HttpResponse("")
 # --- end of ajax views ---
+
+def gamelogic(request):
+    context = {}
+    return render(request, 'gamelogic.html', context=context)
