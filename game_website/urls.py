@@ -38,10 +38,8 @@ urlpatterns = [
     path('<game>/all_rooms/joinRoom', views.joinRoom),
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     # simple page routing
+    path('gamelogic/', views.gamelogic, name='gamelogic'),
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
-    
- 
-    
     path('researcher_login/', auth_views.LoginView.as_view(template_name="researcher_login.html"), name = "researcher_login"),
     path('logout/', auth_views.LogoutView.as_view(next_page='researcher_login'),name='logout'),
     path('data/', views.data, name='research_data'),
@@ -50,7 +48,6 @@ urlpatterns = [
     path('conditions/createExperiment', views.createExperiment),
     path('conditions/createCondition', views.createCondition),
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
-
     path('post/ajax/gameDone', views.gameComplete, name = "complete_game"),
     path('post/ajax/viewConditions', views.viewConditions, name="view_conditions"),
     path('post/ajax/viewGames', views.viewGames, name="view_games"),

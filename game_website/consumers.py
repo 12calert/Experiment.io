@@ -34,6 +34,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         role = text_data_json["role"]
         finished = text_data_json["finished"]
 
+        if role == "move":
+            game = await Game.objects.aget( room_name=self.room_name )
+            game.follower_position[ "x" ] += message[ "x" ] * 10
+            game.follower_position[ "y" ] += message[ "y" ] * 10
+            message = game.follower_position
+            await sync_to_async( game.save )()
         # Send message to room group
         await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": message, "role": role, "finished":finished})
 
@@ -43,14 +49,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         role = event["role"]
         finished = event["finished"]
         # after sending a message create entry in DB and connect it to the specific game
-        if role != "announcement":
+        if role == "announcement":
+            await self.send(text_data=json.dumps({"type":"announcement", "message":message, "finished":False}))
+        elif role == "move":
+            await self.send(text_data=json.dumps( { "type":"move", "message":message, } ) )
+        else:
             # Send message to WebSocket
             await self.send(text_data=json.dumps({"type": "chat_message", "message": message, "role": role, "finished":finished}))
-        else:
-            await self.send(text_data=json.dumps({"type":"announcement", "message":message, "finished":False}))
     
     async def announcement(self,event):
         message = event["message"]
         finished = event["finished"]
 
         await self.send(text_data=json.dumps({"type":"announcement", "message":message, "finished":finished}))
+    
+    async def move( self, event ):
+        message = event[ "message" ]
+
+        await self.send( text_data=json.dumps( { "type":"move", "message":message } ) )

@@ -202,20 +202,17 @@ footer ul li ul li{
   height: 1000px;
 }
 
-
+/* CHAT */
+ 
 .chat {
   background-color: #fff;
   border-radius: 0px;
   box-shadow: 0px 0px 10px #ccc;
   height: 500px;
   overflow-y: scroll;
-  padding: 20px;
-}
-
-#chat-log {
-  border: none;
-  height: 400px;
-  width: 100%;
+  overflow-y: auto;
+  padding-top: 20px;
+  
 }
 
 #chat-message-input {
@@ -239,12 +236,50 @@ footer ul li ul li{
 }
 
 #chat-message-submit:hover {
-  background-color: #0066cc;
+  background-color: blue;
 }
 
+/* end of chat */
+
+/* changes to distinguish the messages sent in the app */
+
+.chat-sent {
+  color: black;
+  background-color: lightgrey;
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 10px;
+  margin-left: 50px;
+  margin-right: 0px;
+  align-self: flex-start;
+  display: block;
+  word-wrap: break-word; /* Add this line */
+}
+
+.chat-received {
+  color: white;
+  display: block;
+  background-color: #3333ff;
+  border-radius: 10px;
+  padding: 8px;
+  margin-bottom: 10px;
+  margin-right: 150px;
+  align-self: flex-start;
+  word-wrap: break-word; /* Add this line */
+}
+
+.chat-log {
+max-height: 600px;
+overflow-y: scroll;
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+}
+
+/* end of changes to distinguish the messages sent in the app */
 
 /* style of two boxes that they distinguish map and chat */
-.col-sm-8.map {
+.col-sm-8.game {
   height: 550px;
   border-color: #333;
   border-style: solid;
