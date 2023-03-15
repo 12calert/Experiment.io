@@ -172,8 +172,6 @@ def researcher_registration(request):
         # is_active set to false until we authenticate them
         user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
         Researcher.objects.create(userkey = user)
-        return redirect("home")
- 
     return render(request, 'researcher_registration.html', context)
 
 # --- start of ajax views ---
