@@ -5,6 +5,7 @@
 
 {# Collapsible "view information" #}
 <div>
+  
 <button type="button" class="collapsible">View information</button>
 <div class="content">
   <p>
@@ -30,8 +31,10 @@
 {% endif %}
 {# Game map and chat #}
 <div class="row">
-  <div class="col-sm-8 map"> <br><br><br><br><br><br><br><br>
-      Photo of the Game map! (probably embeded)
+  <div class="col-sm-8 game">
+    <img id="dummy" hidden src="{% static 'images/logo.png' %}">
+    <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
+    
   </div>
   <div class="col-sm-4 chat"><div textarea id="chat-log" ></div><br>
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
@@ -96,6 +99,7 @@
   ---         can be changed later     ---*/
   chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
+    print(e.data)
     // do some more stuff when game finished
     // both see a finished map, either as popup or redirect to new page
     // this will have to change depending on if the game is given up or completed
@@ -117,6 +121,9 @@
     else if (data.role === playerRole) {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
     } 
+    else if ( data.role == "move" ) {
+      //Update player position
+    }
     else {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-received'>" + data.role + ": " + data.message + "<br></span>";
     }
@@ -127,7 +134,133 @@
   chatSocket.onclose = function(e) {
     console.log('Socket closed unexpectedly');
   };
+
+  function intersect( r1, r2 ) {
+    if( r1.left < r2.left + r2.width && r1.left + r1.width > r2.left &&
+     r1.top < r2.top + r2.height && r1.top + r1.height > r2.top ) return true
+     return false
+  }
+ 
+  // Some of it will be moved to the server side
+  function SpawnMap( rectNumber ) {
+    
+    if( rectNumber > 1000 ) rectNumber = 1000 
+
+    var gameWindow = document.getElementsByClassName( "game" )
+    var rects = []
+    var failCounter = 0
+
+    for( let i = 0; i < rectNumber; i++ ) {
+      rects.push( {
+        "top": Math.floor(Math.random() * 1000),
+        "left": Math.floor(Math.random() * 1000),
+        "width": 100,
+        "height": 100
+      } )
+
+      for( let j = 0; j < rects.length - 1; j++ ) {
+        if( intersect( rects[j], rects[rects.length - 1] ) ) {
+          rects.pop()
+          i -= 1
+          failCounter++
+          if( failCounter > 1000 ) i = 1000
+          break
+        }
+      }
+    }
+
+    let dummmy = document.getElementById( "dummy" )
+    for( let i = 0; i < rectNumber; i++ ) {
+      let img = document.createElement( 'img' )
+      img.src = dummy.src
+      img.style.position = "absolute"
+      img.style.top = rects[i].top + "px"
+      img.style.left = rects[i].left + "px"
+      img.style.width = rects[i].width + "px"
+      img.style.height = rects[i].height + "px"
+      //img.style.zIndex = -1
+      gameWindow[0].appendChild( img ) 
+    }
+
+    return rects
+  }
+
+  // Some of it will be moved to the server side
+  function SpawnPlayer () {
+
+    var gameWindow = document.getElementsByClassName( "game" )
+
+    let img = document.createElement( 'img' )
+    img.src = dummy2.src
+    img.style.position = "absolute"
+    img.style.top = "0px"
+    img.style.left = "0px"
+    img.style.width = "32px"
+    img.style.height = "32px"
+    img.id = "player"
+    img.style.zIndex = 99
+    gameWindow[0].appendChild( img )
+
+    return {
+      "img": img
+    }
+  }
+
+  // Just for showcase, later send a message via WS with "left" or "right" etc.
+  function MoveLeft( amount ) {
+    sendInput( -1, 0 )
+    let player = document.getElementById( "player" )
+    player.style.left = parseInt( player.style.left, 10 ) - amount + "px";
+  }
+
+  function MoveRight( amount ) {
+    sendInput( 1, 0 )
+    let player = document.getElementById( "player" )
+    player.style.left = parseInt( player.style.left, 10 ) + amount + "px";
+  }
+
+  function MoveUp( amount ) {
+    sendInput( 0, -1 )
+    let player = document.getElementById( "player" )
+    player.style.top = parseInt( player.style.top, 10 ) - amount + "px";
+  }
+
+  function MoveDown( amount ) {
+    let player = document.getElementById( "player" )
+    sendInput( 0, 1 )
+    player.style.top = parseInt( player.style.top, 10 ) + amount + "px";
+  }
   
+  function sendInput( x, y ) {
+    chatSocket.send(JSON.stringify({
+          'message': { "x": x, "y": y },
+          'role': "move",
+          'finished' : false,
+        }));
+  }
+
+  function InitializeGame() {
+
+    SpawnPlayer()
+    let rects = SpawnMap( 20 )
+    let speed = 10
+
+    document.addEventListener( 'keydown', function( event ) {
+      if( event.keyCode == 37 ) MoveLeft( speed )
+      else if( event.keyCode == 39 ) MoveRight( speed )
+      else if( event.keyCode == 38 ) MoveUp( speed )
+      else if( event.keyCode == 40 ) MoveDown( speed )
+
+      if( [ "Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight" ].indexOf( event.code ) > -1) {
+        event.preventDefault();
+      }
+    } );
+
+    return {
+      "rects": rects,
+    }
+  }
+
   /* allows for submitting messages via pressing enter*/
   document.querySelector('#chat-message-input').focus();
   document.querySelector('#chat-message-input').onkeyup = function(e) {
@@ -204,6 +337,8 @@ $("#complete").submit(function (e) {
       'finished' : true
   }));
 })
+
+InitializeGame()
  
   </script>
 {% endblock javascript %}

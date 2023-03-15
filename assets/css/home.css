@@ -279,7 +279,7 @@ justify-content: flex-end;
 /* end of changes to distinguish the messages sent in the app */
 
 /* style of two boxes that they distinguish map and chat */
-.col-sm-8.map {
+.col-sm-8.game {
   height: 550px;
   border-color: #333;
   border-style: solid;
