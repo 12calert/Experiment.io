@@ -7,24 +7,93 @@
 page so researchers can view data on games
 {% endcomment %}
 
+<style>
+    /* Define button styles for each theme */
+    .button {
+        background-color: #e0ac1c;
+        font-size: 16px;
+        cursor: pointer;
+        color: white;
+        border: none;
+        margin: 5px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        width: calc(25% - 10px);
+        
+        
+    }
+
+    .button:hover { 
+        color: white;
+        background-color: black;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        
+    }
+
+    th,td {
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+        
+    }
+    
+    td {
+        border-right: 1px solid #ddd;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+        
+    }
+    
+    th {
+        color: white;
+        border-bottom: 1px solid #ddd;
+        padding: 8px;
+        background-color: #e0ac1c;
+        
+    }
+
+    td:last-child {
+        border-right: none;
+    }
+</style>
+
 <div><p>click an experiment to see further information</p></div>
 
 {# needs to change from form to something else #}
 {% if experiments %}
-<div id = "viewConditions">
-    {% csrf_token %}
-	{% for experiment in experiments %}
-    	<button id = "experiment" value = "{{ experiment }}" onclick = "viewConditions('{{experiment}}')">{{ experiment }}</button>
-		{# figure something out here I hate this#}
-		<div id = "conditions_{{experiment}}">
-		</div>
-	{% endfor %}
-
-	
+<div id="viewConditions">
+    <table>
+        <thead>
+            <tr>
+                <th>Experiment</th>
+                <th>Conditions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for experiment in experiments %}
+            <tr>
+                <td>
+                    <button class="button" id="experiment" value="{{ experiment }}" 
+                    onclick="viewConditions('{{experiment}}')">
+                        {{ experiment }}
+                    </button>
+                </td>
+                <td>
+                    <div id="conditions_{{experiment}}"></div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endif %}
 
 {% endblock content %}
+
 
 {% block javascript %}
 <script>
