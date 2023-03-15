@@ -87,6 +87,20 @@ class GameConditions(forms.ModelForm):
         labels = {
             'active': 'Active'
         }
+    
+    def __init__(self, *args, **kwargs):
+        # store value of request so we can access the currently logged in user in validation
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+    def clean_condition_name(self):
+        condition_name = self.cleaned_data['condition_name']
+        try:
+            current_researcher = Researcher.objects.get(userkey=self.request.user)
+            Condition.objects.get(created_by = current_researcher, name = condition_name)
+        except Condition.DoesNotExist:
+            return condition_name
+        raise forms.ValidationError(("This condition name already exists"))
 
 
 

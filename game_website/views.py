@@ -115,7 +115,7 @@ def gamelogic(request):
 def conditions(request):
     #filter by the researcher's ID
     context = {}
-    create_condition = GameConditions(request.POST or None)
+    create_condition = GameConditions(request.POST or None, request=request)
     create_experiment = ExperimentForm(request.POST or None, request=request)
     context['create_experiment'] = create_experiment
     context['create_condition'] = create_condition
@@ -138,7 +138,7 @@ def createExperiment(request):
     else:
         context = {}
         # this is necessary to not check for validations on this form
-        create_condition = GameConditions(None)
+        create_condition = GameConditions(None, request = request)
         context['create_experiment'] = create_experiment
         context['create_condition'] = create_condition
 
@@ -148,21 +148,28 @@ def createExperiment(request):
         return render(request, "conditions.html", context)
 
 def createCondition(request):
-    create_condition = GameConditions(request.POST or None)
+    create_condition = GameConditions(request.POST or None, request=request)
     if request.POST and create_condition.is_valid():
-        try:
-            current_researcher = Researcher.objects.get(userkey=request.user)
-            Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
-                                    restriction = create_condition.cleaned_data.get("restriction"),
-                                    active = create_condition.cleaned_data.get("active"),
-                                    game_type = create_condition.cleaned_data.get("game_type"),
-                                    created_by = current_researcher,
-                                    name = create_condition.cleaned_data.get("condition_name"),
-                                    experiment = create_condition.cleaned_data.get("experiment"))
-        except IntegrityError:
-            # tell the user the condition is not unique
-            print("The condition is not unique")
-    return redirect('game_conditions')
+        current_researcher = Researcher.objects.get(userkey=request.user)
+        Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
+                                restriction = create_condition.cleaned_data.get("restriction"),
+                                active = create_condition.cleaned_data.get("active"),
+                                game_type = create_condition.cleaned_data.get("game_type"),
+                                created_by = current_researcher,
+                                name = create_condition.cleaned_data.get("condition_name"),
+                                experiment = create_condition.cleaned_data.get("experiment"))
+        return redirect('game_conditions')
+    else:
+        context = {}
+        # this is necessary to not check for validations on this form
+        create_experiment = ExperimentForm(None, request = request)
+        context['create_experiment'] = create_experiment
+        context['create_condition'] = create_condition
+
+        current_researcher = Researcher.objects.get(userkey=request.user)
+        context['conditions'] = Condition.objects.filter(created_by = current_researcher)
+        context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
+        return render(request, "conditions.html", context)
 
 def researcher_registration(request):
     create_researcher_registration = ResearcherRegisterForm(request.POST or None)
