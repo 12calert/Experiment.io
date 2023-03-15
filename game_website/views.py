@@ -116,10 +116,9 @@ def conditions(request):
     #filter by the researcher's ID
     context = {}
     create_condition = GameConditions(request.POST or None)
-    create_experiment = ExperimentForm(request.POST or None)
+    create_experiment = ExperimentForm(request.POST or None, request=request)
     context['create_experiment'] = create_experiment
     context['create_condition'] = create_condition
-
 
     current_researcher = Researcher.objects.get(userkey=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
@@ -128,19 +127,25 @@ def conditions(request):
     return render(request, 'conditions.html', context)
 
 def createExperiment(request):
-    create_experiment = ExperimentForm(request.POST or None)
+    create_experiment = ExperimentForm(request.POST or None, request=request)
     if request.POST and create_experiment.is_valid():
         #do stuff from the experiment form
-        try:
-            current_researcher = Researcher.objects.get(userkey=request.user)
-            Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
-                                    active = create_experiment.cleaned_data.get("active"),
-                                    created_by = current_researcher)
-        except IntegrityError:
-            # tell the user the experiment they created was not unique
-            # move validation to client side is an option
-            print("not unique tell the user")
-    return redirect('game_conditions')
+        current_researcher = Researcher.objects.get(userkey=request.user)
+        Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
+                                active = create_experiment.cleaned_data.get("active"),
+                                created_by = current_researcher)
+        return redirect('game_conditions')
+    else:
+        context = {}
+        # this is necessary to not check for validations on this form
+        create_condition = GameConditions(None)
+        context['create_experiment'] = create_experiment
+        context['create_condition'] = create_condition
+
+        current_researcher = Researcher.objects.get(userkey=request.user)
+        context['conditions'] = Condition.objects.filter(created_by = current_researcher)
+        context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
+        return render(request, "conditions.html", context)
 
 def createCondition(request):
     create_condition = GameConditions(request.POST or None)

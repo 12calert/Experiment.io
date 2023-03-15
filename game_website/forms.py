@@ -3,6 +3,7 @@ from accounts.models import Condition, Experiment
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm  
 from django.contrib.auth import get_user_model
+from accounts.models import Researcher
 # bad but we can make a model to store each game later
 GAME_CHOICES = [("MG", "Map Game")]
 
@@ -41,6 +42,20 @@ class ExperimentForm(forms.ModelForm):
         widgets = {
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        # store value of request so we can access the currently logged in user in validation
+        self.request = kwargs.pop("request")
+        super().__init__(*args, **kwargs)
+
+    def clean_experiment_name(self):
+        experiment_name = self.cleaned_data['experiment_name']
+        try:
+            current_researcher = Researcher.objects.get(userkey=self.request.user)
+            Experiment.objects.get(created_by = current_researcher, name = experiment_name)
+        except Experiment.DoesNotExist:
+            return experiment_name
+        raise forms.ValidationError(("This experiment name already exists"))
 
 
 
