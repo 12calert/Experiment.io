@@ -92,6 +92,8 @@ class GameConditions(forms.ModelForm):
         # store value of request so we can access the currently logged in user in validation
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
+        if self.request.user:
+            self.fields['experiment'].queryset = Experiment.objects.filter(created_by = Researcher.objects.get(userkey = self.request.user))
 
     def clean_condition_name(self):
         condition_name = self.cleaned_data['condition_name']
