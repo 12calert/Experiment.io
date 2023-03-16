@@ -99,17 +99,17 @@ def joinRoom(request, game):
         room_name = request.POST['room']
         # find the Game instance which they want to join
         foundGame = Game.objects.get(room_name = room_name)
-        # count how many players there are in the game
-        players = Player.objects.filter(game=foundGame)
         # if there are more than 2 users in the same game, then reload the page.
-        if (players.count() >= 2):
+        # this is hardcoded for now
+        if (foundGame.users >= 2):
             # return response
             return redirect('all_rooms', game)
-            
-        # will have some undefined behaviour if no players exist
+        
+        player = Player.objects.get(game=foundGame)
+        # will have some undefined behaviour if no players exist, though they cannot join an empty room, only create
         # get the role of the current player
-        if players:
-            assignedRole = players.first().role
+        if player:
+            assignedRole = player.role
         else:
             assignedRole = None
         # choose the new roles to assign
