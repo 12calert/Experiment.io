@@ -2,34 +2,40 @@ from django.shortcuts import render, redirect
 from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
-from django.db import IntegrityError
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
 from django.contrib.auth.models import User
 
 # helper methods
+"""checks a request to see if it is an ajax request"""
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
-ROLE_CHOICES = ["follower", "giver"]
+ROLE_CHOICES = ["follower", "giver"]  # Array of roles, either follower or giver
+
+""" view which renders the home page"""
 def homepage(request):
-    # create a session id for anonymous users and add
+    # create a session id for anonymous users and add to cookies
     request.session['user_id'] = secrets.token_hex(5)
     context={}
+    # create the ChooseGame form
     chooseGame = ChooseGame(request.POST or None)
     context['chooseGame'] = chooseGame
-    if request.POST:
-        if chooseGame.is_valid():
+    if request.POST:  # if form submission
+        if chooseGame.is_valid():   # if the form is valid (no inputs are invalid)
             #send to appropriate game rooms page
             return redirect("all_rooms", game = chooseGame.cleaned_data.get("game_choice"))
     return render(request, 'home.html', context)
 
+""" view to render the login page, currently unused"""
 def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+""" renders the game view page which users play the game and chat to each other in"""
 def game_view(request, game, room_name):
+    # query the database to find the correct game instance
     foundGame = Game.objects.get(room_name = room_name)
     
     # Using filter() and first() to allow the case in which someone chooses to play with themself
@@ -39,40 +45,45 @@ def game_view(request, game, room_name):
     # ------- READ ME ----------
     #WARNING: THIS WILL RESULT IN INCONSISTENT ROLE ALLOCATION WHEN PLAYING BY YOURSELF
     # FOR CONSISTENT ALLOCATION USE TWO DIFFERENT BROWSERS
-    foundPlayer = Player.objects.filter(game = foundGame, user_session = request.session.get("user_id")).first()
+
+    # query the database to get the current logged in player
+    foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
                                               "game":game, "player":foundPlayer, "public":foundGame.public}) # dict to store room number
-
+""" view which renders the page containing the list of rooms"""
 def all_rooms(request, game):
-    #rooms with one player waiting for another
+    #query all rooms with one player waiting for another
     rooms = Game.objects.filter(users=1, game_type=game)
     # return response
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
+""" creates the room and sends the user to it, can be either a public or private room"""
 def create_room(request, game):
 
     # choose a random condition, can be extended to choose a condition fairly
     # (choose the condition with the least amount of games, etc...)
 
-    #first filter the conditions we can user for our game
+    #first filter all the conditions we can use for our game
     conditions = Condition.objects.filter(game_type = game)
+    # pick a random condition
     condition = choice(list(conditions))
-    print(condition)
     #note that this will fail if there is no condition
     if condition:
         # if the user selects a Public room:
         if 'Public' in request.POST:
-            #chat = Chat.objects.create()
+            # create the Game instance as public
             new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=True,
             game_type=game, has_condition = condition)
+            # create the Player instance and add it to the newly created game instance
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
 
             return redirect('game_view',  game = game, room_name = new_room.room_name)
     # if the user selects a Private room:
         elif 'Private' in request.POST:
-            #chat = Chat.objects.create()
+            # create the Game instance as private
             new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=False, 
                                    game_type=game, has_condition = condition)
+            # create the player instance and add it to the newly created game instance
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
             return redirect('game_view', game = game, room_name = new_room.room_name)
     else:
@@ -80,65 +91,78 @@ def create_room(request, game):
         # do stuff, let user know there was error
         return redirect("home")
 
+""" function which adds the player to the room they selected"""
 def joinRoom(request, game):
     # check which role the user will be assigned then connect them to the room
     if request.method == 'POST':
+        # get the room name
         room_name = request.POST['room']
+        # find the Game instance which they want to join
         foundGame = Game.objects.get(room_name = room_name)
-        # find what role the player already assigned is
-        num_players = Player.objects.filter(game=foundGame).count()
         # if there are more than 2 users in the same game, then reload the page.
-        if (num_players >= 2):
-            # rooms with one player waiting for another
-            rooms = Game.objects.filter(users=1, game_type=game)
+        # this is hardcoded for now
+        if (foundGame.users >= 2):
             # return response
-            return render(request, 'all_rooms.html', {'rooms':rooms})
-            
-            
-        assignedRole = Player.objects.get(game = foundGame).role
+            return redirect('all_rooms', game)
+        
+        player = Player.objects.get(game=foundGame)
+        # will have some undefined behaviour if no players exist, though they cannot join an empty room, only create
+        # get the role of the current player
+        if player:
+            assignedRole = player.role
+        else:
+            assignedRole = None
+        # choose the new roles to assign
         new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
+        # create the player instance with one of the roles chosen randomly
         Player.objects.create(role = choice(new_roles), game = foundGame, user_session = request.session.get("user_id"))
 
         return redirect('game_view', game = game, room_name = foundGame.room_name)
 
+""" renders the data page"""
 def data(request):
     context = {}
+    # get the currently logged in researcher
     current_researcher = Researcher.objects.get(userkey=request.user)
+    # pass the researcher and experiments objects to the html page
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
     context['researcher'] = current_researcher
     return render(request, 'data.html', context)
-   
-def gamelogic(request):
-    context = { "rect_img": "{% static 'images/logo.png' %}" }
-    return render(request, 'gamelogic.html', context=context)
 
+""" renders the conditions page"""
 def conditions(request):
     #filter by the researcher's ID
     context = {}
+    # initialise the create experiment and condition form
     create_condition = GameConditions(request.POST or None, request=request)
     create_experiment = ExperimentForm(request.POST or None, request=request)
     context['create_experiment'] = create_experiment
     context['create_condition'] = create_condition
-
+    # get the reseacher and find their experiments and conditions and pass to html
     current_researcher = Researcher.objects.get(userkey=request.user)
     context['conditions'] = Condition.objects.filter(created_by = current_researcher)
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
 
     return render(request, 'conditions.html', context)
 
+""" called after experiment form complete, adds the input to the database"""
 def createExperiment(request):
+    # initialise the create experiment form
     create_experiment = ExperimentForm(request.POST or None, request=request)
+    # if the form is valid
     if request.POST and create_experiment.is_valid():
-        #do stuff from the experiment form
+        #get the current logged in researcher and add form data to database as new entry
         current_researcher = Researcher.objects.get(userkey=request.user)
         Experiment.objects.create(name = create_experiment.cleaned_data.get("experiment_name"),
                                 active = create_experiment.cleaned_data.get("active"),
                                 created_by = current_researcher)
         return redirect('game_conditions')
+    # if the form is not valid
     else:
         context = {}
-        # this is necessary to not check for validations on this form
+        # initialise the condition form as empty so we don't check validation
         create_condition = GameConditions(None, request = request)
+        # pass forms to html
         context['create_experiment'] = create_experiment
         context['create_condition'] = create_condition
 
@@ -147,10 +171,15 @@ def createExperiment(request):
         context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
         return render(request, "conditions.html", context)
 
+"""called after experiment form complete, adds the input to the database"""
 def createCondition(request):
+    # initialise game condition form
     create_condition = GameConditions(request.POST or None, request=request)
+    #if the form input is valid
     if request.POST and create_condition.is_valid():
+        #get the current logged in researcher
         current_researcher = Researcher.objects.get(userkey=request.user)
+        # create the condition in the database
         Condition.objects.create(amount_item = create_condition.cleaned_data.get("amount_of_items"),
                                 restriction = create_condition.cleaned_data.get("restriction"),
                                 active = create_condition.cleaned_data.get("active"),
@@ -161,7 +190,7 @@ def createCondition(request):
         return redirect('game_conditions')
     else:
         context = {}
-        # this is necessary to not check for validations on this form
+        # do not check for validation on the experiment form & pass forms to html
         create_experiment = ExperimentForm(None, request = request)
         context['create_experiment'] = create_experiment
         context['create_condition'] = create_condition
@@ -171,93 +200,118 @@ def createCondition(request):
         context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
         return render(request, "conditions.html", context)
 
+""" renders page for researchers to register"""
 def researcher_registration(request):
+    # initialise registration form
     create_researcher_registration = ResearcherRegisterForm(request.POST or None)
     context = {}
+    # pass form to html
     context["register"] = create_researcher_registration
+    # if form inputs are valid
     if request.POST and create_researcher_registration.is_valid():
         forename = request.POST['forename']
         surname = request.POST['surname']
         email = request.POST['email']
         username = request.POST['username']
         password = request.POST['password']
+        # create a django user (so they can log in)
         # is_active set to false until we authenticate them
         user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
+        # add researcher to db
         Researcher.objects.create(userkey = user)
     return render(request, 'researcher_registration.html', context)
 
 # --- start of ajax views ---
+""" called when the game is completed"""
 def gameComplete(request):
     # request should be ajax and method should be POST.
     if request.method == "POST" and is_ajax(request):
         # get the room name from JSON
         room_name = request.POST["roomName"]
+        # find the game that was played
         game = Game.objects.get(room_name=room_name)
+        # set to completed and save in the database
         game.completed = True
         game.save()
         return HttpResponse('')
+    # catch undefined behaviour
     else:
         print("something went wrong")
         return HttpResponse('')
 
+""" called when researcher chooses to view conditions from an experiment"""
 def viewConditions(request):
+    # if valid request
     if request.method == "POST" and is_ajax(request):
         # get the experiment and find all its conditions
         experiment = request.POST.get("experiment_name", None)
+        # catch undefined behaviour
         if not experiment:
             print("something went wrong")
             return HttpResponse("")
+        # create a list of all the conditions for the experiment the researcher chooses to view
         conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment, created_by = request.POST["current_researcher"])))
         # i.e. there exists some conditions for the experiment
         if conditions:
+            # serialise the list to JSON so it can be showed in html
             serialisedConditions = serializers.serialize('json', conditions )
             return JsonResponse({"exist": True, "conditions": serialisedConditions}, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
+""" called when researcher chooses to view the games that have been played or are in progress which have some 
+specified condition set on them"""
 def viewGames(request):
+    # if the request is valid
     if request.method == "POST" and is_ajax(request):
+        # get the condition name from the page request
         condition = request.POST.get("condition_name", None)
+        # catch undefined behaviour
         if not condition:
             print("something went wrong")
             return HttpResponse("")
-        #kinda bad
+        # create a list of games in which the specified condition was applied and it was the condition was created by the logged in user
         games = list(Game.objects.filter(has_condition = Condition.objects.get(name = condition, 
                                 experiment = Experiment.objects.get(name = request.POST["experiment_name"], created_by = request.POST["current_researcher"]))))
         if games:
+            # serialise list to JSON to view in html
             serialisedGames = serializers.serialize('json', games )
             return JsonResponse({"exist": True, "games": serialisedGames }, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
+""" called when researcher chooses to view the chat logs for a specified game"""
 def viewChats(request):
+    # if request is valid
     if request.method == "POST" and is_ajax(request):
+        # get the room name of the game from the page
         room_name = request.POST.get("room_name", None)
+        # catch undefined behaviour
         if not room_name:
             print("something went wrong")
             return HttpResponse("")
+        # get a list of chats in which for the specified game
         chats = list(Chat.objects.filter(game = Game.objects.get(room_name = room_name)))
         if chats:
+            # serialise to JSON to view in html
             serialisedChats = serializers.serialize('json', chats )
             return JsonResponse({"exist": True, "chats": serialisedChats }, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
-# this can potentially be made async
+""" called when a user sends a message in the chat box. Saves the message along with the role to the database"""
 def saveMessage(request):
+    # if request is valid
     if request.method == "POST" and is_ajax(request):
         # get the variables from post data
         role = request.POST["role"]
         message = request.POST["message"]
         room_name = request.POST["room_name"]
+        # add the chat into the database
         Chat.objects.create(role=role, game = Game.objects.get(room_name=room_name), content = message)
         return JsonResponse({},status = 200)
     return HttpResponse("")
 # --- end of ajax views ---
-
-def gamelogic(request):
-    context = {}
-    return render(request, 'gamelogic.html', context=context)

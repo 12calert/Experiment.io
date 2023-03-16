@@ -99,7 +99,6 @@
   ---         can be changed later     ---*/
   chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    print(e.data)
     // do some more stuff when game finished
     // both see a finished map, either as popup or redirect to new page
     // this will have to change depending on if the game is given up or completed

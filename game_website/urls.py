@@ -38,7 +38,6 @@ urlpatterns = [
     path('<game>/all_rooms/joinRoom', views.joinRoom),
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     # simple page routing
-    path('gamelogic/', views.gamelogic, name='gamelogic'),
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
     path('researcher_login/', auth_views.LoginView.as_view(template_name="researcher_login.html"), name = "researcher_login"),
     path('logout/', auth_views.LogoutView.as_view(next_page='researcher_login'),name='logout'),
@@ -47,7 +46,7 @@ urlpatterns = [
     # for creating experiment and conditions from forms in conditions.html
     path('conditions/createExperiment', views.createExperiment),
     path('conditions/createCondition', views.createCondition),
-    path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
+    # ajax views
     path('post/ajax/gameDone', views.gameComplete, name = "complete_game"),
     path('post/ajax/viewConditions', views.viewConditions, name="view_conditions"),
     path('post/ajax/viewGames', views.viewGames, name="view_games"),
@@ -55,7 +54,6 @@ urlpatterns = [
     path('post/ajax/saveMessage', views.saveMessage, name="save_message"),
     # when they put the unique private room key:
  
-    # tried with regex but need help
     #re_path(r'^all_rooms/game_view/(?P<room_name>)/$', views.game_view, name='game_view')
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
