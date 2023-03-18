@@ -16,22 +16,23 @@
           <tbody>
             <tr>
               <td>
-                <form action="actionUrl" method="POST">
+                <form id="public-form" name="Public" action="actionUrl" method="POST" style="display:none;">
                   {% csrf_token %}
                   {{ form.as_p }}
-                  <button class="btn btn-primary" type="submit" name="Public">Create a public room</button>
+                  <input type="hidden" name="Public" value="Public">
                 </form>
+                <button class="btn btn-primary" onclick="showTermsAndConditions('public'); return false;">Create a public room</button>
               </td>
-            </tr>
+            </tr> 
             <tr>
               <td>
-                <form action="actionUrl" method="POST">
+                <form id="private-form" name="Private" action="actionUrl" method="POST" style="display:none;">
                   {% csrf_token %}
                   {{ form.as_p }}
-                  <button class="btn btn-primary" type="submit" name="Private">Create a private room</button>
+                  <input type="hidden" name="Private" value="Private">
                 </form>
-              </td>
-            </tr>
+                <button class="btn btn-primary" name="Private" onclick="showTermsAndConditions('private'); return false;">Create a private room</button>
+              </tr>
           </tbody>
         </table>
       </div>
@@ -81,5 +82,43 @@
     </div>
   </div>
 </div>
+ 
+  <div id="terms-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+    <div style="background-color:white; padding:20px; max-width:500px; margin:10% auto;">
+        <h2>Terms and Conditions</h2>
+        <p>Your terms and conditions content here.</p>
+        <button id="accept-button" type="button"  >Accept</button>
+        <button type="button" onclick="hideTermsAndConditions()">Decline</button>
+    </div>
+</div>
 
+<script>
+  function showTermsAndConditions(buttonType) {
+    event.preventDefault();
+    document.getElementById("terms-popup").style.display = "block";
+    document.getElementById("accept-button").onclick = function () {
+      acceptTermsAndConditions(buttonType);
+    };
+  }
+
+  function hideTermsAndConditions() {
+    document.getElementById("terms-popup").style.display = "none";
+  }
+
+  function acceptTermsAndConditions(buttonType) {
+    hideTermsAndConditions();
+
+    let form;
+    if (buttonType === "public") {
+      form = document.getElementById("public-form");
+    } else if (buttonType === "private") {
+      form = document.getElementById("private-form");
+    }
+
+    if (form) {
+      form.submit();
+    }
+  }
+  </script>
+  
 {% endblock content %}
