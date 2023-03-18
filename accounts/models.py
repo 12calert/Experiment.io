@@ -24,9 +24,8 @@ class Experiment(models.Model):
         # ensure Researcher's set a unique name for their experiment
         constraints = [
             models.UniqueConstraint(
-                Lower('name'),
-                'created_by',
-                name='researcher_and_name_unique',
+                fields=['name','created_by'],
+                name='researcher_and_name_unique'
             ),
         ]
 
@@ -54,8 +53,7 @@ class Condition(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                Lower('name'),
-                'experiment',
+                fields=['name','experiment'],
                 name='name_and_experiment_unique',
             ),
         ]

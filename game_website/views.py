@@ -209,11 +209,11 @@ def researcher_registration(request):
     context["register"] = create_researcher_registration
     # if form inputs are valid
     if request.POST and create_researcher_registration.is_valid():
-        forename = request.POST['forename']
-        surname = request.POST['surname']
+        forename = request.POST['first_name']
+        surname = request.POST['last_name']
         email = request.POST['email']
         username = request.POST['username']
-        password = request.POST['password']
+        password = request.POST['password1']
         # create a django user (so they can log in)
         # is_active set to false until we authenticate them
         user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
