@@ -101,7 +101,6 @@ def create_room(request, game):
         # do stuff, let user know there was error
         return redirect("home")
 
-
 def join_or_create_room(request, game):
     # Get a list of available public rooms
     available_rooms = Game.objects.filter(public=True)
@@ -109,7 +108,7 @@ def join_or_create_room(request, game):
     for room in available_rooms:
         players_in_room = Player.objects.filter(game=room)
 
-        if players_in_room.count() < 2:
+        if room.users < 2:
             player = Player.objects.filter(game=room, user_session=request.session.get("user_id")).first()
 
             if not player:
@@ -117,10 +116,12 @@ def join_or_create_room(request, game):
                 assigned_roles = [p.role for p in players_in_room]
                 new_roles = [v for v in ROLE_CHOICES if v not in assigned_roles]
 
-                # create the player instance with one of the roles chosen randomly
-                Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id"))
+                if new_roles:
+                    # create the player instance with one of the roles chosen randomly
+                    Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id"))
+                
 
-            return redirect('game_view', game=game, room_name=room.room_name)
+                    return redirect('game_view', game=game, room_name=room.room_name)
 
     # if no suitable rooms were found, create a new room
     return create_room2(request, game)

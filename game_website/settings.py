@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # For Render hosting
     'django.contrib.messages.middleware.MessageMiddleware',
-    'game_website.middleware.SetUserIdMiddleware',
+   
 ]
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
