@@ -109,6 +109,7 @@ def join_private_room(request, game):
             # Check if the room already has two players
             players_in_room = Player.objects.filter(game=found_game)
             if players_in_room.count() >= 2:
+                
                 messages.error(request, "The private room is already full.")
                 return redirect('all_rooms', game)
             # Perform necessary operations to join the private room
