@@ -36,7 +36,7 @@
     <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
     
   </div>
-  <div class="col-sm-4 chat"><div textarea id="chat-log" ></div><br>
+  <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}
     </div>
@@ -126,7 +126,9 @@
     else {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-received'>" + data.role + ": " + data.message + "<br></span>";
     }
-
+    // Scroll chat log to bottom
+    const chatLog = document.getElementById('chat-log');
+    chatLog.scrollTop = chatLog.scrollHeight;
   };
  
   /* do something when the chat socket is closed */

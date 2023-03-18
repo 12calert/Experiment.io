@@ -5,13 +5,17 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from accounts.models import Researcher
 # bad but we can make a model to store each game later
+# define choices for the game type dropdown
 GAME_CHOICES = [("MG", "Map Game")]
 
 class ResearcherRegisterForm(UserCreationForm):
+    """ A form to register a new researcher. Inherits from Django's UserCreationForm. """
     class Meta:
         model = User
+        # specify the fields to include in the form
         fields = ('first_name', 'last_name','username','email','password1','password2')
         widgets = {
+            # add a css class to each form field for styling
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
@@ -19,8 +23,8 @@ class ResearcherRegisterForm(UserCreationForm):
             'password1': forms.TextInput(attrs={'class': 'form-control'}),
             'password2': forms.TextInput(attrs={'class': 'form-control'}),
         }
-    """ check to see if the username is unique and appropriate error"""
     def clean_username(self):
+        """Check if the chosen username is unique, and raise an error if not."""
         user_model = get_user_model()
         username = self.cleaned_data['username']
         try:
@@ -30,6 +34,7 @@ class ResearcherRegisterForm(UserCreationForm):
         raise forms.ValidationError(("This username already exists"))
 
 class ExperimentForm(forms.ModelForm):
+    """A form to create a new experiment."""
     experiment_name = forms.CharField(
         max_length=50,
         required=True,
@@ -44,7 +49,7 @@ class ExperimentForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
-        # store value of request so we can access the currently logged in user in validation
+        """ Store the value of request so we can access the currently logged in user in validation."""
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 

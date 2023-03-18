@@ -2,7 +2,33 @@
 {% load static %}
 {% block title %}Rooms{% endblock %}
 {% block content %}
+<style>
+  .terms-box {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .terms-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    color: black;
+  }
+  </style>
+ 
+{% comment %} alert message for wrong input on private room key {% endcomment %}
+{% if messages %}
+      <div class="alert alert-danger" role="alert">
+        <span class="error-icon"></span>
+        {% for message in messages %}
+            <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+      </div>
+    
+{% endif %}
 <div class="container">
+  
   <div class="row">
     <!--Table for creating public or private rooms-->
     <div class="col-sm-6">
@@ -16,22 +42,23 @@
           <tbody>
             <tr>
               <td>
-                <form action="actionUrl" method="POST">
+                <form id="public-form" name="Public" action="actionUrl" method="POST" style="display:none;">
                   {% csrf_token %}
                   {{ form.as_p }}
-                  <button class="btn btn-primary" type="submit" name="Public">Create a public room</button>
+                  <input type="hidden" name="Public" value="Public">
                 </form>
+                <button class="btn btn-primary" onclick="showTermsAndConditions('public'); return false;">Create a public room</button>
               </td>
-            </tr>
+            </tr> 
             <tr>
               <td>
-                <form action="actionUrl" method="POST">
+                <form id="private-form" name="Private" action="actionUrl" method="POST" style="display:none;">
                   {% csrf_token %}
                   {{ form.as_p }}
-                  <button class="btn btn-primary" type="submit" name="Private">Create a private room</button>
+                  <input type="hidden" name="Private" value="Private">
                 </form>
-              </td>
-            </tr>
+                <button class="btn btn-primary" name="Private" onclick="showTermsAndConditions('private'); return false;">Create a private room</button>
+              </tr>
           </tbody>
         </table>
       </div>
@@ -81,5 +108,80 @@
     </div>
   </div>
 </div>
+ 
+<div id="terms-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+  <div class="container h-100">
+    <div class="row h-100">
+      <div class="col-sm-12 col-md-8 col-lg-6 mx-auto my-auto">
+        <div class="terms-box bg-white p-4">
+          <h2 style="color:black">Terms and Conditions</h2>
+          <div class="terms-content">
+            <p>Your terms and conditions content here.</p>
+            <ol>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+          </ol>
+          </div>
+          <br>
+          <button class="btn btn-primary" id="accept-button" type="button">Accept</button>
+          <button class="btn btn-primary" type="button" onclick="hideTermsAndConditions()">Decline</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- unique form NEWWW  -->
+  <form id="private-room-form" action="join_private_room/" method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="unique_room_box">Private room key:</label>
+    <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
+  </div>
+  <button class="btn btn-primary" type="submit">Join a private room</button>
+</form>
+<script>
+  function showTermsAndConditions(buttonType) {
+    event.preventDefault();
+    document.getElementById("terms-popup").style.display = "block";
+    document.getElementById("accept-button").onclick = function () {
+      acceptTermsAndConditions(buttonType);
+    };
+  }
 
+  function hideTermsAndConditions() {
+    document.getElementById("terms-popup").style.display = "none";
+  }
+
+  function acceptTermsAndConditions(buttonType) {
+    hideTermsAndConditions();
+
+    let form;
+    if (buttonType === "public") {
+      form = document.getElementById("public-form");
+    } else if (buttonType === "private") {
+      form = document.getElementById("private-form");
+    }
+
+    if (form) {
+      form.submit();
+    }
+  }
+  </script>
+  
 {% endblock content %}

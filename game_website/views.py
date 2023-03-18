@@ -6,6 +6,9 @@ import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
+from django.http import Http404
 
 # helper methods
 """checks a request to see if it is an ajax request"""
@@ -33,6 +36,13 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+# login page error message wrong credentials
+class CustomLoginView(LoginView):
+    def form_invalid(self, form):
+        messages.set_level(self.request, messages.ERROR)
+        messages.error(self.request, 'Invalid username or password.')
+        return super().form_invalid(form)
+    
 """ renders the game view page which users play the game and chat to each other in"""
 def game_view(request, game, room_name):
     # query the database to find the correct game instance
@@ -90,8 +100,41 @@ def create_room(request, game):
         print("A condition is not specified")
         # do stuff, let user know there was error
         return redirect("home")
+    
+def join_private_room(request, game):
+    if request.method == 'POST':
+        unique_room_key = request.POST.get("unique_room_box")
+        try:
+            found_game = Game.objects.get(room_name=unique_room_key, public=False)
+            # Check if the room already has two players
+            players_in_room = Player.objects.filter(game=found_game)
+            if players_in_room.count() >= 2:
+                
+                messages.error(request, "The private room is already full.")
+                return redirect('all_rooms', game)
+            # Perform necessary operations to join the private room
+            player = Player.objects.get(game=found_game)
+            # will have some undefined behaviour if no players exist, though they cannot join an empty room, only create
+            # get the role of the current player
+            if player:
+                assignedRole = player.role
+            else:
+                assignedRole = None
+            # choose the new roles to assign
+            new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
+            # create the player instance with one of the roles chosen randomly
+            Player.objects.create(role = choice(new_roles), game = found_game, user_session = request.session.get("user_id"))
 
-""" function which adds the player to the room they selected"""
+            return redirect('game_view', game=game, room_name=found_game.room_name)  
+        except Game.DoesNotExist:
+            # Handle the case when the private room with the given key does not exist
+            messages.error(request, "The private room key is invalid or does not exist.")
+            return redirect('all_rooms', game)
+    else:
+        return redirect('all_rooms', game)
+ 
+      
+""" This does not do anything for the moment, delete it later - function which adds the player to the room they selected"""
 def joinRoom(request, game):
     # check which role the user will be assigned then connect them to the room
     if request.method == 'POST':
