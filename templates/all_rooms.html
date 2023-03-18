@@ -134,7 +134,16 @@
     </div>
   </div>
 </div>
-
+<!-- unique form -->
+ 
+  <form id="private-room-form" action="join_private_room/" method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="unique_room_box">Private room key:</label>
+    <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
+  </div>
+  <button class="btn btn-primary" type="submit">Join a private room</button>
+</form>
 <script>
   function showTermsAndConditions(buttonType) {
     event.preventDefault();

@@ -59,7 +59,9 @@ urlpatterns = [
     path('post/ajax/viewChats', views.viewChats, name="view_chats"),
     path('post/ajax/saveMessage', views.saveMessage, name="save_message"),
     # when they put the unique private room key:
- 
+   
+    path('<game>/all_rooms/join_private_room/', views.join_private_room, name="join_private_room"),
+
     #re_path(r'^all_rooms/game_view/(?P<room_name>)/$', views.game_view, name='game_view')
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
