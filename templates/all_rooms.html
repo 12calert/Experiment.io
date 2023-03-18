@@ -42,16 +42,6 @@
           <tbody>
             <tr>
               <td>
-                <form id="public-form" name="Public" action="actionUrl" method="POST" style="display:none;">
-                  {% csrf_token %}
-                  {{ form.as_p }}
-                  <input type="hidden" name="Public" value="Public">
-                </form>
-                <button class="btn btn-primary" onclick="showTermsAndConditions('public'); return false;">Create a public room</button>
-              </td>
-            </tr> 
-            <tr>
-              <td>
                 <form id="private-form" name="Private" action="actionUrl" method="POST" style="display:none;">
                   {% csrf_token %}
                   {{ form.as_p }}
@@ -70,39 +60,14 @@
         <table class="table table-bordered" style="background-color: #f0f0f0;">
           <thead>
             <tr>
-              <th>Join Room</th>
+              <td>
+                <form id="join-form" action="join_or_create_room" method="POST" style="display:none;">
+                  {% csrf_token %}
+                </form>
+                <button class="btn btn-primary" onclick="showTermsAndConditions('join'); return false;">Join a room</button>
+              </td>
             </tr>
           </thead>
-          <tbody>
-            {% if rooms %}
-            <tr>
-              <td>
-                <form action="joinRoom" method="POST" name="">
-                  {% csrf_token %}
-                  <select class="form-select" name="room" onchange="this.form.submit()">
-                    <option selected disabled value="">Join a public room</option>
-                    {% for room in rooms %}
-                    {% if room.public %}
-                    <option value="{{ room.room_name }}">Room number: {{ forloop.counter }}</option>
-                    {% endif %}
-                    {% endfor %}
-                  </select>
-                </form>
-              </td>
-            </tr>
-            {% endif %}
-            <tr>
-              <td>
-                <form>
-                  <div class="form-group">
-                    <label for="unique_room_box">Private room key:</label>
-                    <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
-                  </div>
-                  <button class="btn btn-primary" type="submit">Join a private room</button>
-                </form>
-              </td>
-            </tr>
-          </tbody>
         </table>
       </div>
     </div>
@@ -146,16 +111,20 @@
     </div>
   </div>
 </div>
+
+ 
+
 <!-- unique form NEWWW  -->
-  <form id="private-room-form" action="join_private_room/" method="POST">
+<form id="private-room-form" action="join_private_room/" method="POST">
   {% csrf_token %}
-  <div class="form-group">
-    <label for="unique_room_box">Private room key:</label>
-    <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
-  </div>
-  <button class="btn btn-primary" type="submit">Join a private room</button>
-</form>
+    <div class="form-group">
+      <label for="unique_room_box">Private room key:</label>
+      <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
+    </div>
+    <button class="btn btn-primary" type="button" onclick="showTermsAndConditions('private_room_key');">Join a private room</button>
+  </form>
 <script>
+
   function showTermsAndConditions(buttonType) {
     event.preventDefault();
     document.getElementById("terms-popup").style.display = "block";
@@ -172,10 +141,12 @@
     hideTermsAndConditions();
 
     let form;
-    if (buttonType === "public") {
-      form = document.getElementById("public-form");
-    } else if (buttonType === "private") {
+    if (buttonType === "private") {
       form = document.getElementById("private-form");
+    } else if (buttonType === "join") {
+      form = document.getElementById("join-form");
+    } else if (buttonType === "private_room_key") {
+      form = document.getElementById("private-room-form");
     }
 
     if (form) {

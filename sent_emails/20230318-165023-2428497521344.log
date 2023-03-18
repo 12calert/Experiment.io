@@ -1,0 +1,25 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Password reset on 127.0.0.1:8000
+From: webmaster@localhost
+To: a.konstantinou.20@abdn.ac.uk
+Date: Sat, 18 Mar 2023 16:50:23 -0000
+Message-ID: <167915822362.25232.10650909919259726279@LAPTOP-EJKAF6PA>
+
+
+You're receiving this email because you requested a password reset for your user account at 127.0.0.1:8000.
+
+Please go to the following page and choose a new password:
+
+http://127.0.0.1:8000/reset/Mw/bl9o3z-9dbaf11af91451089d491f6c920d89e2/
+
+Your username, in case you’ve forgotten: athena2001
+
+Thanks for using our site!
+
+The 127.0.0.1:8000 team
+
+
+
+-------------------------------------------------------------------------------
