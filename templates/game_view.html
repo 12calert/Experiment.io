@@ -85,10 +85,10 @@
   const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
   //create new websocket for chat
-  //let protocol = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
+  let protocol = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
   const chatSocket = new WebSocket(
     // needs to be a wss connection to work over https
-    "ws://"
+    protocol
     + window.location.host
     + '/ws/all_rooms/game_view/'
     + roomName
