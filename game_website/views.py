@@ -6,6 +6,8 @@ import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
 
 # helper methods
 """checks a request to see if it is an ajax request"""
@@ -33,6 +35,13 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+# login page error message wrong credentials
+class CustomLoginView(LoginView):
+    def form_invalid(self, form):
+        messages.set_level(self.request, messages.ERROR)
+        messages.error(self.request, 'Invalid username or password.')
+        return super().form_invalid(form)
+    
 """ renders the game view page which users play the game and chat to each other in"""
 def game_view(request, game, room_name):
     # query the database to find the correct game instance

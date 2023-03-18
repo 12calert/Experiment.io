@@ -21,9 +21,13 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 from . import views
+from .views import CustomLoginView
+
 # mysite/urls.py
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -39,7 +43,9 @@ urlpatterns = [
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     # simple page routing
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
-    path('researcher_login/', auth_views.LoginView.as_view(template_name="researcher_login.html"), name = "researcher_login"),
+    path('researcher_login/', CustomLoginView.as_view(
+    template_name="researcher_login.html",
+    authentication_form=AuthenticationForm), name="researcher_login"),
     path('logout/', auth_views.LogoutView.as_view(next_page='researcher_login'),name='logout'),
     path('data/', views.data, name='research_data'),
     path('conditions/', views.conditions, name='game_conditions'),

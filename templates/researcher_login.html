@@ -2,11 +2,12 @@
 {% load static %}
 {% block title %}Researcher Login{% endblock %}
 {% block content %}
+<link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">  
 <div class="login-container">
-  <form method = "POST">
+  <form method="POST">
     {% csrf_token %}
     <div class="form-group">
-      <h5 class="sign_in_instructions">  Please sign in: </h5>
+      <h5 class="sign_in_instructions">Please sign in:</h5>
       <label for="username">Username</label>
       <input type="username" class="form-control" id="username" name="username" required>
     </div>
@@ -15,8 +16,14 @@
       <input type="password" class="form-control" id="password" name="password" required>
     </div>
     <div class="form-group text-center">
-      <input type="submit" value="Log in">
+      <input type="submit" value="Log in" class="custom-button">
     </div>
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">
+        <span class="error-icon"></span>
+        <strong>Error:</strong> {{ form.non_field_errors|join:", " }}
+      </div>
+    {% endif %}
   </form>
-
+</div>
 {% endblock %}
