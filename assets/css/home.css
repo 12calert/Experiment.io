@@ -268,15 +268,6 @@ footer ul li ul li{
   word-wrap: break-word; /* Add this line */
 }
 
-.chat-log {
-max-height: 600px;
-overflow-y: scroll;
-display: flex;
-flex-direction: column;
-justify-content: flex-end;
- 
-}
-
 /* end of changes to distinguish the messages sent in the app */
 
 /* style of two boxes that they distinguish map and chat */
@@ -286,11 +277,22 @@ justify-content: flex-end;
   border-style: solid;
 }
 
-.col-sm-4.chat {
-  height: 550px;
-  border-color: #333;
-  border-style: solid;
-}
+/* chat styling */
+  #chat-log {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .col-sm-4.chat {
+    height: 550px;
+    border-color: #333;
+    border-style: solid;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
 
 /* style of the buttons */
 .button {

@@ -126,7 +126,9 @@
     else {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-received'>" + data.role + ": " + data.message + "<br></span>";
     }
-
+    // Scroll chat log to bottom
+    const chatLog = document.getElementById('chat-log');
+    chatLog.scrollTop = chatLog.scrollHeight;
   };
  
   /* do something when the chat socket is closed */
