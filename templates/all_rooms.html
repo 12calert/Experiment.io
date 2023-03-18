@@ -146,6 +146,16 @@
     </div>
   </div>
 </div>
+<tr>
+  <td>
+    <form action="join_or_create_room" method="POST">
+      {% csrf_token %}
+      <button class="btn btn-primary" type="submit">Join a room</button>
+    </form>
+  </td>
+</tr>
+ 
+
 <!-- unique form NEWWW  -->
   <form id="private-room-form" action="join_private_room/" method="POST">
   {% csrf_token %}
