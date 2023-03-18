@@ -27,6 +27,8 @@ SECRET_KEY = '1u6r1oki8pk9=g)&x%_7glcn-ja^@@o&ggordj0$krek-5y0ye'
 # NEEDED FOR PRODUCTION
 DEFAULT_AUTO_FIELD='django.db.models.AutoField'  
 
+CSRF_TRUSTED_ORIGINS = ['https://*.eu.ngrok.io/','https://*.127.0.0.1']
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
