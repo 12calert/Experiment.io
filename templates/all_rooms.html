@@ -125,12 +125,25 @@
   </form>
 <script>
 
+  TOSaccept = "{{request.session.TOSaccept}}"
+
+  /* below methods should be done using jquery listeners for more compact and scaleable solution 
+  -> event listener on forms, which checks if TOS submitted if so, submit form as normal
+  -> (removes need for paramater passing and else if statements)
+  -> if not accepted show TOS and wait for accept*/
   function showTermsAndConditions(buttonType) {
     event.preventDefault();
-    document.getElementById("terms-popup").style.display = "block";
-    document.getElementById("accept-button").onclick = function () {
-      acceptTermsAndConditions(buttonType);
-    };
+    // if the TOS hasn't been accepted before then prompt to accept
+    if (TOSaccept != "True"){
+      document.getElementById("terms-popup").style.display = "block";
+      document.getElementById("accept-button").onclick = function () {
+        acceptTermsAndConditions(buttonType);
+      };
+    }
+    // otherwise submit as normal
+    else{
+      submitForm(buttonType);
+    }
   }
 
   function hideTermsAndConditions() {
@@ -139,20 +152,35 @@
 
   function acceptTermsAndConditions(buttonType) {
     hideTermsAndConditions();
+    // ajax to set TOS cookie so user only accepts once
+    $.ajax({
+      type: 'GET',
+      url: "{% url 'acceptTOS' %}",
+      success: function (response) {
+				submitForm(buttonType);
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          alert(response["responseJSON"]["error"]);
+        }
+    })
 
-    let form;
-    if (buttonType === "private") {
-      form = document.getElementById("private-form");
-    } else if (buttonType === "join") {
-      form = document.getElementById("join-form");
-    } else if (buttonType === "private_room_key") {
-      form = document.getElementById("private-room-form");
-    }
-
-    if (form) {
-      form.submit();
-    }
+    
   }
-  </script>
+  function submitForm(buttonType){
+    let form;
+        if (buttonType === "private") {
+          form = document.getElementById("private-form");
+        } else if (buttonType === "join") {
+          form = document.getElementById("join-form");
+        } else if (buttonType === "private_room_key") {
+          form = document.getElementById("private-room-form");
+        }
+
+        if (form) {
+          form.submit();
+        }
+  }
+</script>
   
 {% endblock content %}

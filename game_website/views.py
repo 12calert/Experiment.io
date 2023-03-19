@@ -153,12 +153,13 @@ def join_private_room(request, game):
             found_game = Game.objects.get(room_name=unique_room_key, public=False)
             # Check if the room already has two players
             players_in_room = Player.objects.filter(game=found_game)
-            if players_in_room.count() >= 2:
+            if found_game.users >= 2:
                 
                 messages.error(request, "The private room is already full.")
                 return redirect('all_rooms', game)
             # Perform necessary operations to join the private room
-            player = Player.objects.get(game=found_game)
+            # will have unintended behaviour if a player joins a room which a player has joined, left, then joined again
+            player = Player.objects.filter(game=found_game).first()
             # will have some undefined behaviour if no players exist, though they cannot join an empty room, only create
             # get the role of the current player
             if player:
@@ -375,4 +376,9 @@ def saveMessage(request):
         Chat.objects.create(role=role, game = Game.objects.get(room_name=room_name), content = message)
         return JsonResponse({},status = 200)
     return HttpResponse("")
+
+def acceptTOS(request):
+    request.session['TOSaccept'] = True
+    return JsonResponse({},status = 200)
+
 # --- end of ajax views ---

@@ -65,6 +65,7 @@ urlpatterns = [
     path('post/ajax/viewGames', views.viewGames, name="view_games"),
     path('post/ajax/viewChats', views.viewChats, name="view_chats"),
     path('post/ajax/saveMessage', views.saveMessage, name="save_message"),
+    path('post/ajax/accpetTOS', views.acceptTOS, name="acceptTOS"),
     # when they put the unique private room key:
    
     path('<game>/all_rooms/join_or_create_room', views.join_or_create_room, name='join_or_create_room'),
