@@ -8,19 +8,21 @@ page so researchers can view data on games
 {% endcomment %}
 
 <style>
-    /* Define button styles for each theme */
+    /* styling for all buttons and when you expand it. I'll move it into home.css later */
     .button {
+        color: white;
         background-color: #e0ac1c;
         font-size: 16px;
         cursor: pointer;
-        color: white;
-        border: none;
         margin: 5px;
-        padding: 10px 20px;
+        padding: 10px;
         border-radius: 10px;
-        width: calc(25% - 10px);
-        
-        
+        width: 80%;
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+        border: none;
+        text-overflow: ellipsis;
     }
 
     .button:hover { 
@@ -28,72 +30,85 @@ page so researchers can view data on games
         background-color: black;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        
-    }
-
-    th,td {
-        border-bottom: 1px solid #ddd;
-        padding: 8px;
-        
-    }
-    
-    td {
-        border-right: 1px solid #ddd;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-        padding: 8px;
-        
-    }
-    
-    th {
+    .button-expanded {
+        background-color: #4d4d4d;
         color: white;
-        border-bottom: 1px solid #ddd;
-        padding: 8px;
-        background-color: #e0ac1c;
+        border-radius: 10px;
+        border: 2px solid #e0ac1c;
+        padding: 20px;
+        width: 80%;
         
     }
 
-    td:last-child {
-        border-right: none;
+    .button-expanded p {
+        margin: 0;
+    }
+
+    .experiment-row {
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        
+    }
+
+    .experiment-info {
+        border-radius: 10px;
+        border: 2px solid #e0ac1c;
+        background-color: #2e2e2e;
+        margin-top: 5px;
+        padding: 10px;
+        width: 80%;
+        margin: 5px;
+    }
+
+    .experiment-description {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #fff;
     }
 </style>
 
 <div><p>click an experiment to see further information</p></div>
 
-{# needs to change from form to something else #}
 {% if experiments %}
 <div id="viewConditions">
-    <table>
-        <thead>
-            <tr>
-                <th>Experiment</th>
-                <th>Conditions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for experiment in experiments %}
-            <tr>
-                <td>
-                    <button class="button" id="experiment" value="{{ experiment }}" 
-                    onclick="viewConditions('{{experiment}}')">
-                        {{ experiment }}
-                    </button>
-                </td>
-                <td>
-                    <div id="conditions_{{experiment}}"></div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% for experiment in experiments %}
+    <div class="experiment-row">
+        <button class="button" id="experiment_{{experiment}}" 
+            onclick="toggleExperiment('{{experiment}}')">
+            {{ experiment }}
+        </button>
+        <div class="experiment-info" id="experiment_info_{{experiment}}" style="display: none;">
+            <p class="experiment-description">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                Proin sodales dui vel quam efficitur, sit amet bibendum dolor iaculis. 
+                In hac habitasse platea dictumst. Sed consectetur turpis nec augue molestie, 
+                vel ullamcorper mauris eleifend. Vivamus et est vel neque molestie eleifend.
+            </p>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endif %}
 
-{% endblock content %}
+<script>
+    // This function toggles the visibility of the experiment information associated with the clicked button.
+    function toggleExperiment(id) {
+        var experimentButton = document.getElementById("experiment_" + id);
+        var experimentInfo = document.getElementById("experiment_info_" + id);
+        if (experimentButton.classList.contains("button-expanded")) {
+            experimentButton.classList.remove("button-expanded");
+            experimentInfo.style.display = "none";
+        } 
+        else {
+            experimentButton.classList.add("button-expanded");
+            experimentInfo.style.display = "block";
+        }
+    }
+</script>
 
+{% endblock %}
 
 {% block javascript %}
 <script>
