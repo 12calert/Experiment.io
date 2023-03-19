@@ -4,3 +4,4 @@
 *.vscode
 static/
 mydatabase
+*.log
