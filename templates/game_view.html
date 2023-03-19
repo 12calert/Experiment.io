@@ -62,6 +62,7 @@
 
 {# Collapsible "view information" Javascript function #}
 {% block javascript %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js" integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
   // read the player's role from the Django template 
   var playerRole = "{{ player.role }}";
@@ -86,7 +87,7 @@
 
   //create new websocket for chat
   let protocol = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
-  const chatSocket = new WebSocket(
+  const chatSocket = new ReconnectingWebSocket(
     // needs to be a wss connection to work over https
     protocol
     + window.location.host
