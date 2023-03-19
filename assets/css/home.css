@@ -760,3 +760,10 @@ body{
   background-repeat: no-repeat;
   background-size: 24px 24px;
 }
+
+/* the color of the text for form errors */
+.errorlist
+    {
+        color: red;
+        list-style: none;
+    }

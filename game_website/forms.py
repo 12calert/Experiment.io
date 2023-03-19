@@ -32,6 +32,17 @@ class ResearcherRegisterForm(UserCreationForm):
         except user_model.DoesNotExist:
             return username
         raise forms.ValidationError(("This username already exists"))
+    
+    def __init__(self, *args, **kwargs):
+        super(ResearcherRegisterForm, self).__init__(*args, **kwargs)
+
+        for _, field in self.fields.items():
+            if field in self.errors:
+                field.widget.attrs.update({
+                    'autofocus': ''
+                })
+
+                break
 
 class ExperimentForm(forms.ModelForm):
     """A form to create a new experiment."""
