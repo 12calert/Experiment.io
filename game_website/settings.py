@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'bootstrap5',
+    
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # For Render hosting
+    'django.contrib.messages.middleware.MessageMiddleware',
+   
 ]
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 ROOT_URLCONF = 'game_website.urls'
 

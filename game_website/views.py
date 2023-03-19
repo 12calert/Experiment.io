@@ -6,6 +6,9 @@ import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
 from random import choice
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
+from django.contrib import messages
+from django.http import Http404
 
 # helper methods
 """checks a request to see if it is an ajax request"""
@@ -33,6 +36,13 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+# login page error message wrong credentials
+class CustomLoginView(LoginView):
+    def form_invalid(self, form):
+        messages.set_level(self.request, messages.ERROR)
+        messages.error(self.request, 'Invalid username or password.')
+        return super().form_invalid(form)
+    
 """ renders the game view page which users play the game and chat to each other in"""
 def game_view(request, game, room_name):
     # query the database to find the correct game instance
@@ -91,33 +101,84 @@ def create_room(request, game):
         # do stuff, let user know there was error
         return redirect("home")
 
-""" function which adds the player to the room they selected"""
-def joinRoom(request, game):
-    # check which role the user will be assigned then connect them to the room
-    if request.method == 'POST':
-        # get the room name
-        room_name = request.POST['room']
-        # find the Game instance which they want to join
-        foundGame = Game.objects.get(room_name = room_name)
-        # if there are more than 2 users in the same game, then reload the page.
-        # this is hardcoded for now
-        if (foundGame.users >= 2):
-            # return response
-            return redirect('all_rooms', game)
-        
-        player = Player.objects.get(game=foundGame)
-        # will have some undefined behaviour if no players exist, though they cannot join an empty room, only create
-        # get the role of the current player
-        if player:
-            assignedRole = player.role
-        else:
-            assignedRole = None
-        # choose the new roles to assign
-        new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
-        # create the player instance with one of the roles chosen randomly
-        Player.objects.create(role = choice(new_roles), game = foundGame, user_session = request.session.get("user_id"))
+def join_or_create_room(request, game):
+    # Get a list of available public rooms
+    available_rooms = Game.objects.filter(public=True)
 
-        return redirect('game_view', game = game, room_name = foundGame.room_name)
+    for room in available_rooms:
+        players_in_room = Player.objects.filter(game=room)
+
+        if room.users < 2:
+            player = Player.objects.filter(game=room, user_session=request.session.get("user_id")).first()
+
+            if not player:
+                # choose the new roles to assign
+                assigned_roles = [p.role for p in players_in_room]
+                new_roles = [v for v in ROLE_CHOICES if v not in assigned_roles]
+
+                if new_roles:
+                    # create the player instance with one of the roles chosen randomly
+                    Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id"))
+                
+
+                    return redirect('game_view', game=game, room_name=room.room_name)
+
+    # if no suitable rooms were found, create a new room
+    return create_room2(request, game)
+
+
+def create_room2(request, game,):
+    #first filter all the conditions we can use for our game
+    conditions = Condition.objects.filter(game_type = game)
+    # pick a random condition
+    condition = choice(list(conditions))
+    #note that this will fail if there is no condition
+    if condition:
+        # if the user selects a Public room:
+       
+            # create the Game instance as public
+        new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=True,
+        game_type=game, has_condition = condition)
+            # create the Player instance and add it to the newly created game instance
+        Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
+
+        return redirect('game_view',  game = game, room_name = new_room.room_name)
+
+ 
+
+def join_private_room(request, game):
+    if request.method == 'POST':
+        unique_room_key = request.POST.get("unique_room_box")
+        try:
+            found_game = Game.objects.get(room_name=unique_room_key, public=False)
+            # Check if the room already has two players
+            players_in_room = Player.objects.filter(game=found_game)
+            if players_in_room.count() >= 2:
+                
+                messages.error(request, "The private room is already full.")
+                return redirect('all_rooms', game)
+            # Perform necessary operations to join the private room
+            player = Player.objects.get(game=found_game)
+            # will have some undefined behaviour if no players exist, though they cannot join an empty room, only create
+            # get the role of the current player
+            if player:
+                assignedRole = player.role
+            else:
+                assignedRole = None
+            # choose the new roles to assign
+            new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
+            # create the player instance with one of the roles chosen randomly
+            Player.objects.create(role = choice(new_roles), game = found_game, user_session = request.session.get("user_id"))
+
+            return redirect('game_view', game=game, room_name=found_game.room_name)  
+        except Game.DoesNotExist:
+            # Handle the case when the private room with the given key does not exist
+            messages.error(request, "The private room key is invalid or does not exist.")
+            return redirect('all_rooms', game)
+    else:
+        return redirect('all_rooms', game)
+ 
+
 
 """ renders the data page"""
 def data(request):

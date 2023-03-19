@@ -21,12 +21,23 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.views.generic.base import RedirectView
 from . import views
+from .views import CustomLoginView, join_or_create_room
+
 # mysite/urls.py
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth import views as auth_views
-
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import views as auth_views
+ 
+from django.contrib.auth import views as auth_views
+ 
 urlpatterns = [
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='password_reset.html'), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
+
     path('admin/', admin.site.urls, name="admin"),
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('', views.homepage, name='home'),
@@ -35,11 +46,13 @@ urlpatterns = [
     # joining, creating, routing to room
     path('<game>/all_rooms/', views.all_rooms, name="all_rooms"),
     path('<game>/all_rooms/actionUrl', views.create_room),
-    path('<game>/all_rooms/joinRoom', views.joinRoom),
+    
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     # simple page routing
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
-    path('researcher_login/', auth_views.LoginView.as_view(template_name="researcher_login.html"), name = "researcher_login"),
+    path('researcher_login/', CustomLoginView.as_view(
+    template_name="researcher_login.html",
+    authentication_form=AuthenticationForm), name="researcher_login"),
     path('logout/', auth_views.LogoutView.as_view(next_page='researcher_login'),name='logout'),
     path('data/', views.data, name='research_data'),
     path('conditions/', views.conditions, name='game_conditions'),
@@ -53,7 +66,10 @@ urlpatterns = [
     path('post/ajax/viewChats', views.viewChats, name="view_chats"),
     path('post/ajax/saveMessage', views.saveMessage, name="save_message"),
     # when they put the unique private room key:
- 
+   
+    path('<game>/all_rooms/join_or_create_room', views.join_or_create_room, name='join_or_create_room'),
+    path('<game>/all_rooms/join_private_room/', views.join_private_room, name="join_private_room"),
+
     #re_path(r'^all_rooms/game_view/(?P<room_name>)/$', views.game_view, name='game_view')
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
