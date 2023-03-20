@@ -38,8 +38,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             game = await Game.objects.aget( room_name=self.room_name )
             game.follower_position[ "x" ] += message[ "x" ] * 10
             game.follower_position[ "y" ] += message[ "y" ] * 10
-            message = game.follower_position
             await sync_to_async( game.save )()
+            game.follower_position[ "rects" ] = game.rects
+            message = game.follower_position
         # Send message to room group
         await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": message, "role": role, "finished":finished})
 
