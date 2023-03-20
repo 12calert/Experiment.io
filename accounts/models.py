@@ -57,7 +57,6 @@ class Condition(models.Model):
                 name='name_and_experiment_unique',
             ),
         ]
-    
     def __str__(self):
         return self.name
 
@@ -73,6 +72,7 @@ class Game(models.Model):
     follower_position = models.JSONField( default={ 'x': 0, 'y': 0 } )
     # used to filter what rooms the user sees depending on the game they choose to play
     MAPGAME = "MG"
+    rects = models.JSONField(null = True)
     GAME_TYPE_CHOICES = [
         (MAPGAME, 'Map Game'),
 

@@ -3,6 +3,7 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 <div class="container">
+    {% csrf_token %}
     <div class="row">
         <div class="col-md-6">
             <h1 class="mb-4">About the Map Game</h1>
@@ -39,4 +40,32 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+	return cookieValue;
+}
+$(document).ready(function(){
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'set_screensize' %}",
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        data: {"width":window.screen.width, "height": window.screen.height},
+    })
+});
+</script>
 {% endblock %}
