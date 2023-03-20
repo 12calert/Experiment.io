@@ -411,4 +411,15 @@ def acceptTOS(request):
     request.session['TOSaccept'] = True
     return JsonResponse({},status = 200)
 
+def initialPlayer(request):
+    if request.method == "POST" and is_ajax(request):
+        x = int(request.POST["x"])
+        y = int(request.POST["y"])
+        room_name = request.POST["room_name"]
+        game = Game.objects.get( room_name=room_name )
+        game.follower_position[ "x" ] = x
+        game.follower_position[ "y" ] = y
+        game.save()
+        return JsonResponse({},status = 200)
+    return HttpResponse("")
 # --- end of ajax views ---

@@ -12,9 +12,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_group_name = "chat_%s" % self.room_name
 
         self.room = await Game.objects.aget(room_name=self.room_name)    
-        if self.room.users == 0:
-            #intialise the game...
-            pass
         self.room.users += 1
         await sync_to_async(self.room.save)()
         # Join room group

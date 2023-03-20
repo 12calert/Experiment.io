@@ -59,6 +59,7 @@
   </form>
 </div>
 {{ gameCurr.rects|json_script:"gameCurr" }}
+{{ player.role|json_script:"role"}}
 {% endblock content %}
 
 {# Collapsible "view information" Javascript function #}
@@ -66,6 +67,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js" integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
   var rects = JSON.parse(document.getElementById('gameCurr').textContent)
+  var role = JSON.parse(document.getElementById('role').textContent)
   // read the player's role from the Django template 
   var playerRole = "{{ player.role }}";
   // read the player's role from the Django template 
@@ -100,9 +102,6 @@
     + '/'
   );
 
-  //chatSocket.addEventListener('open', () => {
-  //sendInput( 0, 1)
-  //})
 
   /* after every message, log it in a JSON chat log 
   ---         can be changed later     ---*/
@@ -152,50 +151,6 @@
      r1.top < r2.top + r2.height && r1.top + r1.height > r2.top ) return true
      return false
   }
- 
-  // Some of it will be moved to the server side
-  /*function SpawnMap( rectNumber ) {
-    
-    if( rectNumber > 1000 ) rectNumber = 1000 
-
-    var gameWindow = document.getElementsByClassName( "game" )
-    var rects = []
-    var failCounter = 0
-
-    for( let i = 0; i < rectNumber; i++ ) {
-      rects.push( {
-        "top": Math.floor(Math.random() * 1000),
-        "left": Math.floor(Math.random() * 1000),
-        "width": 100,
-        "height": 100
-      } )
-
-      for( let j = 0; j < rects.length - 1; j++ ) {
-        if( intersect( rects[j], rects[rects.length - 1] ) ) {
-          rects.pop()
-          i -= 1
-          failCounter++
-          if( failCounter > 1000 ) i = 1000
-          break
-        }
-      }
-    }
-
-    let dummmy = document.getElementById( "dummy" )
-    for( let i = 0; i < rectNumber; i++ ) {
-      let img = document.createElement( 'img' )
-      img.src = dummy.src
-      img.style.position = "absolute"
-      img.style.top = rects[i].top + "px"
-      img.style.left = rects[i].left + "px"
-      img.style.width = rects[i].width + "px"
-      img.style.height = rects[i].height + "px"
-      //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) 
-    }
-    console.log(rects);
-    return rects
-  }*/
 
   // Some of it will be moved to the server side
   function SpawnPlayer ( x, y ) {
@@ -214,9 +169,19 @@
     gameWindow[0].appendChild( img )
     player = img
     let data = {}
-    data["x"] = x
-    data["y"] = y
-    update(data)
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'initial_player' %}",
+        data: {"x":x,"y":y,"room_name":roomName},
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+            data["x"] = x
+            data["y"] = y
+            update(data)
+            return;
+          // show them the map drawn compared to the initial map
+        }
+    })
   }
 
   function update( data ) {
