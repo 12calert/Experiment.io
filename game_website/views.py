@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
-from random import choice, random, randint
+from random import choice, randint
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib import messages

@@ -73,7 +73,6 @@ class Game(models.Model):
     # used to filter what rooms the user sees depending on the game they choose to play
     MAPGAME = "MG"
     rects = models.JSONField(null = True)
-    final_path = models.JSONField(null = True)
     GAME_TYPE_CHOICES = [
         (MAPGAME, 'Map Game'),
 

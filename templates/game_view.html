@@ -34,7 +34,8 @@
   <div class="col-sm-8 game">
     <img id="dummy" hidden src="{% static 'images/logo.png' %}">
     <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
-    
+    <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
+     
   </div>
   <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
@@ -59,7 +60,6 @@
   </form>
 </div>
 {{ gameCurr.rects|json_script:"rects" }}
-{{ gameCurr.final_path|json_script:"path" }}
 {{ player.role|json_script:"role"}}
 {% endblock content %}
 
@@ -69,7 +69,6 @@
 <script>
   var rects = JSON.parse(document.getElementById('rects').textContent)
   var role = JSON.parse(document.getElementById('role').textContent)
-  var path = JSON.parse(document.getElementById('path').textContent)
   // read the player's role from the Django template 
   var playerRole = "{{ player.role }}";
   // read the player's role from the Django template 
@@ -190,6 +189,16 @@
     let player = document.getElementById( "player" )
     player.style.left = data[ "x" ] + "px";
     player.style.top = data[ "y" ] + "px";
+    var gameWindow = document.getElementsByClassName( "game" )
+    let img = document.createElement( 'img' )
+    img.src = dummy3.src
+    img.style.position = "absolute"
+    img.style.top = player.style.top
+    img.style.left = player.style.left
+    img.style.width = 10 + "px"
+    img.style.height = 10 + "px"
+    //img.style.zIndex = -1
+    gameWindow[0].appendChild( img ) 
   }
   
   function sendInput( x, y ) {
@@ -200,7 +209,7 @@
         }));
   }
 
-  function InitializeGame( rects, path ) {
+  function InitializeGame( rects) {
 
     var gameWindow = document.getElementsByClassName( "game" )
     let dummmy = document.getElementById( "dummy" )
@@ -212,17 +221,6 @@
       img.style.left = rects[i].left + "px"
       img.style.width = rects[i].width + "px"
       img.style.height = rects[i].height + "px"
-      //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) 
-    }
-    for( let i = 0; i < path.length; i++){
-      let img = document.createElement( 'img' )
-      img.src = dummy.src
-      img.style.position = "absolute"
-      img.style.top = path[i].top + "px"
-      img.style.left = path[i].left + "px"
-      img.style.width = path[i].width + "px"
-      img.style.height = path[i].height + "px"
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
     }
@@ -319,7 +317,7 @@ $("#complete").submit(function (e) {
 let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
 SpawnPlayer(0,rect.top)
-InitializeGame(JSON.parse(rects), JSON.parse(path))
+InitializeGame(JSON.parse(rects))
 
   </script>
 {% endblock javascript %}
