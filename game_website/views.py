@@ -4,11 +4,14 @@ from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
-from random import choice
+from random import choice, random
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.http import Http404
+import math
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 
 # helper methods
 """checks a request to see if it is an ajax request"""
@@ -47,7 +50,6 @@ class CustomLoginView(LoginView):
 def game_view(request, game, room_name):
     # query the database to find the correct game instance
     foundGame = Game.objects.get(room_name = room_name)
-    
     # Using filter() and first() to allow the case in which someone chooses to play with themself
     # change this in production to get() instead and handle exceptions accordingly reject the connection and
     # inform the player that they must play with someone else
@@ -59,7 +61,7 @@ def game_view(request, game, room_name):
     # query the database to get the current logged in player
     foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
-                                              "game":game, "player":foundPlayer, "public":foundGame.public}) # dict to store room number
+                                              "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame}) # dict to store room number
 """ view which renders the page containing the list of rooms"""
 def all_rooms(request, game):
     #query all rooms with one player waiting for another
@@ -68,6 +70,13 @@ def all_rooms(request, game):
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
 """ creates the room and sends the user to it, can be either a public or private room"""
+
+def intersect(r1, r2):
+    if (r1["left"] < r2["left"] + r2["width"] and r1["left"] + r1["width"] > r2["left"] and
+        r1["top"] < r2["top"] + r2["height"] and r1["top"] + r1["height"] > r2["top"]):
+        return True
+    else:
+        return False
 def create_room(request, game):
 
     # choose a random condition, can be extended to choose a condition fairly
@@ -94,6 +103,26 @@ def create_room(request, game):
             new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=False, 
                                    game_type=game, has_condition = condition)
             # create the player instance and add it to the newly created game instance
+            
+            itemNo = condition.amount_item
+            rects = []
+            failCounter = 0
+            for i in range(0, itemNo-1):
+                rects.append({"top": math.floor(random() * 1000),
+                    "left": math.floor(random() * 1000),
+                    "width": 100,
+                    "height": 100})
+                for j in range(0, len(rects)-1):
+                    if intersect(rects[j], rects[len(rects)-1]):
+                        rects.pop(i)
+                        i -= 1
+                        failCounter += 1
+                        if failCounter > 1000:
+                            i = 1000
+                            break
+            new_room.rects = json.dumps(rects)
+            new_room.save()
+
             Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
             return redirect('game_view', game = game, room_name = new_room.room_name)
     else:
@@ -139,6 +168,7 @@ def create_room2(request, game,):
             # create the Game instance as public
         new_room = Game.objects.create(users = 0, room_name = secrets.token_hex(5), public=True,
         game_type=game, has_condition = condition)
+        
             # create the Player instance and add it to the newly created game instance
         Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
 

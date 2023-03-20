@@ -58,12 +58,14 @@
     <input type="submit" class="btn btn-primary" value="Give Up" />
   </form>
 </div>
+{{ gameCurr.rects|json_script:"gameCurr" }}
 {% endblock content %}
 
 {# Collapsible "view information" Javascript function #}
 {% block javascript %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js" integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+  var rects = JSON.parse(document.getElementById('gameCurr').textContent)
   // read the player's role from the Django template 
   var playerRole = "{{ player.role }}";
   // read the player's role from the Django template 
@@ -98,9 +100,10 @@
     + '/'
   );
 
-  chatSocket.addEventListener('open', () => {
-    sendInput( 0, 1)
-  })
+  //chatSocket.addEventListener('open', () => {
+  //sendInput( 0, 1)
+  //})
+
   /* after every message, log it in a JSON chat log 
   ---         can be changed later     ---*/
   chatSocket.onmessage = function(e) {
@@ -108,7 +111,7 @@
     // do some more stuff when game finished
     // both see a finished map, either as popup or redirect to new page
     // this will have to change depending on if the game is given up or completed
-    if (data.finished != false){
+    if (data.finished == true){
       // this isn't amazing, we need to have a way to show them both the comparison of the maps
       window.location.replace("/home");
       return;
@@ -126,7 +129,7 @@
     else if (data.role === playerRole) {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
     } 
-    else if ( data.role == "move" ) {
+    else if ( data.type == "move" ) {
       rects = data.message[ "rects" ]
       if ( !player ) SpawnPlayer( data.message[ "x" ], data.message[ "y" ] )
       update( data.message )
@@ -151,7 +154,7 @@
   }
  
   // Some of it will be moved to the server side
-  function SpawnMap( rectNumber ) {
+  /*function SpawnMap( rectNumber ) {
     
     if( rectNumber > 1000 ) rectNumber = 1000 
 
@@ -190,9 +193,9 @@
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
     }
-
+    console.log(rects);
     return rects
-  }
+  }*/
 
   // Some of it will be moved to the server side
   function SpawnPlayer ( x, y ) {
@@ -209,8 +212,11 @@
     img.id = "player"
     img.style.zIndex = 99
     gameWindow[0].appendChild( img )
-
     player = img
+    let data = {}
+    data["x"] = x
+    data["y"] = y
+    update(data)
   }
 
   function update( data ) {
@@ -231,7 +237,7 @@
 
     var gameWindow = document.getElementsByClassName( "game" )
     let dummmy = document.getElementById( "dummy" )
-    for( let i = 0; i < rectNumber; i++ ) {
+    for( let i = 0; i < rects.length; i++ ) {
       let img = document.createElement( 'img' )
       img.src = dummy.src
       img.style.position = "absolute"
@@ -332,8 +338,10 @@ $("#complete").submit(function (e) {
       'finished' : true
   }));
 })
+let gameContainer = document.getElementsByClassName( "game" ).item(0)
+let rect = gameContainer.getBoundingClientRect();
+SpawnPlayer(0,rect.top)
+InitializeGame(JSON.parse(rects))
 
-//InitializeGame()
- 
   </script>
 {% endblock javascript %}
