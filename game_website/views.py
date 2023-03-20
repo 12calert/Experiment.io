@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import secrets
 from .forms import GameConditions, ChooseGame, ExperimentForm, ResearcherRegisterForm
-from random import choice, random
+from random import choice, random, randint
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
@@ -108,8 +108,8 @@ def create_room(request, game):
             rects = []
             failCounter = 0
             for i in range(0, itemNo-1):
-                rects.append({"top": math.floor(random() * 1000),
-                    "left": math.floor(random() * 1000),
+                rects.append({"top": (randint(162,712-100)),
+                    "left": (randint(0,((request.session.get("width")/12)*8)-100)),
                     "width": 100,
                     "height": 100})
                 for j in range(0, len(rects)-1):
@@ -420,6 +420,15 @@ def initialPlayer(request):
         game.follower_position[ "x" ] = x
         game.follower_position[ "y" ] = y
         game.save()
+        return JsonResponse({},status = 200)
+    return HttpResponse("")
+
+def setScreensize(request):
+    if request.method == "POST" and is_ajax(request):
+        width = int(request.POST["width"])
+        height = int(request.POST["height"])
+        request.session['width'] = width
+        request.session['height'] = height
         return JsonResponse({},status = 200)
     return HttpResponse("")
 # --- end of ajax views ---

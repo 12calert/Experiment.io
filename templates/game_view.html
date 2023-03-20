@@ -58,7 +58,8 @@
     <input type="submit" class="btn btn-primary" value="Give Up" />
   </form>
 </div>
-{{ gameCurr.rects|json_script:"gameCurr" }}
+{{ gameCurr.rects|json_script:"rects" }}
+{{ gameCurr.final_path|json_script:"path" }}
 {{ player.role|json_script:"role"}}
 {% endblock content %}
 
@@ -66,8 +67,9 @@
 {% block javascript %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js" integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-  var rects = JSON.parse(document.getElementById('gameCurr').textContent)
+  var rects = JSON.parse(document.getElementById('rects').textContent)
   var role = JSON.parse(document.getElementById('role').textContent)
+  var path = JSON.parse(document.getElementById('path').textContent)
   // read the player's role from the Django template 
   var playerRole = "{{ player.role }}";
   // read the player's role from the Django template 
@@ -198,7 +200,7 @@
         }));
   }
 
-  function InitializeGame( rects ) {
+  function InitializeGame( rects, path ) {
 
     var gameWindow = document.getElementsByClassName( "game" )
     let dummmy = document.getElementById( "dummy" )
@@ -210,6 +212,17 @@
       img.style.left = rects[i].left + "px"
       img.style.width = rects[i].width + "px"
       img.style.height = rects[i].height + "px"
+      //img.style.zIndex = -1
+      gameWindow[0].appendChild( img ) 
+    }
+    for( let i = 0; i < path.length; i++){
+      let img = document.createElement( 'img' )
+      img.src = dummy.src
+      img.style.position = "absolute"
+      img.style.top = path[i].top + "px"
+      img.style.left = path[i].left + "px"
+      img.style.width = path[i].width + "px"
+      img.style.height = path[i].height + "px"
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
     }
@@ -306,7 +319,7 @@ $("#complete").submit(function (e) {
 let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
 SpawnPlayer(0,rect.top)
-InitializeGame(JSON.parse(rects))
+InitializeGame(JSON.parse(rects), JSON.parse(path))
 
   </script>
 {% endblock javascript %}
