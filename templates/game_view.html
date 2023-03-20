@@ -58,6 +58,7 @@
     {% csrf_token %}
     <input type="submit" class="btn btn-primary" value="Give Up" />
   </form>
+  <button onclick = "undo()">Undo move</button>
 </div>
 {{ gameCurr.rects|json_script:"rects" }}
 {{ player.role|json_script:"role"}}
@@ -76,6 +77,9 @@
   var i;
   var rects;
   var player;
+  var moveStack = [];
+  var imgStack = [];
+  var undoTrue = false;
     
   for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
@@ -190,18 +194,23 @@
     player.style.left = data[ "x" ] + "px";
     player.style.top = data[ "y" ] + "px";
     var gameWindow = document.getElementsByClassName( "game" )
-    let img = document.createElement( 'img' )
-    img.src = dummy3.src
-    img.style.position = "absolute"
-    img.style.top = player.style.top
-    img.style.left = player.style.left
-    img.style.width = 10 + "px"
-    img.style.height = 10 + "px"
-    //img.style.zIndex = -1
-    gameWindow[0].appendChild( img ) 
+    if (undoTrue != true){
+      let img = document.createElement( 'img' )
+      img.src = dummy3.src
+      img.style.position = "absolute"
+      img.style.top = player.style.top
+      img.style.left = player.style.left
+      img.style.width = 10 + "px"
+      img.style.height = 10 + "px"
+      imgStack.push(img)
+      //img.style.zIndex = -1
+      gameWindow[0].appendChild( img ) 
+    }
+  undoTrue = false
   }
   
   function sendInput( x, y ) {
+    moveStack.push({"x":x, "y":y})
     chatSocket.send(JSON.stringify({
           'message': { "x": x, "y": y },
           'role': "move",
@@ -209,6 +218,17 @@
         }));
   }
 
+  function undo() {
+    undoTrue = true
+    lastMove = moveStack.pop()
+    lastImg = imgStack.pop()
+    lastImg.remove()
+    chatSocket.send(JSON.stringify({
+          'message': {"x": -lastMove["x"], "y": -lastMove["y"] },
+          'role': "move",
+          'finished' : false,
+        }));
+  }
   function InitializeGame( rects) {
 
     var gameWindow = document.getElementsByClassName( "game" )
