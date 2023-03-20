@@ -2,7 +2,7 @@
 import json
 
 from asgiref.sync import sync_to_async
-from accounts.models import Game, Chat
+from accounts.models import Game
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 # this whole file needs refactoring
@@ -12,7 +12,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_group_name = "chat_%s" % self.room_name
 
         self.room = await Game.objects.aget(room_name=self.room_name)    
-        
         self.room.users += 1
         await sync_to_async(self.room.save)()
         # Join room group
@@ -39,8 +38,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             game.follower_position[ "x" ] += message[ "x" ] * 10
             game.follower_position[ "y" ] += message[ "y" ] * 10
             await sync_to_async( game.save )()
-            game.follower_position[ "rects" ] = game.rects
+            #game.follower_position[ "rects" ] = game.rects
             message = game.follower_position
+            self.channel_layer.group_send(self.room_group_name, {"type": "move", "message": message, "finished":False})
         # Send message to room group
         await self.channel_layer.group_send(self.room_group_name, {"type": "chat_message", "message": message, "role": role, "finished":finished})
 
@@ -67,4 +67,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def move( self, event ):
         message = event[ "message" ]
 
-        await self.send( text_data=json.dumps( { "type":"move", "message":message } ) )
+        await self.send( text_data=json.dumps( { "type":"move", "message":message, "finished":False } ) )
