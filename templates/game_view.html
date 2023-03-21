@@ -36,6 +36,8 @@
     <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
     <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
     <img id="dummy4" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
+    <img id="dummy5" hidden src = "{% static 'images/yellow-box.png' %}">
+
      
   </div>
   <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
@@ -232,7 +234,7 @@
           'finished' : false,
         }));
   }
-  function InitializeGame( rects, path ) {
+  function InitializeObstacles( rects ) {
 
     var gameWindow = document.getElementsByClassName( "game" )
     let dummmy = document.getElementById( "dummy" )
@@ -247,18 +249,7 @@
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
     }
-    let dummmy4 = document.getElementById( "dummy4" )
-    for( let i = 0; i < path.length; i++ ) {
-      let img = document.createElement( 'img' )
-      img.src = dummy4.src
-      img.style.position = "absolute"
-      img.style.top = path[i].top + "px"
-      img.style.left = path[i].left + "px"
-      img.style.width = path[i].width + "px"
-      img.style.height = path[i].height + "px"
-      //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) 
-    }
+    
 
     document.addEventListener( 'keydown', function( event ) {
       if( event.keyCode == 37 ) sendInput( -1, 0 )
@@ -272,7 +263,46 @@
     } );
 
   }
+  function InitializeFinalPath(path){
+    var gameWindow = document.getElementsByClassName( "game" )
+    let dummmy4 = document.getElementById( "dummy4" )
+    for( let i = 0; i < path.length; i++ ) {
+      let img = document.createElement( 'img' )
+      img.src = dummy4.src
+      img.style.position = "absolute"
+      img.style.top = path[i].top + "px"
+      img.style.left = path[i].left + "px"
+      img.style.width = path[i].width + "px"
+      img.style.height = path[i].height + "px"
+      //img.style.zIndex = -1
+      gameWindow[0].appendChild( img ) 
+    }
+  }
 
+  function initializeStartandEnd(path){
+    var gameWindow = document.getElementsByClassName( "game" )
+    let dummmy5 = document.getElementById( "dummy5" )
+    let img = document.createElement( 'img' )
+    img.src = dummy5.src
+    img.style.position = "absolute"
+    console.log(path.length - 1)
+    console.log(path[path.length-1])
+    img.style.top = path[path.length-1].top + "px"
+    img.style.left = path[path.length-1].left + "px"
+    img.style.width = path[path.length-1].width + "px"
+    img.style.height = path[path.length-1].height + "px"
+    //img.style.zIndex = -1
+    gameWindow[0].appendChild( img )
+    img = document.createElement ( 'img' )
+    img.src = dummy5.src
+    img.style.position = "absolute"
+    img.style.top = path[0].top + "px"
+    img.style.left = path[0].left + "px"
+    img.style.width = path[0].width + "px"
+    img.style.height = path[0].height + "px"
+    //img.style.zIndex = -1
+    gameWindow[0].appendChild( img )
+    }
   /* allows for submitting messages via pressing enter*/
   document.querySelector('#chat-message-input').focus();
   document.querySelector('#chat-message-input').onkeyup = function(e) {
@@ -351,8 +381,15 @@ $("#complete").submit(function (e) {
 })
 let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
-SpawnPlayer(0,rect.top)
-InitializeGame(JSON.parse(rects), JSON.parse(path))
+InitializeObstacles(JSON.parse(rects))
+console.log(role)
+if (role == "follower"){
+  SpawnPlayer(0,rect.top)
+  initializeStartandEnd(JSON.parse(path))
+}
+else{
+  InitializeFinalPath(JSON.parse(path))
+}
 
   </script>
 {% endblock javascript %}
