@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shapes trial 100</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        class Shape {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            intersects(other) {
+                return false;
+            }
+        }
+
+        class Circle extends Shape {
+            constructor(x, y, radius) {
+                super(x, y);
+                this.radius = radius;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            intersects(other) {
+                if (other instanceof Circle) {
+                    const dx = this.x - other.x;
+                    const dy = this.y - other.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    return distance < (this.radius + other.radius);
+                } 
+                else if (other instanceof Rectangle) {
+                    const deltaX = this.x - Math.max(other.x, Math.min(this.x, other.x + other.width));
+                    const deltaY = this.y - Math.max(other.y, Math.min(this.y, other.y + other.height));
+
+                    return (deltaX * deltaX + deltaY * deltaY) < (this.radius * this.radius);
+                } 
+                else if (other instanceof Square) {
+                    return other.intersects(this);
+                }
+            }
+        }
+
+        class Rectangle extends Shape {
+            constructor(x, y, width, height) {
+                super(x, y);
+                this.width = width;
+                this.height = height;
+            }
+
+            draw() {
+                ctx.strokeRect(this.x, this.y, this.width, this.height);
+            }
+
+            intersects(other) {
+                if (other instanceof Rectangle) {
+                    return (
+                        this.x < other.x + other.width &&
+                        this.x + this.width > other.x &&
+                        this.y < other.y + other.height &&
+                        this.y + this.height > other.y
+                    );
+                } 
+                else if (other instanceof Circle) {
+                    return other.intersects(this);
+                } 
+                else if (other instanceof Square) {
+                    
+                    return other.intersects(this);
+                }
+            }
+        }
+
+        class Square extends Shape {
+            constructor(x, y, side) {
+                super(x, y);
+                this.side = side;
+            }
+
+            draw() {
+                ctx.strokeRect(this.x, this.y, this.side, this.side);
+            }
+
+            intersects(other) {
+                if (other instanceof Rectangle) {
+                    return (
+                        this.x < other.x + other.width &&
+                        this.x + this.side > other.x &&
+                        this.y < other.y + other.height &&
+                        this.y + this.side > other.y
+                    );
+                } 
+                else if (other instanceof Circle) {
+                    const deltaX = other.x - Math.max(this.x, Math.min(other.x, this.x + this.side));
+                    const deltaY = other.y - Math.max(this.y, Math.min(other.y, this.y + this.side));
+
+                    return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);
+                } 
+                else if (other instanceof Square) {
+                    return (
+                        this.x < other.x + other.side &&
+                        this.x + this.side > other.x &&
+                        this.y < other.y + other.side &&
+                        this.y + this.side > other.y
+                    );
+                }
+            }
+        }
+
+        // I added the attemps for common reasons but we might delete it later.
+        function generateRandomShape(shapes, maxAttempts = 100) {
+            let attempts = 0;
+            while (attempts < maxAttempts) {
+                const shapeType = Math.floor(Math.random() * 3);
+                let shape;
+
+                switch (shapeType) {
+                    case 0: 
+                    // Circle
+                        const radius = Math.floor(Math.random() * 20) + 10;
+                        const x = Math.floor(Math.random() * (canvas.width - 2 * radius) + radius);
+                        const y = Math.floor(Math.random() * (canvas.height - 2 * radius) + radius);
+                        shape = new Circle(x, y, radius);
+                        break;
+                    case 1: 
+                    // Rectangle
+                        const width = Math.floor(Math.random() * 50) + 20;
+                        const height = Math.floor(Math.random() * 50) + 20;
+                        const xR = Math.floor(Math.random() * (canvas.width - width));
+                        const yR = Math.floor(Math.random() * (canvas.height - height));
+                        shape = new Rectangle(xR, yR, width, height);
+                        break;
+                    case 2: 
+                    // Square
+                        const side = Math.floor(Math.random() * 50) + 20;
+                        const xS = Math.floor(Math.random() * (canvas.width - side));
+                        const yS = Math.floor(Math.random() * (canvas.height - side));
+                        shape = new Square(xS, yS, side);
+                        break;
+                }
+
+                let hasIntersection = false;
+                for (const otherShape of shapes) {
+                    if (shape.intersects(otherShape)) {
+                        hasIntersection = true;
+                        break;
+                    }
+                }
+
+                if (!hasIntersection) {
+                    return shape;
+                }
+
+                attempts++;
+            }
+            return null;
+        }
+
+        function drawRandomShapes(numShapes) {
+            const shapes = [];
+        
+            let generatedShapes = 0;
+            while (generatedShapes < numShapes) {
+                const shape = generateRandomShape(shapes);
+                if (shape !== null) {
+                    shapes.push(shape);
+                    shape.draw();
+                    generatedShapes++;
+        
+                    // print the coordinates of each shape
+                    console.log(`Shape ${generatedShapes}: (${shape.x}, ${shape.y})`);
+                }
+            }
+        }
+        drawRandomShapes(10);
+    </script>
+</body>
+</html>
+

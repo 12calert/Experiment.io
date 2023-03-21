@@ -97,10 +97,8 @@ def outOfBounds(obj, containerWidth):
 def place(obj, obstacles, containerWidth):
     for obstacle in obstacles:
         if intersect(obj,obstacle):
-            print("intersected with obj")
             return False
     if outOfBounds(obj, containerWidth):
-        print("out of bounds")
         return False
     else:
         return True
