@@ -31,16 +31,14 @@
 {% endif %}
 {# Game map and chat #}
 <div class="row">
-  <div class="col-sm-8 game">
+  <canvas id="canvas" class="col-sm-8 game" width="900px" height ="550px">
     <img id="dummy" hidden src="{% static 'images/logo.png' %}">
     <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
     <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
     <img id="dummy4" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
     <img id="dummy5" hidden src = "{% static 'images/yellow-box.png' %}">
-
-    <canvas id="canvas" width="900px" height = "520px"></canvas>
+   </canvas>
      
-  </div>
   <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}

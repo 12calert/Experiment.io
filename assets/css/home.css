@@ -253,7 +253,7 @@ footer ul li ul li{
   margin-right: 0px;
   align-self: flex-start;
   display: block;
-  word-wrap: break-word; /* Add this line */
+  word-wrap: break-word;  
 }
 
 .chat-received {
@@ -265,18 +265,19 @@ footer ul li ul li{
   margin-bottom: 10px;
   margin-right: 150px;
   align-self: flex-start;
-  word-wrap: break-word; /* Add this line */
+  word-wrap: break-word;  
 }
 
 /* end of changes to distinguish the messages sent in the app */
 
 /* style of two boxes that they distinguish map and chat */
-.col-sm-8.game {
-  height: 550px;
-  border-color: #333;
-  border-style: solid;
-}
-
+  .col-sm-8.game {
+    background-color:white;
+    height: 550px;
+    border-color: red; /* change it after from red to black or what is suitable*/
+    border-style: solid;
+  }
+ 
 /* chat styling */
   #chat-log {
     max-height: 600px;
