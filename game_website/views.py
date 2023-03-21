@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.http import Http404
-import math
+from math import floor
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -128,7 +128,7 @@ def create_room(request, game):
             rects = []
             failCounter = 0
             # width of the container to stop objects from overflowing
-            containerWidth = request.session.get("width")/12*8
+            containerWidth = floor(request.session.get("width")/12*8)
             # for each object to place on map
             for i in range(0, itemNo-1):
                 # add it
@@ -275,7 +275,7 @@ def create_room2(request, game,):
         itemNo = condition.amount_item
         rects = []
         failCounter = 0
-        containerWidth = request.session.get("width")/12*8
+        containerWidth = floor(request.session.get("width")/12*8)
         for i in range(0, itemNo-1):
             rects.append({"top": (randint(162,712-100)),
                 "left": (randint(0,(containerWidth-100))),
