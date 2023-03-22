@@ -48,6 +48,8 @@ urlpatterns = [
     path('<game>/all_rooms/actionUrl', views.create_room),
     
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
+    path('<game>/all_rooms/game_view/<room_name>/seeMaps', views.seeMaps, name='see_maps'),
+    path('completedGame/', views.compareMaps, name='compare_maps'),
     # simple page routing
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
     path('researcher_login/', CustomLoginView.as_view(

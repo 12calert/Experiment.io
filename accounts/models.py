@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 import uuid
-from django.db.models.functions import Lower
 # Create your models here.
 
 class Researcher(models.Model):
@@ -73,7 +72,8 @@ class Game(models.Model):
     MAPGAME = "MG"
     rects = models.JSONField(null = True)
     path = models.JSONField(null = True)
-
+    finishedFollowerURL = models.TextField(null = True)
+    finishedGiverURL = models.TextField(null = True)
     GAME_TYPE_CHOICES = [
         (MAPGAME, 'Map Game'),
 

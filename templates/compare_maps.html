@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Game View{% endblock %}
+{% block content %}
+<div id = "game">
+    <img id="dummyPath" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
+    <img id = "followerMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{game.finishedFollowerURL}}">
+    <img id = "giverMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{game.finishedGiverURL}}">
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+    //get follower img start position
+    const followerImg = document.getElementById('followerMap');
+    const giverImg = document.getElementById('giverMap');
+    const moves = JSON.parse('{{ moves | safe }}')
+
+    function getCoords(elem) { // crossbrowser version
+    var box = elem.getBoundingClientRect();
+
+    var body = document.body;
+    var docEl = document.documentElement;
+
+    var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+    var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+    var clientTop = docEl.clientTop || body.clientTop || 0;
+    var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+    var top  = box.top +  scrollTop - clientTop;
+    var left = box.left + scrollLeft - clientLeft;
+
+    return { top: Math.round(top), left: Math.round(left) };
+    }
+
+    const folCoords = getCoords(followerImg)
+    console.log(moves)
+    function drawPath(moves){
+        gameWindow = document.getElementById("game")
+        first = false
+        pathStack = []
+        for (let i = 0; i<moves.length; i++){
+            var fields = moves[i]["fields"]
+            if (fields["move_type"] === "mv"){
+                if (first === false){
+                    let img = document.createElement( 'img' )
+                    img.src = dummyPath.src
+                    img.style.position = "absolute"
+                    img.style.top = fields["oldPos"]["y"] + "px"
+                    img.style.left = fields["oldPos"]["x"] + "px"
+                    img.style.width = 32 + "px"
+                    img.style.height = 32 + "px"
+                    img.style.padding = "0px"
+                    pathStack.push(img)
+                    first = true
+                }
+                let img = document.createElement( 'img' )
+                img.src = dummyPath.src
+                img.style.position = "absolute"
+                img.style.top = fields["newPos"]["y"] + "px"
+                img.style.left = fields["newPos"]["x"] + "px"
+                img.style.width = 32 + "px"
+                img.style.height = 32 + "px"
+                img.style.padding = "0px"
+                //img.style.zIndex = -1
+                gameWindow.appendChild( img )
+                pathStack.push(img)
+                console.log(pathStack)
+            }
+            else if (fields["move_type"] === "un"){
+                if (pathStack.length > 0){
+                    pathStack.pop().remove()
+                    console.log(pathStack)
+                }
+            }
+        }
+    }
+    drawPath(moves)
+</script>
+{% endblock javascript %}
