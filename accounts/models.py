@@ -63,17 +63,17 @@ class Condition(models.Model):
 class Game(models.Model):
     #game_id = models.OneToOneField(Chat, verbose_name=('game_id'), primary_key=True, on_delete=models.CASCADE, default = uuid.uuid4) # PK/FK
     game = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    final_map = models.TextField(default="")
     completed = models.BooleanField(default=False)
     room_name = models.TextField(default = "", unique = True)
     users = models.IntegerField(default = 0) # this can be changed to an arrayfield of session ids
     has_condition = models.ForeignKey(Condition, on_delete=models.DO_NOTHING, null=False)
     public = models.BooleanField()
-    follower_position = models.JSONField( default={ 'x': 0, 'y': 0 } )
+    follower_position = models.JSONField( default=dict(x = 0, y = 0 ) )
     # used to filter what rooms the user sees depending on the game they choose to play
     MAPGAME = "MG"
     rects = models.JSONField(null = True)
     path = models.JSONField(null = True)
+
     GAME_TYPE_CHOICES = [
         (MAPGAME, 'Map Game'),
 
@@ -83,6 +83,19 @@ class Game(models.Model):
         choices=GAME_TYPE_CHOICES,
         default=MAPGAME,
     )
+
+class Move(models.Model):
+    MOVE = "mv"
+    UNDO = "un"
+    MOVE_TYPE_CHOICES = [
+        (MOVE, 'Move'),
+        (UNDO, 'Undo')
+    ]
+    move_type = models.CharField(max_length=2,
+        choices=MOVE_TYPE_CHOICES)
+    oldPos = models.JSONField(default=dict(x = 0, y = 0 ), null = True)
+    newPos = models.JSONField(default=dict(x = 0, y = 0 ), null = True)
+    game = models.ForeignKey(Game, on_delete=models.DO_NOTHING, null=False)
 
 class Chat(models.Model):
     game = models.ForeignKey(Game, on_delete=models.DO_NOTHING, null = False)

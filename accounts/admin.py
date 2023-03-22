@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import Researcher, Game, Chat,Player
+from accounts.models import Researcher, Game, Chat,Player, Move
 from django.db import models
 from django.conf import settings
 from jsonfield import JSONField
@@ -13,3 +13,4 @@ admin.site.register(Game)
 admin.site.register(Player)
 admin.site.register(Chat)
 admin.site.register(Researcher, AuthorAdmin)
+admin.site.register(Move)

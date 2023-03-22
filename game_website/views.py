@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
+from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment, Move
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import secrets
@@ -642,4 +642,27 @@ def setScreensize(request):
         request.session['height'] = height
         return JsonResponse({},status = 200)
     return HttpResponse("")
+
+def saveMove(request):
+    if request.method == "POST" and is_ajax(request):
+        room_name = request.POST["roomName"]
+        game = Game.objects.get( room_name=room_name )
+        type = request.POST["type"]
+        if request.POST["x"]:
+            x = int(request.POST["x"])
+            y = int(request.POST["y"])
+        if type == "mv":
+            Move.objects.create(game=game,
+                        move_type = type,
+                        oldPos = {'x': game.follower_position[ "x" ], 'y': game.follower_position[ "y" ]},
+                        newPos = {'x': game.follower_position[ "x" ] + x * 32, 'y': game.follower_position[ "y" ] + y * 32},
+                        )
+            return JsonResponse({},status = 200)
+        elif type == "un":
+            Move.objects.create(game=game,
+                        move_type = type
+                        )
+            return JsonResponse({},status = 200)
+        else:
+            return HttpResponse("")
 # --- end of ajax views ---
