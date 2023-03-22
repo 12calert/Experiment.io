@@ -49,7 +49,7 @@ class CustomLoginView(LoginView):
 """ renders the game view page which users play the game and chat to each other in"""
 def game_view(request, game, room_name):
     # query the database to find the correct game instance
-    foundGame = Game.objects.get(room_name = room_name)
+    foundGame = Game.objects.get(room_name = room_name, game_type = game)
     # Using filter() and first() to allow the case in which someone chooses to play with themself
     # change this in production to get() instead and handle exceptions accordingly reject the connection and
     # inform the player that they must play with someone else
@@ -64,6 +64,14 @@ def game_view(request, game, room_name):
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
                                               "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame, 
                                               "containerSize":conatinerSize}) # dict to store room number
+
+""" renders the page to see both maps"""
+def seeMaps(request, game, room_name):
+    foundGame = Game.objects.get(room_name = room_name)
+    containerSize = (request.session.get("width")/12*8)
+    moves = serializers.serialize("json", Move.objects.filter(game=foundGame))
+    return render(request, 'compare_maps.html', {"game":foundGame, "containerSize":containerSize, "moves":moves})
+
 """ view which renders the page containing the list of rooms"""
 def all_rooms(request, game):
     #query all rooms with one player waiting for another
@@ -400,6 +408,7 @@ def join_private_room(request, game):
             found_game = Game.objects.get(room_name=unique_room_key, public=False)
             # Check if the room already has two players
             players_in_room = Player.objects.filter(game=found_game)
+            print(found_game.users)
             if found_game.users >= 2:
                 
                 messages.error(request, "The private room is already full.")
@@ -529,6 +538,23 @@ def researcher_registration(request):
         # add researcher to db
         Researcher.objects.create(userkey = user)
     return render(request, 'researcher_registration.html', context)
+
+def compareMaps(request):
+    # query the database to find the correct game instance
+    if request.method == "POST" and is_ajax(request):
+        room_name = request.POST["roomName"]
+        # find the game that was played
+        game = Game.objects.get(room_name=room_name)
+        canvasURL = request.POST["canvasURL"]
+        role = request.POST["role"]
+        if role == "follower":
+            game.finishedFollowerURL = canvasURL
+        elif role == "giver":
+            game.finishedGiverURL = canvasURL
+        game.save()
+        return JsonResponse({"gameType":game.game_type, "room_name":room_name}, status=200)
+    else:
+        HttpResponse("")
 
 # --- start of ajax views ---
 """ called when the game is completed"""
