@@ -102,10 +102,13 @@ class Circle extends Shape {
     }
 
     draw() {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = getRandomColor();
-      ctx.stroke();
+      const color = getRandomColor(); // get a random color
+      ctx.beginPath();  // start a new path on the canvas
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);  // draw a circular path with the given center coordinates and radius
+      ctx.fillStyle = color; // set fill color
+      ctx.fill();  // fill the circle with the given color
+      ctx.strokeStyle = color;   // set border color to same color
+      ctx.stroke();  // draw border
     }
 
  
@@ -139,8 +142,11 @@ class Rectangle extends Shape {
 
   
     draw() {
-      ctx.strokeStyle = getRandomColor();
-      ctx.strokeRect(this.x, this.y, this.width, this.height);
+      const color = getRandomColor(); // get a random color
+      ctx.fillStyle = color; // set fill color
+      ctx.fillRect(this.x, this.y, this.width, this.height); // fill shape with color
+      ctx.strokeStyle = color; // set border color to same color
+      ctx.strokeRect(this.x, this.y, this.width, this.height); // draw border
     }
     
     intersects(other) {
@@ -186,10 +192,18 @@ class Square extends Shape {
             );
         } 
         else if (other instanceof Circle) {
-            const deltaX = other.x - Math.max(this.x, Math.min(other.x, this.x + this.side));
+          const nearestX = Math.max(this.x, Math.min(other.x, this.x + this.side));
+          const nearestY = Math.max(this.y, Math.min(other.y, this.y + this.side));
+
+          const deltaX = other.x - nearestX;
+          const deltaY = other.y - nearestY;
+
+          return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);
+   
+          /*  const deltaX = other.x - Math.max(this.x, Math.min(other.x, this.x + this.side));
             const deltaY = other.y - Math.max(this.y, Math.min(other.y, this.y + this.side));
 
-            return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);
+            return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);*/
         } 
         else if (other instanceof Square) {
             return (
@@ -401,16 +415,57 @@ function getOffset(el) {
     let dummmy = document.getElementById( "dummy" )
     leftOffset = getOffset(gameWindow[0]).left
     topOffset = getOffset(gameWindow[0]).top
-    for( let i = 0; i < rects.length; i++ ) {
+  /*  for( let i = 0; i < rects.length; i++ ) {
       const side = rects[i].width
       const xS = rects[i].left
       const yS = rects[i].top - topOffset
       shape = new Square(xS, yS, side);
       shape.draw();
       
-    }
+    }*/
     
-
+    for (let i = 0; i < rects.length; i++) {
+      var shapeType = Math.random(); //generates a random float between 0 (inclusive) and 1 (exclusive)
+      let width, height, radius;
+      xS = rects[i].left;
+      yS = rects[i].top - topOffset;
+      let shape;
+      // this is from the backend if you need it again
+      //  width = rects[i].width; 
+      //  height = rects[i].height;
+      //Each of the three intervals [(0, 1/3), (1/3, 2/3), (2/3, 1)] has the same length (1/3), 
+      //so the probabilities of selecting a rectangle, square, and circle are equal to 1/3.
+      if (shapeType < 1 / 3) { // rectangle
+          // Returns a random integer from 2 to 100, I can 1 too but like i think its too small up to u
+          width = Math.floor(Math.random() * 100) + 5;
+          height = Math.floor(Math.random() * 100) + 5;
+          shape = new Rectangle(xS, yS, width, height);
+      } 
+      else if (shapeType < 2 / 3) { // square
+          width = height = Math.floor(Math.random() * 100) + 2;
+          shape = new Square(xS, yS, width);
+      }
+      else { // circle
+        radius = Math.floor(Math.random() * 20) + 5; // 2 to 50 since its radius the diameter will be double = 100
+        shape = new Circle(xS + radius/2, yS, radius);
+      }
+      console.log(shape); // test it to be certain, remove this line after 
+      shape.draw(); // draw the shape
+    }
+    // !!!!!!!!!!! PREVIOUS CODE   !!!!!!!!!!  i leave it in case u want to go back
+    /*for (let i = 0; i < rects.length; i++) {
+      const width = rects[i].width;
+      const height = rects[i].height;
+      const xS = rects[i].left;
+      const yS = rects[i].top - topOffset;
+      
+        shape = new Square(xS, yS, width);
+     
+        shape = new Rectangle(xS, yS, width, height);
+     
+      console.log(shape)
+      shape.draw();
+    }*/
     document.addEventListener( 'keydown', function( event ) {
       if( event.keyCode == 37 ) sendInput( -1, 0 )
       else if( event.keyCode == 39 ) sendInput( 1, 0 )
@@ -425,7 +480,7 @@ function getOffset(el) {
   }
 
   function getRandomColor() {
-    const colors = ['red', 'yellow', 'blue'];
+    const colors = ['red', 'yellow', 'blue']; // add any colors you like
     return colors[Math.floor(Math.random() * colors.length)];
   }
   
