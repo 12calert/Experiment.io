@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment
+from accounts.models import Game, Chat, Researcher, Condition, Player, Experiment, Move
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 import secrets
@@ -59,9 +59,11 @@ def game_view(request, game, room_name):
     # FOR CONSISTENT ALLOCATION USE TWO DIFFERENT BROWSERS
 
     # query the database to get the current logged in player
+    conatinerSize = (request.session.get("width")/12*8)
     foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
-                                              "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame}) # dict to store room number
+                                              "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame, 
+                                              "containerSize":conatinerSize}) # dict to store room number
 """ view which renders the page containing the list of rooms"""
 def all_rooms(request, game):
     #query all rooms with one player waiting for another
@@ -80,16 +82,12 @@ def intersect(r1, r2):
 """ checks if an object is out of bounds within some container"""
 def outOfBounds(obj, containerWidth):
     if (obj["left"] < 0):
-        print(obj["left"], "out of bounds left")
         return True
     elif (obj["left"]+obj["width"] > containerWidth):
-        print(obj["left"]+obj["width"], "out of bounds right")
         return True
     elif (obj["top"] < 162): # replace with top of container
-        print(obj["top"], "out of bounds top")
         return True
     elif (obj["top"]+obj["height"] > 712): # replace with bottom of container
-        print(obj["top"]+obj["height"], "out of bounds bottom")
         return True
     else:
         return False
@@ -124,34 +122,42 @@ def create_room(request, game):
             # amount of items to generate
             itemNo = condition.amount_item
             rects = []
+            containerWidth = floor(request.session.get("width")/12*8)
+            rects.append({"top": (randint(162,712-100)), #hardcoded values bad
+                        "left": (randint(0,(containerWidth-100))),
+                        "width": 100,
+                        "height": 100})
             failCounter = 0
             # width of the container to stop objects from overflowing
-            containerWidth = floor(request.session.get("width")/12*8)
+            placed = False
+            failed = False
             # for each object to place on map
             for i in range(0, itemNo-1):
-                # add it
-                rects.append({"top": (randint(162,712-100)),
-                    "left": (randint(0,(containerWidth-100))),
-                    "width": 100,
-                    "height": 100})
+                placed = False
+                while(not placed or failCounter > 1000):
+                    tempRect = {"top": (randint(162,712-100)), #hardcoded values bad
+                        "left": (randint(0,(containerWidth-100))),
+                        "width": 100,
+                        "height": 100}
                 # check if it intersects with any already added
-                for j in range(0, len(rects)-1):
-                    if intersect(rects[j], rects[len(rects)-1]):
-                        # if it does then remove it
-                        rects.pop(i)
-                        i -= 1
-                        failCounter += 1
-                        # if too many failures, then stop
-                        if failCounter > 1000:
-                            i = 1000
+                    for j in range(0, len(rects)):
+                        if intersect(tempRect, rects[j]):
+                            failCounter += 1
+                            # if too many failures, then stop
+                            failed = True
                             break
+                    if (not failed):
+                        rects.append(tempRect)
+                        placed = True
+                    else:
+                        failed = False
             # the finished path
             path = []
             # initial placement
             path.append({"top":162,
                     "left": 0,
-                    "width": 25,
-                    "height":25})
+                    "width": 32,
+                    "height":32})
             # the last step which was taken
             lastStep = path[0]
             # the directions which the path can take
@@ -169,8 +175,8 @@ def create_room(request, game):
                     # temporarily create the step 
                     tempStep = ({"top":lastStep["top"],
                                 "left":lastStep["left"]+lastStep["width"],
-                                "width": 25,
-                                "height": 25})
+                                "width": 32,
+                                "height": 32})
                     # check if its able to be added to the map
                     if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
                         path.append(tempStep)
@@ -184,8 +190,8 @@ def create_room(request, game):
                 elif direction == "left":
                     tempStep = ({"top":lastStep["top"],
                                 "left":lastStep["left"]-lastStep["width"],
-                                "width": 25,
-                                "height": 25})
+                                "width": 32,
+                                "height": 32})
                     if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
                         path.append(tempStep)
                         lastStep = tempStep
@@ -197,8 +203,8 @@ def create_room(request, game):
                 elif direction == "down":
                     tempStep = ({"top":lastStep["top"]-lastStep["height"],
                                 "left":lastStep["left"],
-                                "width": 25,
-                                "height": 25})
+                                "width": 32,
+                                "height": 32})
                     if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
                         path.append(tempStep)
                         lastStep = tempStep
@@ -210,8 +216,8 @@ def create_room(request, game):
                 else:
                     tempStep = ({"top":lastStep["top"]+lastStep["height"],
                                 "left":lastStep["left"],
-                                "width": 25,
-                                "height": 25})
+                                "width": 32,
+                                "height": 32})
                     if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
                         path.append(tempStep)
                         lastStep = tempStep
@@ -272,21 +278,35 @@ def create_room2(request, game,):
         game_type=game, has_condition = condition)
         itemNo = condition.amount_item
         rects = []
-        failCounter = 0
         containerWidth = floor(request.session.get("width")/12*8)
+        rects.append({"top": (randint(162,712-100)), #hardcoded values bad
+                    "left": (randint(0,(containerWidth-100))),
+                    "width": 100,
+                    "height": 100})
+        failCounter = 0
+        # width of the container to stop objects from overflowing
+        placed = False
+        failed = False
+        # for each object to place on map
         for i in range(0, itemNo-1):
-            rects.append({"top": (randint(162,712-100)),
-                "left": (randint(0,(containerWidth-100))),
-                "width": 100,
-                "height": 100})
-            for j in range(0, len(rects)-1):
-                if intersect(rects[j], rects[len(rects)-1]):
-                    rects.pop(i)
-                    i -= 1
-                    failCounter += 1
-                    if failCounter > 1000:
-                        i = 1000
+            placed = False
+            while(not placed or failCounter > 1000):
+                tempRect = {"top": (randint(138,712-100)), # hardcoded values bad
+                    "left": (randint(0,(containerWidth-100))),
+                    "width": 100,
+                    "height": 100}
+            # check if it intersects with any already added
+                for j in range(0, len(rects)):
+                    if intersect(tempRect, rects[j]):
+                        failCounter += 1
+                        # if too many failures, then stop
+                        failed = True
                         break
+                if (not failed):
+                    rects.append(tempRect)
+                    placed = True
+                else:
+                    failed = False
         
         path = []
         # initial placement
@@ -628,4 +648,27 @@ def setScreensize(request):
         request.session['height'] = height
         return JsonResponse({},status = 200)
     return HttpResponse("")
+
+def saveMove(request):
+    if request.method == "POST" and is_ajax(request):
+        room_name = request.POST["roomName"]
+        game = Game.objects.get( room_name=room_name )
+        type = request.POST["type"]
+        if request.POST["x"]:
+            x = int(request.POST["x"])
+            y = int(request.POST["y"])
+        if type == "mv":
+            Move.objects.create(game=game,
+                        move_type = type,
+                        oldPos = {'x': game.follower_position[ "x" ], 'y': game.follower_position[ "y" ]},
+                        newPos = {'x': game.follower_position[ "x" ] + x * 32, 'y': game.follower_position[ "y" ] + y * 32},
+                        )
+            return JsonResponse({},status = 200)
+        elif type == "un":
+            Move.objects.create(game=game,
+                        move_type = type
+                        )
+            return JsonResponse({},status = 200)
+        else:
+            return HttpResponse("")
 # --- end of ajax views ---

@@ -31,12 +31,9 @@
 {% endif %}
 {# Game map and chat #}
 <div class="row">
-  <canvas id="canvas" class="col-sm-8 game" width="900px" height ="550px">
-    <img id="dummy" hidden src="{% static 'images/logo.png' %}">
-    <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
-    <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
-    <img id="dummy4" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
-    <img id="dummy5" hidden src = "{% static 'images/yellow-box.png' %}">
+  <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
+  <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
+  <canvas id="canvas" class="col-sm-8 game" style = "border:0; padding:0; margin:0;" width = "{{containerSize}}" height = "550">
    </canvas>
      
   <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
@@ -258,7 +255,6 @@ function getOffset(el) {
     } 
     else if ( data.type == "move" ) {
       rects = data.message[ "rects" ]
-      if ( !player ) SpawnPlayer( data.message[ "x" ], data.message[ "y" ] )
       update( data.message )
     }
     else {
@@ -283,7 +279,7 @@ function getOffset(el) {
   // Some of it will be moved to the server side
   function SpawnPlayer ( x, y ) {
 
-    var gameWindow = document.getElementsByClassName( "game" )
+    var gameWindow = document.getElementsByClassName( "row" )
 
     let img = document.createElement( 'img' )
     img.src = dummy2.src
@@ -292,6 +288,7 @@ function getOffset(el) {
     img.style.left = x + "px"
     img.style.width = "32px"
     img.style.height = "32px"
+    img.style.padding = "0px"
     img.id = "player"
     img.style.zIndex = 99
     gameWindow[0].appendChild( img )
@@ -300,7 +297,7 @@ function getOffset(el) {
     $.ajax({
         type: 'POST',
         url: "{% url 'initial_player' %}",
-        data: {"x":x,"y":y,"room_name":roomName},
+        data: {"x":Math.floor(x),"y":Math.floor(y),"room_name":roomName},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
         success: function (response) {
             data["x"] = x
@@ -316,15 +313,16 @@ function getOffset(el) {
     let player = document.getElementById( "player" )
     player.style.left = data[ "x" ] + "px";
     player.style.top = data[ "y" ] + "px";
-    var gameWindow = document.getElementsByClassName( "game" )
+    var gameWindow = document.getElementsByClassName( "row" )
     if (undoTrue != true){
       let img = document.createElement( 'img' )
       img.src = dummy3.src
       img.style.position = "absolute"
       img.style.top = player.style.top
       img.style.left = player.style.left
-      img.style.width = 10 + "px"
-      img.style.height = 10 + "px"
+      img.style.width = 32 + "px"
+      img.style.height = 32 + "px"
+      img.style.padding = "0px"
       imgStack.push(img)
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
@@ -333,24 +331,48 @@ function getOffset(el) {
   }
   
   function sendInput( x, y ) {
-    moveStack.push({"x":x, "y":y})
-    chatSocket.send(JSON.stringify({
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'save_move' %}",
+      data: {"roomName":roomName,"type":"mv","x":x,"y":y},
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      success: function (response) {
+        moveStack.push({"x":x, "y":y})
+        chatSocket.send(JSON.stringify({
           'message': { "x": x, "y": y },
           'role': "move",
           'finished' : false,
         }));
+      },
+      error: function (response) {
+        // alert the error if any error occured
+        console.log(response["responseJSON"]["error"]);
+      }
+    })
   }
 
   function undo() {
-    undoTrue = true
-    lastMove = moveStack.pop()
-    lastImg = imgStack.pop()
-    lastImg.remove()
-    chatSocket.send(JSON.stringify({
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'save_move' %}",
+      data: {"roomName":roomName,"type":"un","x":null,"y":null},
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      success: function (response) {
+        undoTrue = true
+        lastMove = moveStack.pop()
+        lastImg = imgStack.pop()
+        lastImg.remove()
+        chatSocket.send(JSON.stringify({
           'message': {"x": -lastMove["x"], "y": -lastMove["y"] },
           'role': "move",
           'finished' : false,
         }));
+      },
+      error: function (response) {
+        // alert the error if any error occured
+        console.log(response["responseJSON"]["error"]);
+      }
+    })
   }
   function InitializeObstacles( rects ) {
 
@@ -361,7 +383,6 @@ function getOffset(el) {
     for( let i = 0; i < rects.length; i++ ) {
       const side = rects[i].width
       const xS = rects[i].left
-      console.log(xS, rects[i].left)
       const yS = rects[i].top - topOffset
       shape = new Square(xS, yS, side);
       shape.draw();
@@ -397,7 +418,6 @@ function getOffset(el) {
     for( let i = 0; i < path.length; i++ ) {
       const side = path[i].width
       const xS = path[i].left
-      console.log(xS, path[i].left)
       const yS = path[i].top - topOffset
       shape = new Square(xS, yS, side);
       shape.draw();
@@ -437,8 +457,6 @@ function getOffset(el) {
     let img = document.createElement( 'img' )
     img.src = dummy5.src
     img.style.position = "absolute"
-    console.log(path.length - 1)
-    console.log(path[path.length-1])
     img.style.top = path[path.length-1].top + "px"
     img.style.left = path[path.length-1].left + "px"
     img.style.width = path[path.length-1].width + "px"
@@ -534,7 +552,6 @@ $("#complete").submit(function (e) {
 let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
 InitializeObstacles(JSON.parse(rects))
-console.log(role)
 if (role == "follower"){
   SpawnPlayer(0,rect.top)
   initializeStartandEnd(JSON.parse(path))

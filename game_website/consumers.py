@@ -37,8 +37,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if role == "move":
             game = await Game.objects.aget( room_name=self.room_name )
-            game.follower_position[ "x" ] += message[ "x" ] * 10
-            game.follower_position[ "y" ] += message[ "y" ] * 10
+            game.follower_position[ "x" ] += message[ "x" ] * 32
+            game.follower_position[ "y" ] += message[ "y" ] * 32
             await sync_to_async( game.save )()
             #game.follower_position[ "rects" ] = game.rects
             message = game.follower_position
