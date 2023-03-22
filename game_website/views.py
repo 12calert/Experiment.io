@@ -128,7 +128,7 @@ def create_room(request, game):
             # width of the container to stop objects from overflowing
             containerWidth = floor(request.session.get("width")/12*8)
             # for each object to place on map
-            for i in range(0, itemNo-1):
+            for i in range(0, itemNo):
                 # add it
                 rects.append({"top": (randint(162,712-100)),
                     "left": (randint(0,(containerWidth-100))),

@@ -119,6 +119,15 @@ class GameConditions(forms.ModelForm):
         except Condition.DoesNotExist:
             return condition_name
         raise forms.ValidationError(("This condition name already exists"))
+    
+    def clean_amount_of_items(self):
+        amount_of_items = self.cleaned_data['amount_of_items']
+        if amount_of_items < 0:
+            raise forms.ValidationError(("You cannot set negative items"))
+        elif amount_of_items == 0:
+            raise forms.ValidationError(("You must set at least one item"))
+        else:
+            return amount_of_items
 
 
 
