@@ -31,12 +31,9 @@
 {% endif %}
 {# Game map and chat #}
 <div class="row">
-  <canvas id="canvas" class="col-sm-8 game" width="900px" height ="550px">
-    <img id="dummy" hidden src="{% static 'images/logo.png' %}">
-    <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
-    <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
-    <img id="dummy4" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
-    <img id="dummy5" hidden src = "{% static 'images/yellow-box.png' %}">
+  <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
+  <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
+  <canvas id="canvas" class="col-sm-8 game" style = "border:0; padding:0; margin:0;" width = "{{containerSize}}" height = "550">
    </canvas>
      
   <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
@@ -283,7 +280,7 @@ function getOffset(el) {
   // Some of it will be moved to the server side
   function SpawnPlayer ( x, y ) {
 
-    var gameWindow = document.getElementsByClassName( "game" )
+    var gameWindow = document.getElementsByClassName( "row" )
 
     let img = document.createElement( 'img' )
     img.src = dummy2.src
@@ -292,6 +289,7 @@ function getOffset(el) {
     img.style.left = x + "px"
     img.style.width = "32px"
     img.style.height = "32px"
+    img.style.padding = "0px"
     img.id = "player"
     img.style.zIndex = 99
     gameWindow[0].appendChild( img )
@@ -316,15 +314,16 @@ function getOffset(el) {
     let player = document.getElementById( "player" )
     player.style.left = data[ "x" ] + "px";
     player.style.top = data[ "y" ] + "px";
-    var gameWindow = document.getElementsByClassName( "game" )
+    var gameWindow = document.getElementsByClassName( "row" )
     if (undoTrue != true){
       let img = document.createElement( 'img' )
       img.src = dummy3.src
       img.style.position = "absolute"
       img.style.top = player.style.top
       img.style.left = player.style.left
-      img.style.width = 10 + "px"
-      img.style.height = 10 + "px"
+      img.style.width = 32 + "px"
+      img.style.height = 32 + "px"
+      img.style.padding = "0px"
       imgStack.push(img)
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
@@ -534,7 +533,6 @@ $("#complete").submit(function (e) {
 let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
 InitializeObstacles(JSON.parse(rects))
-console.log(role)
 if (role == "follower"){
   SpawnPlayer(0,rect.top)
   initializeStartandEnd(JSON.parse(path))
