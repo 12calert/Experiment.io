@@ -82,16 +82,12 @@ def intersect(r1, r2):
 """ checks if an object is out of bounds within some container"""
 def outOfBounds(obj, containerWidth):
     if (obj["left"] < 0):
-        print(obj["left"], "out of bounds left")
         return True
     elif (obj["left"]+obj["width"] > containerWidth):
-        print(obj["left"]+obj["width"], "out of bounds right")
         return True
     elif (obj["top"] < 162): # replace with top of container
-        print(obj["top"], "out of bounds top")
         return True
     elif (obj["top"]+obj["height"] > 712): # replace with bottom of container
-        print(obj["top"]+obj["height"], "out of bounds bottom")
         return True
     else:
         return False
@@ -127,22 +123,19 @@ def create_room(request, game):
             itemNo = condition.amount_item
             rects = []
             containerWidth = floor(request.session.get("width")/12*8)
-            rects.append({"top": (randint(162,712-100)),
+            rects.append({"top": (randint(162,712-100)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
                         "width": 100,
                         "height": 100})
             failCounter = 0
             # width of the container to stop objects from overflowing
-            print(containerWidth)
             placed = False
             failed = False
             # for each object to place on map
             for i in range(0, itemNo-1):
-                print(i)
                 placed = False
                 while(not placed or failCounter > 1000):
-                    print(failCounter, "fail")
-                    tempRect = {"top": (randint(162,712-100)),
+                    tempRect = {"top": (randint(162,712-100)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
                         "width": 100,
                         "height": 100}
@@ -158,7 +151,6 @@ def create_room(request, game):
                         placed = True
                     else:
                         failed = False
-            print(itemNo, rects)
             # the finished path
             path = []
             # initial placement
@@ -286,21 +278,35 @@ def create_room2(request, game,):
         game_type=game, has_condition = condition)
         itemNo = condition.amount_item
         rects = []
-        failCounter = 0
         containerWidth = floor(request.session.get("width")/12*8)
+        rects.append({"top": (randint(162,712-100)), #hardcoded values bad
+                    "left": (randint(0,(containerWidth-100))),
+                    "width": 100,
+                    "height": 100})
+        failCounter = 0
+        # width of the container to stop objects from overflowing
+        placed = False
+        failed = False
+        # for each object to place on map
         for i in range(0, itemNo-1):
-            rects.append({"top": (randint(162,712-100)),
-                "left": (randint(0,(containerWidth-100))),
-                "width": 100,
-                "height": 100})
-            for j in range(0, len(rects)-1):
-                if intersect(rects[j], rects[len(rects)-1]):
-                    rects.pop(i)
-                    i -= 1
-                    failCounter += 1
-                    if failCounter > 1000:
-                        i = 1000
+            placed = False
+            while(not placed or failCounter > 1000):
+                tempRect = {"top": (randint(138,712-100)), # hardcoded values bad
+                    "left": (randint(0,(containerWidth-100))),
+                    "width": 100,
+                    "height": 100}
+            # check if it intersects with any already added
+                for j in range(0, len(rects)):
+                    if intersect(tempRect, rects[j]):
+                        failCounter += 1
+                        # if too many failures, then stop
+                        failed = True
                         break
+                if (not failed):
+                    rects.append(tempRect)
+                    placed = True
+                else:
+                    failed = False
         
         path = []
         # initial placement

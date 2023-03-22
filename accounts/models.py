@@ -93,8 +93,8 @@ class Move(models.Model):
     ]
     move_type = models.CharField(max_length=2,
         choices=MOVE_TYPE_CHOICES)
-    oldPos = models.JSONField(default=dict(x = 0, y = 0 ), null = True)
-    newPos = models.JSONField(default=dict(x = 0, y = 0 ), null = True)
+    oldPos = models.JSONField(null = True)
+    newPos = models.JSONField(null = True)
     game = models.ForeignKey(Game, on_delete=models.DO_NOTHING, null=False)
 
 class Chat(models.Model):
