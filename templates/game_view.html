@@ -180,7 +180,7 @@
     $.ajax({
         type: 'POST',
         url: "{% url 'initial_player' %}",
-        data: {"x":x,"y":y,"room_name":roomName},
+        data: {"x":Math.floor(x),"y":Math.floor(y),"room_name":roomName},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
         success: function (response) {
             data["x"] = x
