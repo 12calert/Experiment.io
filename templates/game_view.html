@@ -31,13 +31,14 @@
 {% endif %}
 {# Game map and chat #}
 <div class="row">
-  <div class="col-sm-8 game">
+  <canvas id="canvas" class="col-sm-8 game" width="900px" height ="550px">
     <img id="dummy" hidden src="{% static 'images/logo.png' %}">
     <img id="dummy2" hidden src="{% static 'images/player.png' %}"> 
     <img id="dummy3" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
     <img id="dummy4" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
+    <img id="dummy5" hidden src = "{% static 'images/yellow-box.png' %}">
+   </canvas>
      
-  </div>
   <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}
@@ -83,6 +84,125 @@
   var moveStack = [];
   var imgStack = [];
   var undoTrue = false;
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  class Shape {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    intersects(other) {
+        return false;
+    }
+}
+
+class Circle extends Shape {
+    constructor(x, y, radius) {
+        super(x, y);
+        this.radius = radius;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    intersects(other) {
+        if (other instanceof Circle) {
+            const dx = this.x - other.x;
+            const dy = this.y - other.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            return distance < (this.radius + other.radius);
+        } 
+        else if (other instanceof Rectangle) {
+            const deltaX = this.x - Math.max(other.x, Math.min(this.x, other.x + other.width));
+            const deltaY = this.y - Math.max(other.y, Math.min(this.y, other.y + other.height));
+
+            return (deltaX * deltaX + deltaY * deltaY) < (this.radius * this.radius);
+        } 
+        else if (other instanceof Square) {
+            return other.intersects(this);
+        }
+    }
+}
+
+class Rectangle extends Shape {
+    constructor(x, y, width, height) {
+        super(x, y);
+        this.width = width;
+        this.height = height;
+    }
+
+    draw() {
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
+
+    intersects(other) {
+        if (other instanceof Rectangle) {
+            return (
+                this.x < other.x + other.width &&
+                this.x + this.width > other.x &&
+                this.y < other.y + other.height &&
+                this.y + this.height > other.y
+            );
+        } 
+        else if (other instanceof Circle) {
+            return other.intersects(this);
+        } 
+        else if (other instanceof Square) {
+            
+            return other.intersects(this);
+        }
+    }
+}
+
+class Square extends Shape {
+    constructor(x, y, side) {
+        super(x, y);
+        this.side = side;
+    }
+
+    draw() {
+        ctx.strokeRect(this.x, this.y, this.side, this.side);
+    }
+
+    intersects(other) {
+        if (other instanceof Rectangle) {
+            return (
+                this.x < other.x + other.width &&
+                this.x + this.side > other.x &&
+                this.y < other.y + other.height &&
+                this.y + this.side > other.y
+            );
+        } 
+        else if (other instanceof Circle) {
+            const deltaX = other.x - Math.max(this.x, Math.min(other.x, this.x + this.side));
+            const deltaY = other.y - Math.max(this.y, Math.min(other.y, this.y + this.side));
+
+            return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);
+        } 
+        else if (other instanceof Square) {
+            return (
+                this.x < other.x + other.side &&
+                this.x + this.side > other.x &&
+                this.y < other.y + other.side &&
+                this.y + this.side > other.y
+            );
+        }
+    }
+}
+
+function getOffset(el) {
+  const rect = el.getBoundingClientRect();
+  return {
+    left: rect.left + window.scrollX,
+    top: rect.top + window.scrollY
+  };
+}
     
   for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
@@ -232,12 +352,20 @@
           'finished' : false,
         }));
   }
-  function InitializeGame( rects, path ) {
+  function InitializeObstacles( rects ) {
 
     var gameWindow = document.getElementsByClassName( "game" )
     let dummmy = document.getElementById( "dummy" )
+    leftOffset = getOffset(gameWindow[0]).left
+    topOffset = getOffset(gameWindow[0]).top
     for( let i = 0; i < rects.length; i++ ) {
-      let img = document.createElement( 'img' )
+      const side = rects[i].width
+      const xS = rects[i].left
+      console.log(xS, rects[i].left)
+      const yS = rects[i].top - topOffset
+      shape = new Square(xS, yS, side);
+      shape.draw();
+      /*let img = document.createElement( 'img' )
       img.src = dummy.src
       img.style.position = "absolute"
       img.style.top = rects[i].top + "px"
@@ -245,20 +373,9 @@
       img.style.width = rects[i].width + "px"
       img.style.height = rects[i].height + "px"
       //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) 
+      gameWindow[0].appendChild( img ) */
     }
-    let dummmy4 = document.getElementById( "dummy4" )
-    for( let i = 0; i < path.length; i++ ) {
-      let img = document.createElement( 'img' )
-      img.src = dummy4.src
-      img.style.position = "absolute"
-      img.style.top = path[i].top + "px"
-      img.style.left = path[i].left + "px"
-      img.style.width = path[i].width + "px"
-      img.style.height = path[i].height + "px"
-      //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) 
-    }
+    
 
     document.addEventListener( 'keydown', function( event ) {
       if( event.keyCode == 37 ) sendInput( -1, 0 )
@@ -272,7 +389,72 @@
     } );
 
   }
+  function InitializeFinalPath(path){
+    var gameWindow = document.getElementsByClassName( "game" )
+    //let dummmy4 = document.getElementById( "dummy4" )
+    leftOffset = getOffset(gameWindow[0]).left
+    topOffset = getOffset(gameWindow[0]).top
+    for( let i = 0; i < path.length; i++ ) {
+      const side = path[i].width
+      const xS = path[i].left
+      console.log(xS, path[i].left)
+      const yS = path[i].top - topOffset
+      shape = new Square(xS, yS, side);
+      shape.draw();
+      /*let img = document.createElement( 'img' )
+      img.src = dummy4.src
+      img.style.position = "absolute"
+      img.style.top = path[i].top + "px"
+      img.style.left = path[i].left + "px"
+      img.style.width = path[i].width + "px"
+      img.style.height = path[i].height + "px"
+      //img.style.zIndex = -1
+      gameWindow[0].appendChild( img ) */
+    }
+  }
 
+  function initializeStartandEnd(path){
+    var gameWindow = document.getElementsByClassName( "game" )
+    leftOffset = getOffset(gameWindow[0]).left
+    topOffset = getOffset(gameWindow[0]).top
+    var side = path[path.length-1].width
+    var xS = path[path.length-1].left
+    var yS = path[path.length-1].top - topOffset
+    shape = new Square(xS, yS, side);
+    shape.draw();
+
+    side = path[0].width
+    xS = path[0].left
+    yS = path[0].top - topOffset
+    shape = new Square(xS, yS, side);
+    shape.draw();
+
+    shape = new Square(xS, yS, side);
+    shape.draw();
+
+    /*var gameWindow = document.getElementsByClassName( "game" )
+    let dummmy5 = document.getElementById( "dummy5" )
+    let img = document.createElement( 'img' )
+    img.src = dummy5.src
+    img.style.position = "absolute"
+    console.log(path.length - 1)
+    console.log(path[path.length-1])
+    img.style.top = path[path.length-1].top + "px"
+    img.style.left = path[path.length-1].left + "px"
+    img.style.width = path[path.length-1].width + "px"
+    img.style.height = path[path.length-1].height + "px"
+    //img.style.zIndex = -1
+    gameWindow[0].appendChild( img )
+    img = document.createElement ( 'img' )
+    img.src = dummy5.src
+    img.style.position = "absolute"
+    img.style.top = path[0].top + "px"
+    img.style.left = path[0].left + "px"
+    img.style.width = path[0].width + "px"
+    img.style.height = path[0].height + "px"
+    //img.style.zIndex = -1
+    gameWindow[0].appendChild( img )*/
+    }
   /* allows for submitting messages via pressing enter*/
   document.querySelector('#chat-message-input').focus();
   document.querySelector('#chat-message-input').onkeyup = function(e) {
@@ -351,8 +533,15 @@ $("#complete").submit(function (e) {
 })
 let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
-SpawnPlayer(0,rect.top)
-InitializeGame(JSON.parse(rects), JSON.parse(path))
+InitializeObstacles(JSON.parse(rects))
+console.log(role)
+if (role == "follower"){
+  SpawnPlayer(0,rect.top)
+  initializeStartandEnd(JSON.parse(path))
+}
+else{
+  InitializeFinalPath(JSON.parse(path))
+}
 
   </script>
 {% endblock javascript %}
