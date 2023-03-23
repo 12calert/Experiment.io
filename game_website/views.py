@@ -237,7 +237,6 @@ def create_room(request, game):
                         direction = choice(new_direction)
                         continue
             new_room.path = json.dumps(path)
-            print(path)
 
             new_room.rects = json.dumps(rects)
             new_room.save()
@@ -571,7 +570,6 @@ def gameComplete(request):
         # set to completed and save in the database
         game.completed = True
         game.save()
-        print(game.completed)
         return HttpResponse('')
     # catch undefined behaviour
     else:
