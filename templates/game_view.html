@@ -83,6 +83,8 @@
   var undoTrue = false;
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
+  var oldx;
+  var oldy;
 
   class Shape {
     constructor(x, y) {
@@ -101,14 +103,11 @@ class Circle extends Shape {
         this.radius = radius;
     }
 
-    draw() {
-      const color = getRandomColor(); // get a random color
+    draw(color) {
       ctx.beginPath();  // start a new path on the canvas
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);  // draw a circular path with the given center coordinates and radius
       ctx.fillStyle = color; // set fill color
       ctx.fill();  // fill the circle with the given color
-      ctx.strokeStyle = color;   // set border color to same color
-      ctx.stroke();  // draw border
     }
 
  
@@ -141,12 +140,9 @@ class Rectangle extends Shape {
     }
 
   
-    draw() {
-      const color = getRandomColor(); // get a random color
+    draw(color) {
       ctx.fillStyle = color; // set fill color
       ctx.fillRect(this.x, this.y, this.width, this.height); // fill shape with color
-      ctx.strokeStyle = color; // set border color to same color
-      ctx.strokeRect(this.x, this.y, this.width, this.height); // draw border
     }
     
     intersects(other) {
@@ -177,8 +173,6 @@ class Square extends Shape {
       //const color = getRandomColor(); // get a random color
       ctx.fillStyle = color; // set fill color
       ctx.fillRect(this.x, this.y, this.side, this.side); // fill shape with color
-      ctx.strokeStyle = color; // set border color to same color
-      ctx.strokeRect(this.x, this.y, this.side, this.side); // draw border
     }
 
     intersects(other) {
@@ -312,8 +306,13 @@ function getOffset(el) {
 
   // Some of it will be moved to the server side
   function SpawnPlayer ( x, y ) {
+    let width = 32;
+    shape = new Square(x, y, width);
+    shape.draw("red")
+    oldx = x
+    oldy = y
 
-    var gameWindow = document.getElementsByClassName( "row" )
+    /*var gameWindow = document.getElementsByClassName( "row" )
 
     let img = document.createElement( 'img' )
     img.src = dummy2.src
@@ -326,7 +325,8 @@ function getOffset(el) {
     img.id = "player"
     img.style.zIndex = 99
     gameWindow[0].appendChild( img )
-    player = img
+    player = img*/
+
     let data = {}
     $.ajax({
         type: 'POST',
@@ -337,6 +337,9 @@ function getOffset(el) {
             data["x"] = x
             data["y"] = y
             update(data)
+            // global variables bad
+            oldx = x
+            oldy = y
             return;
           // show them the map drawn compared to the initial map
         }
@@ -344,7 +347,13 @@ function getOffset(el) {
   }
 
   function update( data ) {
-    let player = document.getElementById( "player" )
+    path = new Square(oldx, oldy, 32)
+    path.draw("orange")
+    oldx = data["x"]
+    oldy = data["y"]
+    shape = new Square(data["x"], data["y"], 32);
+    shape.draw("red")
+    /*let player = document.getElementById( "player" )
     player.style.left = data[ "x" ] + "px";
     player.style.top = data[ "y" ] + "px";
     var gameWindow = document.getElementsByClassName( "row" )
@@ -361,7 +370,7 @@ function getOffset(el) {
       //img.style.zIndex = -1
       gameWindow[0].appendChild( img ) 
     }
-  undoTrue = false
+  undoTrue = false*/
   }
   
   function sendInput( x, y ) {
@@ -446,9 +455,8 @@ function getOffset(el) {
       }
       else { // circle
         radius = Math.floor(Math.random() * 20) + 5; // 2 to 50 since its radius the diameter will be double = 100
-        shape = new Circle(xS + radius/2, yS, radius);
+        shape = new Circle(xS + radius, yS, radius);
       }
-      console.log(shape); // test it to be certain, remove this line after 
       shape.draw(getRandomColor()); // draw the shape
     }
     // !!!!!!!!!!! PREVIOUS CODE   !!!!!!!!!!  i leave it in case u want to go back
@@ -625,8 +633,8 @@ let gameContainer = document.getElementsByClassName( "game" ).item(0)
 let rect = gameContainer.getBoundingClientRect();
 InitializeObstacles(JSON.parse(rects))
 if (role == "follower"){
-  SpawnPlayer(0,rect.top)
   initializeStartandEnd(JSON.parse(path))
+  SpawnPlayer(0,0)
 }
 else{
   InitializeFinalPath(JSON.parse(path))
