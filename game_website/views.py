@@ -12,7 +12,7 @@ from django.http import Http404
 from math import floor
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-
+from django.urls import reverse
 # helper methods
 """checks a request to see if it is an ajax request"""
 def is_ajax(request):
@@ -537,6 +537,8 @@ def researcher_registration(request):
         user = User.objects.create_user(username = username, email = email, password = password, is_active = False, first_name = forename, last_name = surname)
         # add researcher to db
         Researcher.objects.create(userkey = user)
+        # redirect to home page
+        return redirect(reverse('home'))
     return render(request, 'researcher_registration.html', context)
 
 def compareMaps(request):
