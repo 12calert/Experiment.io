@@ -3,111 +3,127 @@ from django.urls import reverse
 from .models import Researcher
 from game_website.forms import ResearcherRegisterForm
 from django.test import TestCase
+from django.contrib.auth import get_user_model
+from django.contrib.auth.views import LoginView
+from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
 
 # Testing of Researcher registration
-class ResearcherRegistrationTests(TestCase):
-    # Test that the registration page loads successfully:
-    def test_registration_page_loads_successfully(self):
-        url = reverse('researcher_registration')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-    
+class ResearcherRegistrationTest(TestCase):
     def setUp(self):
+        self.client = Client()
         self.valid_data = {
-            'forename': 'John',
-            'surname': 'Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john.doe@example.com',
             'username': 'johndoe',
-            'email': 'johndoe@example.com',
-            'password': 'password123'
+            'password1': 'Testpassword123',
+            'password2': 'Testpassword123',
         }
-        
         self.invalid_data = {
-            'forename': 'John',
-            'surname': 'Doe',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john.doe@example.com',
             'username': 'johndoe',
-            'email': 'invalid_email',
-            'password': 'password123'
+            'password1': 'Testpassword123',
+            'password2': 'Differentpassword123',
         }
-    
-    def test_register_valid_data(self):
-        # Make a POST request to the researcher_registration view with valid form data
-        response = self.client.post(reverse('researcher_registration'), self.valid_data)
-        
-        # Check that the response is a redirect to the home page
-        self.assertRedirects(response, reverse('home'))
-        
-        # Check that a new User object was created with the correct data
-        self.assertTrue(User.objects.filter(username=self.valid_data['username']).exists())
-        user = User.objects.get(username=self.valid_data['username'])
-        self.assertEqual(user.email, self.valid_data['email'])
-        self.assertEqual(user.first_name, self.valid_data['forename'])
-        self.assertEqual(user.last_name, self.valid_data['surname'])     
-        self.assertFalse(user.is_active) # The user should not be active yet
- 
-        # Check that a new Researcher object was created with the correct userkey
+        self.missing_field_data = {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john.doe@example.com',
+            'username': '',
+            'password1': 'Testpassword123',
+            'password2': 'Testpassword123',
+        }
+        self.weak_password_data = {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john.doe@example.com',
+            'username': 'johndoe',
+            'password1': 'password',
+            'password2': 'password',
+        }
+
+    def test_researcher_registration_page_render(self):
+        response = self.client.get('/researcher_registration/')
+        self.assertEqual(response.status_code, 200) # Still on the registration page
+        self.assertTemplateUsed(response, 'researcher_registration.html')
+        self.assertIsInstance(response.context['register'], ResearcherRegisterForm)
+
+    def test_researcher_registration_valid_data(self):
+        response = self.client.post('/researcher_registration/', self.valid_data)
+        self.assertEqual(response.status_code, 302)  # Redirected to the home page
+        self.assertTrue(User.objects.filter(username='johndoe').exists())
+        user = User.objects.get(username='johndoe')
         self.assertTrue(Researcher.objects.filter(userkey=user).exists())
-        researcher = Researcher.objects.get(userkey=user)
-        self.assertIsNotNone(researcher.researcher_id)
-        
-        # Check that the user is not active until they are authenticated
-        self.assertFalse(user.is_active)
-        
-    def test_register_invalid_data(self):
-        # Make a POST request to the researcher_registration view with invalid form data
-        response = self.client.post(reverse('researcher_registration'), self.invalid_data)
-        
-        # Check that the response is not a redirect
-        self.assertEqual(response.status_code, 200)
-        
-        # Check that the form is invalid
-        self.assertFalse(ResearcherRegisterForm(data=self.invalid_data).is_valid())
-        
-        # Check that no new User or Researcher objects were created
-        self.assertFalse(User.objects.filter(username=self.invalid_data['username']).exists())
-        self.assertFalse(Researcher.objects.filter(userkey__username=self.invalid_data['username']).exists())
+
+    def test_researcher_registration_invalid_data(self):
+        response = self.client.post('/researcher_registration/', self.invalid_data)
+        self.assertEqual(response.status_code, 200)  # Still on the registration page
+        self.assertTemplateUsed(response, 'researcher_registration.html')
+        self.assertFalse(User.objects.filter(username='johndoe').exists())
+        self.assertFalse(Researcher.objects.filter(userkey__username='johndoe').exists())
+
+    def test_researcher_registration_missing_field(self):
+        response = self.client.post('/researcher_registration/', self.missing_field_data)
+        self.assertEqual(response.status_code, 200) # Still on the registration page
+        self.assertTemplateUsed(response, 'researcher_registration.html')
+        self.assertFalse(User.objects.filter(email='john.doe@example.com').exists())
+        self.assertFalse(Researcher.objects.filter(userkey__email='john.doe@example.com').exists())
+
+    def test_researcher_registration_duplicate_username(self):
+        User.objects.create_user(username='johndoe', email='john.doe@example.com', password='Testpassword123')
+
+        response = self.client.post('/researcher_registration/', self.valid_data)
+        self.assertEqual(response.status_code, 200) # Still on the registration page
+        self.assertTemplateUsed(response, 'researcher_registration.html')
+        self.assertEqual(User.objects.filter(username='johndoe').count(), 1)
+        self.assertFalse(Researcher.objects.filter(userkey__email='john.doe@example.com').exists())
+
+    def test_researcher_registration_weak_password(self):
+        response = self.client.post('/researcher_registration/', self.weak_password_data)
+        self.assertEqual(response.status_code, 200) # Still on the registration page
+        self.assertTemplateUsed(response, 'researcher_registration.html')
+        self.assertFalse(User.objects.filter(username='johndoe').exists())
+        self.assertFalse(Researcher.objects.filter(userkey__username='johndoe').exists())
 
 # Testing of Researcher login
-class ResearcherLoginTestCase(TestCase):
-    # Test that the registration page loads successfully:
-    def test_registration_page_loads_successfully(self):
-        url = reverse('researcher_login')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        
+class ResearcherLoginTest(TestCase):
     def setUp(self):
-        self.username = "testuser"
-        self.password = "testpass"
-        self.user = User.objects.create_user(
-            username=self.username,
-            password=self.password,
-            is_active=True
+        self.client = Client()
+        self.user = get_user_model().objects.create_user(
+            username='johndoe',
+            email='john.doe@example.com',
+            password='Testpassword123',
+            first_name='John',
+            last_name='Doe',
         )
+        Researcher.objects.create(userkey=self.user)
+
+        self.valid_credentials = {
+            'username': 'johndoe',
+            'password': 'Testpassword123',
+        }
+        self.invalid_credentials = {
+            'username': 'johndoe',
+            'password': 'WrongPassword',
+        }
+
+    def test_researcher_login_page_render(self):
+        response = self.client.get('/researcher_login/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'researcher_login.html')
+
+    def test_researcher_login_valid_credentials(self):
+        response = self.client.post('/researcher_login/', self.valid_credentials)
+        self.assertEqual(response.status_code, 302)  # Redirected after successful login
+
+    def test_researcher_login_invalid_credentials(self):
+        response = self.client.post('/researcher_login/', self.invalid_credentials)
+        self.assertEqual(response.status_code, 200)  # Still on the login page
+        self.assertTemplateUsed(response, 'researcher_login.html')
         
-    def test_researcher_login_successful(self):
-        # Log in as an existing user
-        response = self.client.post(reverse('researcher_login'), {
-            'username': self.username,
-            'password': self.password
-        })
-        self.assertEqual(response.status_code, 302) # should redirect to home page
-        self.assertRedirects(response, reverse('home'))
-
-    def test_researcher_login_invalid_username(self):
-        # Attempt to log in with an invalid username
-        response = self.client.post(reverse('researcher_login'), {
-            'username': 'invaliduser',
-            'password': self.password
-        })
-        self.assertEqual(response.status_code, 200) # should remain on login page
-
-    def test_researcher_login_invalid_password(self):
-        # Attempt to log in with an invalid password
-        response = self.client.post(reverse('researcher_login'), {
-            'username': self.username,
-            'password': 'invalidpass'
-        })
-        self.assertEqual(response.status_code, 200) # should remain on login page
-  
-    def tearDown(self):
-        self.user.delete()
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Invalid username or password.')
