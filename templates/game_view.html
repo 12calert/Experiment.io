@@ -79,16 +79,27 @@
   var rects;
   var player;
   var moveStack = [];
-  var imgStack = [];
   var undoTrue = false;
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
   var oldx;
   var oldy;
   var cPushArray = new Array();
   var cStep = -1;
-  var lastMove = {}
+  function cPush() {
+    cStep++;
+    if (cStep < cPushArray.length) { cPushArray.length = cStep; }
+    cPushArray.push(canvas.toDataURL());
 
+}
+function cUndo() {
+    if (cStep > 0) {
+        cStep--;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    }
+}
   class Shape {
     constructor(x, y) {
         this.x = x;
@@ -219,19 +230,6 @@ function getOffset(el) {
     top: rect.top + window.scrollY
   };
 }
-function cPush() {
-    cStep++;
-    if (cStep < cPushArray.length) { cPushArray.length = cStep; }
-    cPushArray.push(canvas.toDataURL());
-}
-function cUndo() {
-    if (cStep > 0) {
-        cStep--;
-        var canvasPic = new Image();
-        canvasPic.src = cPushArray[cStep];
-        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
-    }
-}
   for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
       this.classList.toggle("active");
@@ -327,7 +325,6 @@ function cUndo() {
     oldx = x
     oldy = y
     cPush()
-
     /*var gameWindow = document.getElementsByClassName( "row" )
 
     let img = document.createElement( 'img' )
@@ -366,16 +363,21 @@ function cUndo() {
     if (undoTrue != true){
       path = new Square(oldx, oldy, 32)
       path.draw("orange")
+      cPush()
       shape = new Square(data["x"], data["y"], 32);
       shape.draw("red")
-      cPush()
     }
     else{
+      // I have no idea why clearing it works but I won't complain
+      ctx.clearRect(0,0,canvas.width, canvas.height)
       cUndo()
-      ctx.clearRect(oldx, oldy,32, 32)
+      player = new Square(data["x"],data["y"], 32)
+      player.draw("red")
+
     }
     oldx = data["x"]
     oldy = data["y"]
+    undoTrue = false
     /*let player = document.getElementById( "player" )
     player.style.left = data[ "x" ] + "px";
     player.style.top = data[ "y" ] + "px";
@@ -425,8 +427,9 @@ function cUndo() {
       headers: { "X-CSRFToken": getCookie("csrftoken") },
       success: function (response) {
         undoTrue = true
+        lastMove = moveStack.pop()
         chatSocket.send(JSON.stringify({
-          'message': {"x": -oldx, "y": oldy },
+          'message': {"x": -lastMove["x"], "y": -lastMove["y"] },
           'role': "move",
           'finished' : false,
         }));

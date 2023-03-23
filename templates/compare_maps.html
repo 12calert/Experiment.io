@@ -31,11 +31,10 @@
     var top  = box.top +  scrollTop - clientTop;
     var left = box.left + scrollLeft - clientLeft;
 
-    return { top: Math.round(top), left: Math.round(left) };
+    return { top: Math.round(top), left: Math.round(left)};
     }
 
     const folCoords = getCoords(followerImg)
-    console.log(moves)
     function drawPath(moves){
         gameWindow = document.getElementById("game")
         first = false
