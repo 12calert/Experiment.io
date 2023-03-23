@@ -95,9 +95,9 @@ def outOfBounds(obj, containerWidth):
         return True
     elif (obj["left"]+obj["width"] > containerWidth):
         return True
-    elif (obj["top"] < 162): # replace with top of container
+    elif (obj["top"] < 0): # replace with top of container
         return True
-    elif (obj["top"]+obj["height"] > 712): # replace with bottom of container
+    elif (obj["top"]+obj["height"] > 550): # replace with bottom of container
         return True
     else:
         return False
@@ -133,7 +133,7 @@ def create_room(request, game):
             itemNo = condition.amount_item
             rects = []
             containerWidth = floor(request.session.get("width")/12*8)
-            rects.append({"top": (randint(162,712-100)), #hardcoded values bad
+            rects.append({"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
                         "width": 100,
                         "height": 100})
@@ -145,7 +145,7 @@ def create_room(request, game):
             for i in range(0, itemNo-1):
                 placed = False
                 while(not placed or failCounter > 1000):
-                    tempRect = {"top": (randint(162,712-100)), #hardcoded values bad
+                    tempRect = {"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
                         "width": 100,
                         "height": 100}
@@ -164,7 +164,7 @@ def create_room(request, game):
             # the finished path
             path = []
             # initial placement
-            path.append({"top":162,
+            path.append({"top":0,
                     "left": 0,
                     "width": 32,
                     "height":32})
@@ -237,6 +237,7 @@ def create_room(request, game):
                         direction = choice(new_direction)
                         continue
             new_room.path = json.dumps(path)
+            print(path)
 
             new_room.rects = json.dumps(rects)
             new_room.save()
@@ -289,7 +290,7 @@ def create_room2(request, game,):
         itemNo = condition.amount_item
         rects = []
         containerWidth = floor(request.session.get("width")/12*8)
-        rects.append({"top": (randint(162,712-100)), #hardcoded values bad
+        rects.append({"top": (randint(0,450)), #hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
                     "width": 100,
                     "height": 100})
@@ -301,7 +302,7 @@ def create_room2(request, game,):
         for i in range(0, itemNo-1):
             placed = False
             while(not placed or failCounter > 1000):
-                tempRect = {"top": (randint(138,712-100)), # hardcoded values bad
+                tempRect = {"top": (randint(0,450)), # hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
                     "width": 100,
                     "height": 100}
@@ -320,7 +321,7 @@ def create_room2(request, game,):
         
         path = []
         # initial placement
-        path.append({"top":162,
+        path.append({"top":0,
                 "left": 0,
                 "width": 25,
                 "height":25})
