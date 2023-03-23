@@ -173,14 +173,13 @@ class Square extends Shape {
         super(x, y);
         this.side = side;
     }
-    draw() {
-      const color = getRandomColor(); // get a random color
+    draw(color) {
+      //const color = getRandomColor(); // get a random color
       ctx.fillStyle = color; // set fill color
       ctx.fillRect(this.x, this.y, this.side, this.side); // fill shape with color
       ctx.strokeStyle = color; // set border color to same color
       ctx.strokeRect(this.x, this.y, this.side, this.side); // draw border
     }
-    
 
     intersects(other) {
         if (other instanceof Rectangle) {
@@ -450,7 +449,7 @@ function getOffset(el) {
         shape = new Circle(xS + radius/2, yS, radius);
       }
       console.log(shape); // test it to be certain, remove this line after 
-      shape.draw(); // draw the shape
+      shape.draw(getRandomColor()); // draw the shape
     }
     // !!!!!!!!!!! PREVIOUS CODE   !!!!!!!!!!  i leave it in case u want to go back
     /*for (let i = 0; i < rects.length; i++) {
@@ -495,7 +494,7 @@ function getOffset(el) {
       const xS = path[i].left
       const yS = path[i].top - topOffset
       shape = new Square(xS, yS, side);
-      shape.draw();
+      shape.draw("orange");
       /*let img = document.createElement( 'img' )
       img.src = dummy4.src
       img.style.position = "absolute"
@@ -516,16 +515,13 @@ function getOffset(el) {
     var xS = path[path.length-1].left
     var yS = path[path.length-1].top - topOffset
     shape = new Square(xS, yS, side);
-    shape.draw();
+    shape.draw("black");
 
     side = path[0].width
     xS = path[0].left
     yS = path[0].top - topOffset
     shape = new Square(xS, yS, side);
-    shape.draw();
-
-    shape = new Square(xS, yS, side);
-    shape.draw();
+    shape.draw("black");
 
     /*var gameWindow = document.getElementsByClassName( "game" )
     let dummmy5 = document.getElementById( "dummy5" )
@@ -641,6 +637,7 @@ else{
         data: {"roomName":roomName,"canvasURL":canvasURL,"role":playerRole},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
     })
+  initializeStartandEnd(JSON.parse(path))
 }
 
   </script>
