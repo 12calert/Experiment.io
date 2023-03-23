@@ -68,9 +68,11 @@ def game_view(request, game, room_name):
 """ renders the page to see both maps"""
 def seeMaps(request, game, room_name):
     foundGame = Game.objects.get(room_name = room_name)
+    foundGame.refresh_from_db()
     containerSize = (request.session.get("width")/12*8)
     moves = serializers.serialize("json", Move.objects.filter(game=foundGame))
-    return render(request, 'compare_maps.html', {"game":foundGame, "containerSize":containerSize, "moves":moves})
+    return render(request, 'compare_maps.html', {"followerURL":foundGame.finishedFollowerURL, "giverURL":foundGame.finishedGiverURL,
+                                                  "containerSize":containerSize, "moves":moves})
 
 """ view which renders the page containing the list of rooms"""
 def all_rooms(request, game):
@@ -407,8 +409,6 @@ def join_private_room(request, game):
         try:
             found_game = Game.objects.get(room_name=unique_room_key, public=False)
             # Check if the room already has two players
-            players_in_room = Player.objects.filter(game=found_game)
-            print(found_game.users)
             if found_game.users >= 2:
                 
                 messages.error(request, "The private room is already full.")
@@ -570,6 +570,7 @@ def gameComplete(request):
         # set to completed and save in the database
         game.completed = True
         game.save()
+        print(game.completed)
         return HttpResponse('')
     # catch undefined behaviour
     else:

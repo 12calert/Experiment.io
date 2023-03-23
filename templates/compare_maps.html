@@ -4,8 +4,8 @@
 {% block content %}
 <div id = "game">
     <img id="dummyPath" hidden src = "{% static 'images/blue-rectangle-hi.png' %}">
-    <img id = "followerMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{game.finishedFollowerURL}}">
-    <img id = "giverMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{game.finishedGiverURL}}">
+    <img id = "followerMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{followerURL}}">
+    <img id = "giverMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{giverURL}}">
 </div>
 {% endblock content %}
 
@@ -77,5 +77,9 @@
         }
     }
     drawPath(moves)
+    function updateImages(){
+        fol = document.getElementById("followerMap")
+        return
+    }
 </script>
 {% endblock javascript %}
