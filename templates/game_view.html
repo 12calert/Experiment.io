@@ -75,15 +75,41 @@
   var playerRole = "{{ player.role }}";
   // read the player's role from the Django template 
   var coll = document.getElementsByClassName("collapsible");
+  // global variables bad
   var i;
   var rects;
   var player;
   var moveStack = [];
-  var imgStack = [];
   var undoTrue = false;
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var oldx;
+  var oldy;
+  var cPushArray = new Array();
+  var cStep = -1;
+  // pushes the canvas instance to stack
+  function cPush() {
+    cStep++;
+    if (cStep < cPushArray.length) { cPushArray.length = cStep; }
+    cPushArray.push(canvas.toDataURL());
 
+}
+// sets the canvas to previous instance
+function cUndo() {
+    if (cStep > 0) {
+        cStep--;
+        var canvasPic = new Image();
+        canvasPic.src = cPushArray[cStep];
+        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    }
+}
+// gets a random colour to apply to shapes
+function getRandomColor() {
+    const colors = ['red', 'yellow', 'blue']; // add any colors you like
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+// classes for each shape to draw to canvas
   class Shape {
     constructor(x, y) {
         this.x = x;
@@ -101,35 +127,11 @@ class Circle extends Shape {
         this.radius = radius;
     }
 
-    draw() {
-      const color = getRandomColor(); // get a random color
+    draw(color) {
       ctx.beginPath();  // start a new path on the canvas
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);  // draw a circular path with the given center coordinates and radius
       ctx.fillStyle = color; // set fill color
       ctx.fill();  // fill the circle with the given color
-      ctx.strokeStyle = color;   // set border color to same color
-      ctx.stroke();  // draw border
-    }
-
- 
-
-    intersects(other) {
-        if (other instanceof Circle) {
-            const dx = this.x - other.x;
-            const dy = this.y - other.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            return distance < (this.radius + other.radius);
-        } 
-        else if (other instanceof Rectangle) {
-            const deltaX = this.x - Math.max(other.x, Math.min(this.x, other.x + other.width));
-            const deltaY = this.y - Math.max(other.y, Math.min(this.y, other.y + other.height));
-
-            return (deltaX * deltaX + deltaY * deltaY) < (this.radius * this.radius);
-        } 
-        else if (other instanceof Square) {
-            return other.intersects(this);
-        }
     }
 }
 
@@ -140,31 +142,9 @@ class Rectangle extends Shape {
         this.height = height;
     }
 
-  
-    draw() {
-      const color = getRandomColor(); // get a random color
+    draw(color) {
       ctx.fillStyle = color; // set fill color
       ctx.fillRect(this.x, this.y, this.width, this.height); // fill shape with color
-      ctx.strokeStyle = color; // set border color to same color
-      ctx.strokeRect(this.x, this.y, this.width, this.height); // draw border
-    }
-    
-    intersects(other) {
-        if (other instanceof Rectangle) {
-            return (
-                this.x < other.x + other.width &&
-                this.x + this.width > other.x &&
-                this.y < other.y + other.height &&
-                this.y + this.height > other.y
-            );
-        } 
-        else if (other instanceof Circle) {
-            return other.intersects(this);
-        } 
-        else if (other instanceof Square) {
-            
-            return other.intersects(this);
-        }
     }
 }
 
@@ -173,57 +153,13 @@ class Square extends Shape {
         super(x, y);
         this.side = side;
     }
-    draw() {
-      const color = getRandomColor(); // get a random color
+    draw(color) {
+      //const color = getRandomColor(); // get a random color
       ctx.fillStyle = color; // set fill color
       ctx.fillRect(this.x, this.y, this.side, this.side); // fill shape with color
-      ctx.strokeStyle = color; // set border color to same color
-      ctx.strokeRect(this.x, this.y, this.side, this.side); // draw border
-    }
-    
-
-    intersects(other) {
-        if (other instanceof Rectangle) {
-            return (
-                this.x < other.x + other.width &&
-                this.x + this.side > other.x &&
-                this.y < other.y + other.height &&
-                this.y + this.side > other.y
-            );
-        } 
-        else if (other instanceof Circle) {
-          const nearestX = Math.max(this.x, Math.min(other.x, this.x + this.side));
-          const nearestY = Math.max(this.y, Math.min(other.y, this.y + this.side));
-
-          const deltaX = other.x - nearestX;
-          const deltaY = other.y - nearestY;
-
-          return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);
-   
-          /*  const deltaX = other.x - Math.max(this.x, Math.min(other.x, this.x + this.side));
-            const deltaY = other.y - Math.max(this.y, Math.min(other.y, this.y + this.side));
-
-            return (deltaX * deltaX + deltaY * deltaY) < (other.radius * other.radius);*/
-        } 
-        else if (other instanceof Square) {
-            return (
-                this.x < other.x + other.side &&
-                this.x + this.side > other.x &&
-                this.y < other.y + other.side &&
-                this.y + this.side > other.y
-            );
-        }
     }
 }
 
-function getOffset(el) {
-  const rect = el.getBoundingClientRect();
-  return {
-    left: rect.left + window.scrollX,
-    top: rect.top + window.scrollY
-  };
-}
-    
   for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
       this.classList.toggle("active");
@@ -273,7 +209,7 @@ function getOffset(el) {
           window.location = url;
         },
     })
-      return;
+    return
     }
     // Get the current time
     const time = new Date();
@@ -289,7 +225,6 @@ function getOffset(el) {
       document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
     } 
     else if ( data.type == "move" ) {
-      rects = data.message[ "rects" ]
       update( data.message )
     }
     else {
@@ -305,29 +240,14 @@ function getOffset(el) {
     console.log('Socket closed unexpectedly');
   };
 
-  function intersect( r1, r2 ) {
-    if( r1.left < r2.left + r2.width && r1.left + r1.width > r2.left &&
-     r1.top < r2.top + r2.height && r1.top + r1.height > r2.top ) return true
-     return false
-  }
-
-  // Some of it will be moved to the server side
+  // Spawns the player at the start of the game
   function SpawnPlayer ( x, y ) {
-
-    var gameWindow = document.getElementsByClassName( "row" )
-
-    let img = document.createElement( 'img' )
-    img.src = dummy2.src
-    img.style.position = "absolute"
-    img.style.top = y + "px"
-    img.style.left = x + "px"
-    img.style.width = "32px"
-    img.style.height = "32px"
-    img.style.padding = "0px"
-    img.id = "player"
-    img.style.zIndex = 99
-    gameWindow[0].appendChild( img )
-    player = img
+    let width = 32;
+    shape = new Square(x, y, width);
+    shape.draw("red")
+    oldx = x
+    oldy = y
+    cPush()
     let data = {}
     $.ajax({
         type: 'POST',
@@ -338,33 +258,36 @@ function getOffset(el) {
             data["x"] = x
             data["y"] = y
             update(data)
+            // global variables bad
+            oldx = x
+            oldy = y
             return;
           // show them the map drawn compared to the initial map
         }
     })
   }
-
+// updates the player position
   function update( data ) {
-    let player = document.getElementById( "player" )
-    player.style.left = data[ "x" ] + "px";
-    player.style.top = data[ "y" ] + "px";
-    var gameWindow = document.getElementsByClassName( "row" )
     if (undoTrue != true){
-      let img = document.createElement( 'img' )
-      img.src = dummy3.src
-      img.style.position = "absolute"
-      img.style.top = player.style.top
-      img.style.left = player.style.left
-      img.style.width = 32 + "px"
-      img.style.height = 32 + "px"
-      img.style.padding = "0px"
-      imgStack.push(img)
-      //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) 
+      path = new Square(oldx, oldy, 32)
+      path.draw("orange")
+      cPush()
+      shape = new Square(data["x"], data["y"], 32);
+      shape.draw("red")
     }
-  undoTrue = false
+    else{
+      // I have no idea why clearing it works but I won't complain
+      ctx.clearRect(0,0,canvas.width, canvas.height)
+      cUndo()
+      player = new Square(data["x"],data["y"], 32)
+      player.draw("red")
+
+    }
+    oldx = data["x"]
+    oldy = data["y"]
+    undoTrue = false
   }
-  
+  // function which sends input to server side
   function sendInput( x, y ) {
     $.ajax({
       type: 'POST',
@@ -385,7 +308,7 @@ function getOffset(el) {
       }
     })
   }
-
+// function which undoes the last move
   function undo() {
     $.ajax({
       type: 'POST',
@@ -395,8 +318,6 @@ function getOffset(el) {
       success: function (response) {
         undoTrue = true
         lastMove = moveStack.pop()
-        lastImg = imgStack.pop()
-        lastImg.remove()
         chatSocket.send(JSON.stringify({
           'message': {"x": -lastMove["x"], "y": -lastMove["y"] },
           'role': "move",
@@ -409,30 +330,18 @@ function getOffset(el) {
       }
     })
   }
+  // initialises the game objects
   function InitializeObstacles( rects ) {
 
     var gameWindow = document.getElementsByClassName( "game" )
     let dummmy = document.getElementById( "dummy" )
-    leftOffset = getOffset(gameWindow[0]).left
-    topOffset = getOffset(gameWindow[0]).top
-  /*  for( let i = 0; i < rects.length; i++ ) {
-      const side = rects[i].width
-      const xS = rects[i].left
-      const yS = rects[i].top - topOffset
-      shape = new Square(xS, yS, side);
-      shape.draw();
-      
-    }*/
     
     for (let i = 0; i < rects.length; i++) {
       var shapeType = Math.random(); //generates a random float between 0 (inclusive) and 1 (exclusive)
       let width, height, radius;
       xS = rects[i].left;
-      yS = rects[i].top - topOffset;
+      yS = rects[i].top
       let shape;
-      // this is from the backend if you need it again
-      //  width = rects[i].width; 
-      //  height = rects[i].height;
       //Each of the three intervals [(0, 1/3), (1/3, 2/3), (2/3, 1)] has the same length (1/3), 
       //so the probabilities of selecting a rectangle, square, and circle are equal to 1/3.
       if (shapeType < 1 / 3) { // rectangle
@@ -447,25 +356,11 @@ function getOffset(el) {
       }
       else { // circle
         radius = Math.floor(Math.random() * 20) + 5; // 2 to 50 since its radius the diameter will be double = 100
-        shape = new Circle(xS + radius/2, yS, radius);
+        shape = new Circle(xS + radius, yS, radius);
       }
-      console.log(shape); // test it to be certain, remove this line after 
-      shape.draw(); // draw the shape
+      shape.draw(getRandomColor()); // draw the shape
     }
-    // !!!!!!!!!!! PREVIOUS CODE   !!!!!!!!!!  i leave it in case u want to go back
-    /*for (let i = 0; i < rects.length; i++) {
-      const width = rects[i].width;
-      const height = rects[i].height;
-      const xS = rects[i].left;
-      const yS = rects[i].top - topOffset;
-      
-        shape = new Square(xS, yS, width);
-     
-        shape = new Rectangle(xS, yS, width, height);
-     
-      console.log(shape)
-      shape.draw();
-    }*/
+
     document.addEventListener( 'keydown', function( event ) {
       if( event.keyCode == 37 ) sendInput( -1, 0 )
       else if( event.keyCode == 39 ) sendInput( 1, 0 )
@@ -478,75 +373,32 @@ function getOffset(el) {
     } );
 
   }
-
-  function getRandomColor() {
-    const colors = ['red', 'yellow', 'blue']; // add any colors you like
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
   
-
+// creates the final path for the giver
   function InitializeFinalPath(path){
-    var gameWindow = document.getElementsByClassName( "game" )
-    //let dummmy4 = document.getElementById( "dummy4" )
-    leftOffset = getOffset(gameWindow[0]).left
-    topOffset = getOffset(gameWindow[0]).top
     for( let i = 0; i < path.length; i++ ) {
       const side = path[i].width
       const xS = path[i].left
-      const yS = path[i].top - topOffset
+      const yS = path[i].top
       shape = new Square(xS, yS, side);
-      shape.draw();
-      /*let img = document.createElement( 'img' )
-      img.src = dummy4.src
-      img.style.position = "absolute"
-      img.style.top = path[i].top + "px"
-      img.style.left = path[i].left + "px"
-      img.style.width = path[i].width + "px"
-      img.style.height = path[i].height + "px"
-      //img.style.zIndex = -1
-      gameWindow[0].appendChild( img ) */
+      shape.draw("orange");
+
     }
   }
-
+// draws the start and end positions of the path
   function initializeStartandEnd(path){
-    var gameWindow = document.getElementsByClassName( "game" )
-    leftOffset = getOffset(gameWindow[0]).left
-    topOffset = getOffset(gameWindow[0]).top
     var side = path[path.length-1].width
     var xS = path[path.length-1].left
-    var yS = path[path.length-1].top - topOffset
+    var yS = path[path.length-1].top
     shape = new Square(xS, yS, side);
-    shape.draw();
+    shape.draw("black");
 
     side = path[0].width
     xS = path[0].left
-    yS = path[0].top - topOffset
+    yS = path[0].top
     shape = new Square(xS, yS, side);
-    shape.draw();
+    shape.draw("black");
 
-    shape = new Square(xS, yS, side);
-    shape.draw();
-
-    /*var gameWindow = document.getElementsByClassName( "game" )
-    let dummmy5 = document.getElementById( "dummy5" )
-    let img = document.createElement( 'img' )
-    img.src = dummy5.src
-    img.style.position = "absolute"
-    img.style.top = path[path.length-1].top + "px"
-    img.style.left = path[path.length-1].left + "px"
-    img.style.width = path[path.length-1].width + "px"
-    img.style.height = path[path.length-1].height + "px"
-    //img.style.zIndex = -1
-    gameWindow[0].appendChild( img )
-    img = document.createElement ( 'img' )
-    img.src = dummy5.src
-    img.style.position = "absolute"
-    img.style.top = path[0].top + "px"
-    img.style.left = path[0].left + "px"
-    img.style.width = path[0].width + "px"
-    img.style.height = path[0].height + "px"
-    //img.style.zIndex = -1
-    gameWindow[0].appendChild( img )*/
     }
   /* allows for submitting messages via pressing enter*/
   document.querySelector('#chat-message-input').focus();
@@ -582,6 +434,7 @@ function getOffset(el) {
     messageInputDom.value = '';
   };
 
+  // gets cookie from name, needed for ajax POST requests
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -600,8 +453,6 @@ function getOffset(el) {
 
 $("#complete").submit(function (e) {
   e.preventDefault()
-  // tell the group the game has ended
-  // NOTE: this has to be changed depending if the game is either given up or completed
     // serialize the data for sending the form data.
     // make POST ajax call
     $.ajax({
@@ -616,8 +467,6 @@ $("#complete").submit(function (e) {
           'role': "",
           'finished' : true
         }));
-          //window.location.replace("/home");
-          // show them the map drawn compared to the initial map
         },
         error: function (response) {
           // alert the error if any error occured
@@ -625,15 +474,15 @@ $("#complete").submit(function (e) {
         }
     })  
 })
-let gameContainer = document.getElementsByClassName( "game" ).item(0)
-let rect = gameContainer.getBoundingClientRect();
+
 InitializeObstacles(JSON.parse(rects))
 if (role == "follower"){
-  SpawnPlayer(0,rect.top)
   initializeStartandEnd(JSON.parse(path))
+  SpawnPlayer(0,0)
 }
 else{
   InitializeFinalPath(JSON.parse(path))
+  // save the giver's canvas to the database on game creation
   let canvasURL = canvas.toDataURL()
       $.ajax({
         type: 'POST',
@@ -641,6 +490,7 @@ else{
         data: {"roomName":roomName,"canvasURL":canvasURL,"role":playerRole},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
     })
+  initializeStartandEnd(JSON.parse(path))
 }
 
   </script>
