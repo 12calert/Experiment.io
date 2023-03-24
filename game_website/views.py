@@ -8,11 +8,11 @@ from random import choice, randint
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
-from django.http import Http404
 from math import floor
 import json
-from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
+# custom shapes module allows us to easily change values (also to apply custom conditions)
+from game_website.shapes import randomColour, randomShape
 # helper methods
 """checks a request to see if it is an ajax request"""
 def is_ajax(request):
@@ -135,8 +135,14 @@ def create_room(request, game):
             containerWidth = floor(request.session.get("width")/12*8)
             rects.append({"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
-                        "width": 100,
-                        "height": 100})
+                        "width": randint(50,100), # change as needed or take from condition (depending on how much control we give researcher)
+                        "height": randint(50,100),
+                        "shape": randomShape(),
+                        "colour": randomColour()})
+            print(rects[0])
+            temp = rects[0]
+            if temp["shape"] == "square":
+                temp["height"] = rects["width"]
             failCounter = 0
             # width of the container to stop objects from overflowing
             placed = False
@@ -147,8 +153,12 @@ def create_room(request, game):
                 while(not placed or failCounter > 1000):
                     tempRect = {"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
-                        "width": 100,
-                        "height": 100}
+                        "width": randint(50,100),
+                        "height": randint(50,100),
+                        "shape": randomShape(),
+                        "colour": randomColour()}
+                    if tempRect["shape"] == "square":
+                        tempRect["height"] = rects["width"]
                 # check if it intersects with any already added
                     for j in range(0, len(rects)):
                         if intersect(tempRect, rects[j]):
@@ -291,8 +301,12 @@ def create_room2(request, game,):
         containerWidth = floor(request.session.get("width")/12*8)
         rects.append({"top": (randint(0,450)), #hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
-                    "width": 100,
-                    "height": 100})
+                    "width": randint(50,100),
+                    "height": randint(50,100),
+                    "shape":randomShape(),
+                    "color": randomColour()})
+        if rects["shape"] == "square":
+            rects["height"] = rects["width"]
         failCounter = 0
         # width of the container to stop objects from overflowing
         placed = False
@@ -303,8 +317,12 @@ def create_room2(request, game,):
             while(not placed or failCounter > 1000):
                 tempRect = {"top": (randint(0,450)), # hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
-                    "width": 100,
-                    "height": 100}
+                    "width": randint(50,100),
+                    "height": randint(50,100),
+                    "shape":randomShape(),
+                    "color": randomColour()}
+                if rects["shape"] == "square":
+                    rects["height"] = rects["width"]
             # check if it intersects with any already added
                 for j in range(0, len(rects)):
                     if intersect(tempRect, rects[j]):
