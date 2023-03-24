@@ -58,9 +58,17 @@ def game_view(request, game, room_name):
     #WARNING: THIS WILL RESULT IN INCONSISTENT ROLE ALLOCATION WHEN PLAYING BY YOURSELF
     # FOR CONSISTENT ALLOCATION USE TWO DIFFERENT BROWSERS
 
-    # query the database to get the current logged in player
-    conatinerSize = (request.session.get("width")/12*8)
-    foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
+    # IMPORTANT: second parameter defines the default value if there is no found cookie, we use the width of 
+    # 1366px since that is the most commonly used screenwidth, this may cause some undefined behaviour though
+    conatinerSize = (request.session.get("width", 1366)/12*8)
+    try:
+        foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
+    # if the player has not got a cookie set one and add them to the DB
+    except Player.DoesNotExist:
+        tempSession = secrets.token_hex(5)
+        foundPlayer = Player.objects.create(game = foundGame, user_session = tempSession)
+        request.session['user_id'] = secrets.token_hex(5)
+
     foundGame.refresh_from_db()
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
                                               "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame, 
@@ -70,7 +78,7 @@ def game_view(request, game, room_name):
 def seeMaps(request, game, room_name):
     foundGame = Game.objects.get(room_name = room_name)
     foundGame.refresh_from_db()
-    containerSize = (request.session.get("width")/12*8)
+    containerSize = (request.session.get("width", 1366)/12*8)
     moves = serializers.serialize("json", Move.objects.filter(game=foundGame))
     return render(request, 'compare_maps.html', {"followerURL":foundGame.finishedFollowerURL, "giverURL":foundGame.finishedGiverURL,
                                                   "containerSize":containerSize, "moves":moves})
@@ -133,7 +141,7 @@ def create_room(request, game):
             # amount of items to generate
             itemNo = condition.amount_item
             rects = []
-            containerWidth = floor(request.session.get("width")/12*8)
+            containerWidth = floor(request.session.get("width", 1366)/12*8)
             rects.append({"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
                         "width": randint(50,100), # change as needed or take from condition (depending on how much control we give researcher)
@@ -250,7 +258,7 @@ def create_room(request, game):
             new_room.rects = json.dumps(rects)
             new_room.save()
 
-            Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
+            Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id", secrets.token_hex(5)))
             return redirect('game_view', game = game, room_name = new_room.room_name)
     else:
         print("A condition is not specified")
@@ -274,7 +282,7 @@ def join_or_create_room(request, game):
 
                 if new_roles:
                     # create the player instance with one of the roles chosen randomly
-                    Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id"))
+                    Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id", secrets.token_hex(5)))
                 
 
                     return redirect('game_view', game=game, room_name=room.room_name)
@@ -297,7 +305,7 @@ def create_room2(request, game,):
         game_type=game, has_condition = condition)
         itemNo = condition.amount_item
         rects = []
-        containerWidth = floor(request.session.get("width")/12*8)
+        containerWidth = floor(request.session.get("width", 1366)/12*8)
         rects.append({"top": (randint(0,450)), #hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
                     "width": randint(50,100),
@@ -414,7 +422,7 @@ def create_room2(request, game,):
         new_room.save()
         
             # create the Player instance and add it to the newly created game instance
-        Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
+        Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id", secrets.token_hex(5)))
 
         return redirect('game_view',  game = game, room_name = new_room.room_name)
 
@@ -442,7 +450,7 @@ def join_private_room(request, game):
             # choose the new roles to assign
             new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
             # create the player instance with one of the roles chosen randomly
-            Player.objects.create(role = choice(new_roles), game = found_game, user_session = request.session.get("user_id"))
+            Player.objects.create(role = choice(new_roles), game = found_game, user_session = request.session.get("user_id", secrets.token_hex(5)))
 
             return redirect('game_view', game=game, room_name=found_game.room_name)  
         except Game.DoesNotExist:
