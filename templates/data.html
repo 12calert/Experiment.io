@@ -201,6 +201,15 @@ function viewGames(condition_name, experiment_name){
     })
 };
 function viewChats(room_name){
+    var experimentButton = document.getElementById("game_"+room_name);
+    var gameInfo = document.getElementById("chats_"+room_name)
+    var experimentInfo = document.getElementById("chats_sub_"+ room_name);
+        if (experimentButton.classList.contains("button-expanded")) {
+            experimentButton.classList.remove("button-expanded");
+            experimentInfo.remove()
+            gameInfo.style.display = "none"
+            return;
+        }
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_chats' %}",
@@ -213,13 +222,18 @@ function viewChats(room_name){
 				// convert to JSON object
 				var instance = JSON.parse(chats);
 				var id = "chats_"+room_name;
+                subId = "chats_sub_"+room_name
+                $("#"+id).append(
+                    `<div id = "${subId}"> </div>`
+                )
                 document.getElementById(id).style.display = "block"
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
-					$("#"+id).append(
+					$("#"+subId).append(
                     `<p>${fields["role"]}: ${fields["content"]} -- ${fields["created"]}</p><br>`
                 )
 				}
+                experimentButton.classList.add("button-expanded");
 			}
         },
         error: function (response) {
