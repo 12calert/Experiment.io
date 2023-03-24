@@ -74,39 +74,15 @@ page so researchers can view data on games
 {% if experiments %}
 <div id="viewConditions">
     {% for experiment in experiments %}
-    <div class="experiment-row">
-        <button class="button" id="experiment_{{experiment}}" 
-            onclick="toggleExperiment('{{experiment}}')">
-            {{ experiment }}
-        </button>
-        <div class="experiment-info" id="experiment_info_{{experiment}}" style="display: none;">
-            <p class="experiment-description">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                Proin sodales dui vel quam efficitur, sit amet bibendum dolor iaculis. 
-                In hac habitasse platea dictumst. Sed consectetur turpis nec augue molestie, 
-                vel ullamcorper mauris eleifend. Vivamus et est vel neque molestie eleifend.
-            </p>
-        </div>
+    <div class="experiment-row" id = "experiment_{{experiment}}">
+            <button class="button" id="experiment_button{{experiment}}" 
+                onclick="viewConditions('{{experiment}}')">
+                {{ experiment }}
+            </button>
     </div>
     {% endfor %}
 </div>
 {% endif %}
-
-<script>
-    // This function toggles the visibility of the experiment information associated with the clicked button.
-    function toggleExperiment(id) {
-        var experimentButton = document.getElementById("experiment_" + id);
-        var experimentInfo = document.getElementById("experiment_info_" + id);
-        if (experimentButton.classList.contains("button-expanded")) {
-            experimentButton.classList.remove("button-expanded");
-            experimentInfo.style.display = "none";
-        } 
-        else {
-            experimentButton.classList.add("button-expanded");
-            experimentInfo.style.display = "block";
-        }
-    }
-</script>
 
 {% endblock %}
 
@@ -129,8 +105,15 @@ function getCookie(name) {
 	return cookieValue;
 }
 //some ajax
-// I hate this works but needs some heavy additions
 function viewConditions(experiment_name){
+    // functionality to expand and remove experimenet info
+    var experimentButton = document.getElementById("experiment_button" + experiment_name);
+    var experimentInfo = document.getElementById("conditions_" + experiment_name);
+        if (experimentButton.classList.contains("button-expanded")) {
+            experimentButton.classList.remove("button-expanded");
+            experimentInfo.remove()
+            return;
+        } 
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_conditions' %}",
@@ -142,14 +125,26 @@ function viewConditions(experiment_name){
 				var conditions = response["conditions"]
 				// convert to JSON object
 				var instance = JSON.parse(conditions);
-				var id = "conditions_"+experiment_name;
+                experimentId = "experiment_"+experiment_name
+                var id = "conditions_"+experiment_name;
+                $("#"+experimentId).append(
+                    `<div class="experiment-info" id = "${id}"> </div>`
+                )
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
-                    `<button id = "condition_${fields["name"]}" value="${fields["name"]}" onclick="viewGames('${fields["name"]}', '${experiment_name}')">${fields["name"]}</button><br>
-					<div id = "games_${fields["name"]}_${experiment_name}"></div>`
+                    `
+                    <table>
+                    </table>
+                    <div><p>${fields["amount_item"]},${fields["active"]}<p></div>
+                    <button class = "button" id = "condition_${fields["name"]}" 
+                    value="${fields["name"]}" onclick="viewGames('${fields["name"]}', '${experiment_name}')">${fields["name"]}</button><br>
+					<div class = "experiment-info" style="display:none"
+                    id = "games_${fields["name"]}_${experiment_name}"></div>`
                 )
 				}
+                experimentButton.classList.add("button-expanded");
+                //experimentInfo.style.display = "block";
 			}
         },
         error: function (response) {
@@ -160,14 +155,15 @@ function viewConditions(experiment_name){
 };
 
 function viewGames(condition_name, experiment_name){
-    /* You need to make it so the researcher cannot click the button again, or you make it so the researcher can
-    click the button again to remove the elements that were just added, do the same for the other button events.
-    To remove and add different onclick events using jquery use something like
-    $('#id').unbind('click'); -- to remove the event, you can also directly change the attribute of the element if you have the id (which we do)
-    $('#id').click(function(){ -- to add a click event
-    // your code here
-    });
-    */
+    var experimentButton = document.getElementById("condition_"+condition_name);
+    var gameInfo = document.getElementById("games_"+condition_name+"_"+experiment_name)
+    var experimentInfo = document.getElementById("games_sub_"+ condition_name + "_" + experiment_name);
+        if (experimentButton.classList.contains("button-expanded")) {
+            experimentButton.classList.remove("button-expanded");
+            experimentInfo.remove()
+            gameInfo.style.display = "none"
+            return;
+        }
 	$.ajax({
         type: 'POST',
         url: "{% url 'view_games' %}",
@@ -176,18 +172,26 @@ function viewGames(condition_name, experiment_name){
         success: function (response) {
 			// take the gathered query data and display
 			if (response.exist){
+                gameInfo.style.display = "block"
 				var games = response["games"]
 				// convert to JSON object
 				var instance = JSON.parse(games);
 				var id = "games_"+condition_name+"_"+experiment_name;
+                subId = "games_sub_"+condition_name+"_"+experiment_name
+                $("#"+id).append(
+                    `<div id = "${subId}"> </div>`
+                )
+                document.getElementById(id).style.display = "block"
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
-					$("#"+id).append(
+					$("#"+subId).append(
 					// ADD ONCLICK EVENT FOR CHATS/PLAYERS
-                    `<button id = "game_${fields["room_name"]}" value="${fields["room_name"]}" onclick="viewChats('${fields["room_name"]}')">${fields["room_name"]}</button><br>
-					<div id = "chats_${fields["room_name"]}"></div>`
+                    `<button class = "button" id = "game_${fields["room_name"]}" value="${fields["room_name"]}" onclick="viewChats('${fields["room_name"]}')">${fields["room_name"]}</button><br>
+					<div class = "experiment-info" style="display:none"
+                    id = "chats_${fields["room_name"]}"></div>`
                 )
 				}
+                experimentButton.classList.add("button-expanded");
 			}
         },
         error: function (response) {
@@ -209,6 +213,7 @@ function viewChats(room_name){
 				// convert to JSON object
 				var instance = JSON.parse(chats);
 				var id = "chats_"+room_name;
+                document.getElementById(id).style.display = "block"
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+id).append(
