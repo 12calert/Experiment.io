@@ -587,12 +587,15 @@ def viewConditions(request):
             print("something went wrong")
             return HttpResponse("")
         # create a list of all the conditions for the experiment the researcher chooses to view
-        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment, created_by = request.POST["current_researcher"])))
+        experiment = Experiment.objects.filter(name = experiment, created_by = request.POST["current_researcher"])
+        conditions = list(Condition.objects.filter(experiment = experiment.first()))
         # i.e. there exists some conditions for the experiment
-        if conditions:
+        if conditions or experiment:
             # serialise the list to JSON so it can be showed in html
             serialisedConditions = serializers.serialize('json', conditions )
-            return JsonResponse({"exist": True, "conditions": serialisedConditions}, status=200)
+            experiment = list(experiment)
+            serialisedExperiment = serializers.serialize('json', experiment )
+            return JsonResponse({"exist": True, "conditions": serialisedConditions, "experiment": serialisedExperiment}, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")

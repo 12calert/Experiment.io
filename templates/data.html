@@ -122,23 +122,30 @@ function viewConditions(experiment_name){
         success: function (response) {
 			// take the gathered query data and display
 			if (response.exist){
+                // the conditions from the DB
 				var conditions = response["conditions"]
+                // the experiment from the DB
+                var experiment = response["experiment"]
 				// convert to JSON object
 				var instance = JSON.parse(conditions);
+                var instanceExperiment = JSON.parse(experiment)
+                var fieldsExp = instance[0]["fields"]
                 experimentId = "experiment_"+experiment_name
                 var id = "conditions_"+experiment_name;
                 $("#"+experimentId).append(
-                    `<div class="experiment-info" id = "${id}"> </div>`
+                    `<div class="experiment-info" id = "${id}"> <p>some info for experiment here, ${fieldsExp["active"]}, also some 
+                        summarised data but that is heavy effort</p></div>`
                 )
 				for (let i = 0; i<instance.length; i++){
+                    // fields for the conditions
 					fields = instance[i]["fields"]
 					$("#"+id).append(
                     `
                     <table>
                     </table>
-                    <div><p>${fields["amount_item"]},${fields["active"]}<p></div>
                     <button class = "button" id = "condition_${fields["name"]}" 
-                    value="${fields["name"]}" onclick="viewGames('${fields["name"]}', '${experiment_name}')">${fields["name"]}</button><br>
+                    value="${fields["name"]}" onclick="viewGames('${fields["name"]}', '${experiment_name}')">${fields["name"]}</button>
+                    <div><p>The info for condition here ${fields["amount_item"]},${fields["active"]}</p></div>
 					<div class = "experiment-info" style="display:none"
                     id = "games_${fields["name"]}_${experiment_name}"></div>`
                 )
@@ -186,7 +193,9 @@ function viewGames(condition_name, experiment_name){
 					fields = instance[i]["fields"]
 					$("#"+subId).append(
 					// ADD ONCLICK EVENT FOR CHATS/PLAYERS
-                    `<button class = "button" id = "game_${fields["room_name"]}" value="${fields["room_name"]}" onclick="viewChats('${fields["room_name"]}')">${fields["room_name"]}</button><br>
+                    `<button class = "button" id = "game_${fields["room_name"]}" value="${fields["room_name"]}" 
+                    onclick="viewChats('${fields["room_name"]}')">${fields["room_name"]}</button>
+                    <p> the info for the game here </p>
 					<div class = "experiment-info" style="display:none"
                     id = "chats_${fields["room_name"]}"></div>`
                 )
@@ -230,7 +239,7 @@ function viewChats(room_name){
 				for (let i = 0; i<instance.length; i++){
 					fields = instance[i]["fields"]
 					$("#"+subId).append(
-                    `<p>${fields["role"]}: ${fields["content"]} -- ${fields["created"]}</p><br>`
+                    `<p>${fields["role"]}: ${fields["content"]} -- ${fields["created"]}</p>`
                 )
 				}
                 experimentButton.classList.add("button-expanded");
