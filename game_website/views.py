@@ -61,6 +61,7 @@ def game_view(request, game, room_name):
     # query the database to get the current logged in player
     conatinerSize = (request.session.get("width")/12*8)
     foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
+    foundGame.refresh_from_db()
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
                                               "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame, 
                                               "containerSize":conatinerSize}) # dict to store room number
@@ -139,10 +140,8 @@ def create_room(request, game):
                         "height": randint(50,100),
                         "shape": randomShape(),
                         "colour": randomColour()})
-            print(rects[0])
-            temp = rects[0]
-            if temp["shape"] == "square":
-                temp["height"] = rects["width"]
+            if rects[0]["shape"] == "square":
+                rects[0]["height"] = rects[0]["width"]
             failCounter = 0
             # width of the container to stop objects from overflowing
             placed = False
@@ -158,7 +157,7 @@ def create_room(request, game):
                         "shape": randomShape(),
                         "colour": randomColour()}
                     if tempRect["shape"] == "square":
-                        tempRect["height"] = rects["width"]
+                        tempRect["height"] = tempRect["width"]
                 # check if it intersects with any already added
                     for j in range(0, len(rects)):
                         if intersect(tempRect, rects[j]):
@@ -304,9 +303,9 @@ def create_room2(request, game,):
                     "width": randint(50,100),
                     "height": randint(50,100),
                     "shape":randomShape(),
-                    "color": randomColour()})
-        if rects["shape"] == "square":
-            rects["height"] = rects["width"]
+                    "colour": randomColour()})
+        if rects[0]["shape"] == "square":
+            rects[0]["height"] = rects[0]["width"]
         failCounter = 0
         # width of the container to stop objects from overflowing
         placed = False
@@ -320,9 +319,9 @@ def create_room2(request, game,):
                     "width": randint(50,100),
                     "height": randint(50,100),
                     "shape":randomShape(),
-                    "color": randomColour()}
-                if rects["shape"] == "square":
-                    rects["height"] = rects["width"]
+                    "colour": randomColour()}
+                if tempRect["shape"] == "square":
+                    tempRect["height"] = tempRect["width"]
             # check if it intersects with any already added
                 for j in range(0, len(rects)):
                     if intersect(tempRect, rects[j]):
