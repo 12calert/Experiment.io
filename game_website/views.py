@@ -8,11 +8,11 @@ from random import choice, randint
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
-from django.http import Http404
 from math import floor
 import json
-from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import reverse
+# custom shapes module allows us to easily change values (also to apply custom conditions)
+from game_website.shapes import randomColour, randomShape
 # helper methods
 """checks a request to see if it is an ajax request"""
 def is_ajax(request):
@@ -58,9 +58,18 @@ def game_view(request, game, room_name):
     #WARNING: THIS WILL RESULT IN INCONSISTENT ROLE ALLOCATION WHEN PLAYING BY YOURSELF
     # FOR CONSISTENT ALLOCATION USE TWO DIFFERENT BROWSERS
 
-    # query the database to get the current logged in player
-    conatinerSize = (request.session.get("width")/12*8)
-    foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
+    # IMPORTANT: second parameter defines the default value if there is no found cookie, we use the width of 
+    # 1366px since that is the most commonly used screenwidth, this may cause some undefined behaviour though
+    conatinerSize = (request.session.get("width", 1366)/12*8)
+    try:
+        foundPlayer = Player.objects.get(game = foundGame, user_session = request.session.get("user_id"))
+    # if the player has not got a cookie set one and add them to the DB
+    except Player.DoesNotExist:
+        tempSession = secrets.token_hex(5)
+        foundPlayer = Player.objects.create(game = foundGame, user_session = tempSession)
+        request.session['user_id'] = secrets.token_hex(5)
+
+    foundGame.refresh_from_db()
     return render(request, 'game_view.html', {"room_name":room_name, "rect_img": "{% static 'images/logo.png' %}", 
                                               "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame, 
                                               "containerSize":conatinerSize}) # dict to store room number
@@ -69,7 +78,7 @@ def game_view(request, game, room_name):
 def seeMaps(request, game, room_name):
     foundGame = Game.objects.get(room_name = room_name)
     foundGame.refresh_from_db()
-    containerSize = (request.session.get("width")/12*8)
+    containerSize = (request.session.get("width", 1366)/12*8)
     moves = serializers.serialize("json", Move.objects.filter(game=foundGame))
     return render(request, 'compare_maps.html', {"followerURL":foundGame.finishedFollowerURL, "giverURL":foundGame.finishedGiverURL,
                                                   "containerSize":containerSize, "moves":moves})
@@ -132,11 +141,15 @@ def create_room(request, game):
             # amount of items to generate
             itemNo = condition.amount_item
             rects = []
-            containerWidth = floor(request.session.get("width")/12*8)
+            containerWidth = floor(request.session.get("width", 1366)/12*8)
             rects.append({"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
-                        "width": 100,
-                        "height": 100})
+                        "width": randint(50,100), # change as needed or take from condition (depending on how much control we give researcher)
+                        "height": randint(50,100),
+                        "shape": randomShape(),
+                        "colour": randomColour()})
+            if rects[0]["shape"] == "square":
+                rects[0]["height"] = rects[0]["width"]
             failCounter = 0
             # width of the container to stop objects from overflowing
             placed = False
@@ -147,8 +160,12 @@ def create_room(request, game):
                 while(not placed or failCounter > 1000):
                     tempRect = {"top": (randint(0,450)), #hardcoded values bad
                         "left": (randint(0,(containerWidth-100))),
-                        "width": 100,
-                        "height": 100}
+                        "width": randint(50,100),
+                        "height": randint(50,100),
+                        "shape": randomShape(),
+                        "colour": randomColour()}
+                    if tempRect["shape"] == "square":
+                        tempRect["height"] = tempRect["width"]
                 # check if it intersects with any already added
                     for j in range(0, len(rects)):
                         if intersect(tempRect, rects[j]):
@@ -241,7 +258,7 @@ def create_room(request, game):
             new_room.rects = json.dumps(rects)
             new_room.save()
 
-            Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
+            Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id", secrets.token_hex(5)))
             return redirect('game_view', game = game, room_name = new_room.room_name)
     else:
         print("A condition is not specified")
@@ -265,7 +282,7 @@ def join_or_create_room(request, game):
 
                 if new_roles:
                     # create the player instance with one of the roles chosen randomly
-                    Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id"))
+                    Player.objects.create(role=choice(new_roles), game=room, user_session=request.session.get("user_id", secrets.token_hex(5)))
                 
 
                     return redirect('game_view', game=game, room_name=room.room_name)
@@ -288,11 +305,15 @@ def create_room2(request, game,):
         game_type=game, has_condition = condition)
         itemNo = condition.amount_item
         rects = []
-        containerWidth = floor(request.session.get("width")/12*8)
+        containerWidth = floor(request.session.get("width", 1366)/12*8)
         rects.append({"top": (randint(0,450)), #hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
-                    "width": 100,
-                    "height": 100})
+                    "width": randint(50,100),
+                    "height": randint(50,100),
+                    "shape":randomShape(),
+                    "colour": randomColour()})
+        if rects[0]["shape"] == "square":
+            rects[0]["height"] = rects[0]["width"]
         failCounter = 0
         # width of the container to stop objects from overflowing
         placed = False
@@ -303,8 +324,12 @@ def create_room2(request, game,):
             while(not placed or failCounter > 1000):
                 tempRect = {"top": (randint(0,450)), # hardcoded values bad
                     "left": (randint(0,(containerWidth-100))),
-                    "width": 100,
-                    "height": 100}
+                    "width": randint(50,100),
+                    "height": randint(50,100),
+                    "shape":randomShape(),
+                    "colour": randomColour()}
+                if tempRect["shape"] == "square":
+                    tempRect["height"] = tempRect["width"]
             # check if it intersects with any already added
                 for j in range(0, len(rects)):
                     if intersect(tempRect, rects[j]):
@@ -397,7 +422,7 @@ def create_room2(request, game,):
         new_room.save()
         
             # create the Player instance and add it to the newly created game instance
-        Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id"))
+        Player.objects.create(role = choice(ROLE_CHOICES), game = new_room, user_session = request.session.get("user_id", secrets.token_hex(5)))
 
         return redirect('game_view',  game = game, room_name = new_room.room_name)
 
@@ -425,7 +450,7 @@ def join_private_room(request, game):
             # choose the new roles to assign
             new_roles = [v for v in ROLE_CHOICES if v != assignedRole]
             # create the player instance with one of the roles chosen randomly
-            Player.objects.create(role = choice(new_roles), game = found_game, user_session = request.session.get("user_id"))
+            Player.objects.create(role = choice(new_roles), game = found_game, user_session = request.session.get("user_id", secrets.token_hex(5)))
 
             return redirect('game_view', game=game, room_name=found_game.room_name)  
         except Game.DoesNotExist:
@@ -587,12 +612,15 @@ def viewConditions(request):
             print("something went wrong")
             return HttpResponse("")
         # create a list of all the conditions for the experiment the researcher chooses to view
-        conditions = list(Condition.objects.filter(experiment = Experiment.objects.get(name = experiment, created_by = request.POST["current_researcher"])))
+        experiment = Experiment.objects.filter(name = experiment, created_by = request.POST["current_researcher"])
+        conditions = list(Condition.objects.filter(experiment = experiment.first()))
         # i.e. there exists some conditions for the experiment
-        if conditions:
+        if conditions or experiment:
             # serialise the list to JSON so it can be showed in html
             serialisedConditions = serializers.serialize('json', conditions )
-            return JsonResponse({"exist": True, "conditions": serialisedConditions}, status=200)
+            experiment = list(experiment)
+            serialisedExperiment = serializers.serialize('json', experiment )
+            return JsonResponse({"exist": True, "conditions": serialisedConditions, "experiment": serialisedExperiment}, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
