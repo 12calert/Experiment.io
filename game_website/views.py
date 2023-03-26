@@ -39,6 +39,10 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+def terms_and_conditions(request):
+    context = {}
+    return render(request, 'terms_and_conditions.html', context=context)
+
 # login page error message wrong credentials
 class CustomLoginView(LoginView):
     def form_invalid(self, form):

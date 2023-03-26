@@ -51,6 +51,7 @@ urlpatterns = [
     path('<game>/all_rooms/game_view/<room_name>/seeMaps', views.seeMaps, name='see_maps'),
     path('completedGame/', views.compareMaps, name='compare_maps'),
     # simple page routing
+    path('terms_and_conditions/', views.terms_and_conditions, name='terms_and_conditions'),
     path('researcher_registration/', views.researcher_registration, name='researcher_registration'),
     path('researcher_login/', CustomLoginView.as_view(
     template_name="researcher_login.html",
