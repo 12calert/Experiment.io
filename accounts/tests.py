@@ -281,3 +281,23 @@ class ViewFunctionsTest(TestCase):
         # Check if the initial player position is updated correctly with the new x and y values sent in the request
         self.game.refresh_from_db()
         self.assertEqual(self.game.follower_position, {'x': 10, 'y': 20})
+        
+    # Checks the functionality of the setScreensize view function. Checks if it updates the session data with the provided screen size information, and it returns a successful response.
+    def test_setScreensize(self):
+        # Set up a session for the request
+        session = self.client.session
+        session.save()
+
+        # Create a request object with the POST data and simulate an AJAX request
+        request = self.factory.post('/setScreensize/', {'width': 800, 'height': 600}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.session = session
+
+        # Call the setScreensize view function with the request
+        response = setScreensize(request)
+        
+        # Check if the response is successful (status code 200)
+        self.assertEqual(response.status_code, 200)
+
+        # Check if the session data has been updated with the correct screen size
+        self.assertEqual(request.session['width'], 800)
+        self.assertEqual(request.session['height'], 600)
