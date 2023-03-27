@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
-from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove
+from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove, viewChats
 from django.http import JsonResponse
 from django.test import TestCase, RequestFactory, Client
  

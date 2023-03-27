@@ -94,7 +94,7 @@ DATABASES ={}
 DATABASES['default'] = dj_database_url.parse('postgres://map_game_us3g_user:v2eGa2v12vF9LAcGR1zdNXgBnOwC8iR2@dpg-cg2ep682qv24hdl42pb0-a.frankfurt-postgres.render.com/map_game_us3g', conn_max_age=600)
 
 DATABASES['default']['TEST'] = {
-    'NAME': 'my_new_test_db',
+    'NAME': 'my_test_db',
 }
 
 #DATABASES = {
