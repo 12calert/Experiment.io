@@ -266,3 +266,18 @@ class ViewFunctionsTest(TestCase):
         move = Move.objects.last()
         self.assertIsNotNone(move)
         self.assertEqual(move.move_type, 'un') 
+        
+    # Checks if the initialPlayer view function works correctly. 
+    def test_initialPlayer(self):
+        # Create a request object with the POST data and simulate an AJAX request
+        request = self.factory.post('/initialPlayer/', {'x': 10, 'y': 20, 'room_name': self.game.room_name}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        
+        # Call the initialPlayer view function with the request
+        response = initialPlayer(request)
+
+        # Check if the response is successful (status code 200)
+        self.assertEqual(response.status_code, 200)
+
+        # Check if the initial player position is updated correctly with the new x and y values sent in the request
+        self.game.refresh_from_db()
+        self.assertEqual(self.game.follower_position, {'x': 10, 'y': 20})
