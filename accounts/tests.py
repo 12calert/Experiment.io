@@ -1,13 +1,15 @@
 from django.test import TestCase, Client
 from django.urls import reverse 
-from .models import Researcher
+from .models import Researcher, Chat, Player, Experiment, Condition, Game, Move
 from game_website.forms import ResearcherRegisterForm
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
-from game_website.views import intersect, outOfBounds, place
+from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove
+from django.http import JsonResponse
+from django.test import TestCase, RequestFactory, Client
+ 
 # Testing of Researcher registration
 class ResearcherRegistrationTest(TestCase):
     def setUp(self):
@@ -210,3 +212,57 @@ class UtilityFunctionsTest(TestCase):
         obstacle3 = {"left": 810, "top": 0, "width": 10, "height": 10}
         obstacles.append(obstacle3)
         self.assertFalse(place(obj4, obstacles, containerWidth))
+
+# Testing for saveMove() function in views file
+class ViewFunctionsTest(TestCase):
+    def setUp(self):
+        # Create a User object
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+
+        # Use the created User object when creating the Researcher object
+        self.researcher = Researcher.objects.create(userkey=self.user)
+
+        # Set up RequestFactory and Client for testing requests
+        self.factory = RequestFactory()
+        self.client = Client()
+
+        # Create objects for testing: Experiment, Condition, and Game
+        self.experiment = Experiment.objects.create(name="Test Experiment", created_by=self.researcher)
+        self.condition = Condition.objects.create(amount_item=2, created_by=self.researcher, name="Test Condition", experiment=self.experiment)
+        self.game = Game.objects.create(has_condition=self.condition, public=True)
+
+        # Create a session object for testing
+        self.session = self.client.session
+        self.session.save()
+    
+    # Checks if the saveMove view function works correctly when handling an "undo" move type
+    def test_saveMove_undo(self):
+        # Create required objects for testing
+        researcher = Researcher.objects.create(userkey=self.user)
+        experiment = Experiment.objects.create(name="Test Experiment", created_by=researcher)
+        condition = Condition.objects.create(amount_item=1, created_by=researcher, name="Test Condition", experiment=experiment)
+        game = Game.objects.create(has_condition=condition, room_name="test_room", public=True)
+
+        # Set up the POST data for the request
+        data = {
+            "roomName": game.room_name,
+            "type": "un",
+            "x": 0,  # Add the "x" key with a default value
+            "y": 0,  # Add the "y" key with a default value
+        }
+
+        # Create a request object with the POST data and simulate an AJAX request
+        request = self.factory.post('/saveMove/', data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.session = self.session
+
+        # Call the saveMove view function with the request
+        response = saveMove(request)
+
+        # Check if the response is successful (status code 200)
+        self.assertEqual(response.status_code, 200)
+
+        # Check if a new Move object is created in the database with the correct data (move_type set to 'un').
+        move = Move.objects.last()
+        self.assertIsNotNone(move)
+        self.assertEqual(move.move_type, 'un') 

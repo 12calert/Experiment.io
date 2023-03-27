@@ -710,6 +710,7 @@ def setScreensize(request):
     return HttpResponse("")
 
 def saveMove(request):
+    
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
         game = Game.objects.get( room_name=room_name )
@@ -731,4 +732,5 @@ def saveMove(request):
             return JsonResponse({},status = 200)
         else:
             return HttpResponse("")
+        
 # --- end of ajax views ---
