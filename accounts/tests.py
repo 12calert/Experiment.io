@@ -301,3 +301,21 @@ class ViewFunctionsTest(TestCase):
         # Check if the session data has been updated with the correct screen size
         self.assertEqual(request.session['width'], 800)
         self.assertEqual(request.session['height'], 600)
+
+    # Checks saveMove function if it behaves as expected when provided with correct input data 
+    def test_saveMove(self):
+        # Create a request object with the POST data and simulate an AJAX request
+        request = self.factory.post('/saveMove/', {'roomName': self.game.room_name, 'type': 'mv', 'x': 2, 'y': 3}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # Call the saveMove view function with the request
+        response = saveMove(request)
+
+        # Check if the response is successful (status code 200)
+        self.assertEqual(response.status_code, 200)
+
+        # Check if the Move object was created with the correct data
+        move = Move.objects.last()
+        self.assertIsNotNone(move)
+        self.assertEqual(move.move_type, 'mv')
+        self.assertEqual(move.oldPos, {'x': 0, 'y': 0})
+        self.assertEqual(move.newPos, {'x': 64, 'y': 96})
