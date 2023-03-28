@@ -651,7 +651,7 @@ def viewGames(request):
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
-""" called when researcher chooses to view the chat logs for a specified game"""
+""" TESTED called when researcher chooses to view the chat logs for a specified game"""
 def viewChats(request):
     # if request is valid
     if request.method == "POST" and is_ajax(request):
@@ -672,7 +672,7 @@ def viewChats(request):
     return HttpResponse("")
 
 
-""" called when a user sends a message in the chat box. Saves the message along with the role to the database"""
+""" tested called when a user sends a message in the chat box. Saves the message along with the role to the database"""
 def saveMessage(request):
     # if request is valid
     if request.method == "POST" and is_ajax(request):
