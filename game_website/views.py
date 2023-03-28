@@ -727,4 +727,12 @@ def saveMove(request):
             return JsonResponse({},status = 200)
         else:
             return HttpResponse("")
+
+def decrementUsers(request):
+    if request.method == "POST" and is_ajax(request):
+        room_name = request.POST["roomName"]
+        game = Game.objects.get( room_name=room_name )
+        game.users -= 1
+        game.save()
+        return JsonResponse({},status = 200)
 # --- end of ajax views ---
