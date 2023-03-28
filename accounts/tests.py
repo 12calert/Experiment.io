@@ -6,10 +6,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
-from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove, viewChats
+from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove, viewChats, saveMessage, acceptTOS, decrementUsers, is_ajax
 from django.http import JsonResponse
-from django.test import TestCase, RequestFactory, Client
- 
+from django.test import TestCase, RequestFactory, Client # RequestFactory to simulate POST requests.
+
 # Testing of Researcher registration
 class ResearcherRegistrationTest(TestCase):
     def setUp(self):
@@ -319,3 +319,49 @@ class ViewFunctionsTest(TestCase):
         self.assertEqual(move.move_type, 'mv')
         self.assertEqual(move.oldPos, {'x': 0, 'y': 0})
         self.assertEqual(move.newPos, {'x': 64, 'y': 96})
+  
+# Checks acceptTOS view function works properly  
+class TestAcceptTOSTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_acceptTOS(self):
+        request = self.factory.get('/acceptTOS/')
+        request.session = {}  # Mimic session behavior
+        response = acceptTOS(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(request.session['TOSaccept'])
+        
+# Checks decrementUsers view function works properly  
+class DecrementUsersTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        
+        # Create a user and researcher
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.researcher = Researcher.objects.create(userkey=self.user)
+
+        self.condition = Condition.objects.create(
+            amount_item=1,
+            restriction="Some restriction",
+            active=True,
+            name="Test Condition",
+            created_by=self.researcher  # Set created_by to the researcher instance
+        )
+        self.game = Game.objects.create(
+            room_name="test_room",
+            users=5,
+            has_condition=self.condition,
+            public=True
+        )
+            
+    def test_decrement_users(self):
+        request = self.factory.post('/some_path/', {'roomName': 'test_room'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = decrementUsers(request)
+
+        # Reload the game object to get the updated value of users
+        updated_game = Game.objects.get(room_name="test_room")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(updated_game.users, 4)
+

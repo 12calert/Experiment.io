@@ -671,6 +671,7 @@ def viewChats(request):
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
+
 """ called when a user sends a message in the chat box. Saves the message along with the role to the database"""
 def saveMessage(request):
     # if request is valid
@@ -684,10 +685,19 @@ def saveMessage(request):
         return JsonResponse({},status = 200)
     return HttpResponse("")
 
+# TESTED
 def acceptTOS(request):
     request.session['TOSaccept'] = True
     return JsonResponse({},status = 200)
-
+# TESTED
+def decrementUsers(request):
+    if request.method == "POST" and is_ajax(request):
+        room_name = request.POST["roomName"]
+        game = Game.objects.get( room_name=room_name )
+        game.users -= 1
+        game.save()
+        return JsonResponse({},status = 200)
+# TESTED
 def initialPlayer(request):
     if request.method == "POST" and is_ajax(request):
         x = int(request.POST["x"])
@@ -699,7 +709,7 @@ def initialPlayer(request):
         game.save()
         return JsonResponse({},status = 200)
     return HttpResponse("")
-
+# TESTED
 def setScreensize(request):
     if request.method == "POST" and is_ajax(request):
         width = int(request.POST["width"])
@@ -708,7 +718,7 @@ def setScreensize(request):
         request.session['height'] = height
         return JsonResponse({},status = 200)
     return HttpResponse("")
-
+# TESTED
 def saveMove(request):
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
@@ -732,11 +742,5 @@ def saveMove(request):
         else:
             return HttpResponse("")
 
-def decrementUsers(request):
-    if request.method == "POST" and is_ajax(request):
-        room_name = request.POST["roomName"]
-        game = Game.objects.get( room_name=room_name )
-        game.users -= 1
-        game.save()
-        return JsonResponse({},status = 200)
+
 # --- end of ajax views ---
