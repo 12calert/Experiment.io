@@ -72,9 +72,7 @@
     max-height: 90vh;
     overflow-y: auto;
     }
-    .rooms-card p {
-    text-align: left;
-    }
+    
     .terms-content {
     max-height: 60vh;
     overflow-y: auto;
@@ -109,12 +107,12 @@
     <div class="row">
         <div class="col-12">
             <div class="rooms-card">
+                <div>
+                    <h5>Please join a designated room to be randomly paired with another participant for the purpose of conducting the experiment.</h5>
+                </div>
                 <form id="join-form" action="join_or_create_room" method="POST" style="display:none;">
                     {% csrf_token %}
                 </form>
-                <div class="form-group">
-                    <h5>Please join a designated room to be randomly paired with another participant for the purpose of conducting the experiment.</h5>
-                </div>
                 <div>
                     <button class="btn btn-primary all_rooms_button" type="button" onclick="showTermsAndConditions('join'); return false;">Join a room</button>
                 </div>
