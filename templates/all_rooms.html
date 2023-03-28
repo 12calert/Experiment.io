@@ -7,13 +7,16 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style> 
     
+    .input-box-container {
+        padding-left: 15px; /* left padding */
+    }
+
     .footer-distributed {
-        
         width: 100%;
-        
         margin-left: auto;
         margin-right: auto;
-      }
+    }
+
     .input-container {
     display: flex;
     align-items: center;
@@ -110,7 +113,7 @@
                     {% csrf_token %}
                 </form>
                 <div class="form-group">
-                    <h6>Please join a designated room to be randomly paired with another participant for the purpose of conducting the experiment.</h6>
+                    <h5>Please join a designated room to be randomly paired with another participant for the purpose of conducting the experiment.</h5>
                 </div>
                 <div>
                     <button class="btn btn-primary all_rooms_button" type="button" onclick="showTermsAndConditions('join'); return false;">Join a room</button>
@@ -124,7 +127,7 @@
         <div class="col-12">
             <div class="rooms-card">
                 <div>
-                    <p>Please proceed to create a private room and share the designated key with another individual in order to participate in the same experiment together</p>
+                    <h5>Please proceed to create a private room and share the designated key with another individual in order to participate in the same experiment.</h5>
                 </div>
                 <form id="private-form" name="Private" action="actionUrl" method="POST" style="display:none;">
                     {% csrf_token %}
@@ -145,9 +148,11 @@
                 <form id="private-room-form" action="join_private_room/" method="POST">
                     {% csrf_token %}
                     <div class="form-group d-flex align-items-center">
-                        <p class="mb-0 mr-2">Kindly enter your designated private room key in the provided input field</p>
-                        <input type="text" id="unique_room_box2" name="unique_room_box" placeholder="Your private room key.." class="mr-2">
-                    </div>
+                        <h5 class="mb-0 mr-2">Kindly enter your designated private room key in the provided input field:</h5>
+                        <div class="input-box-container">
+                            <input type="text" id="unique_room_box2" name="unique_room_box" placeholder="Your private room key.." class="mr-2">
+                          </div>
+                        </div>
                     <button class="btn btn-primary all_rooms_button" type="button" onclick="showTermsAndConditions('private_room_key');">Join a private room</button>
             </div>
             </form>
