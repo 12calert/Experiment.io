@@ -71,6 +71,7 @@ urlpatterns = [
     path('post/ajax/initialPlayer', views.initialPlayer, name="initial_player"),
     path('post/ajax/setScreensize', views.setScreensize, name="set_screensize"),
     path('post/ajax/saveMove', views.saveMove, name="save_move"),
+    path('get/ajax/decrement_users', views.decrementUsers, name="decrement_users"),
     # when they put the unique private room key:
     path('<game>/all_rooms/join_or_create_room', views.join_or_create_room, name='join_or_create_room'),
     path('<game>/all_rooms/join_private_room/', views.join_private_room, name="join_private_room"),

@@ -225,9 +225,18 @@ class Square extends Shape {
   };
  
   /* do something when the chat socket is closed */
-  chatSocket.onclose = function(e) {
-    console.log('Socket closed unexpectedly');
-  };
+  //chatSocket.onclose = function(e) {
+  //  console.log('Socket closed unexpectedly');
+  //};
+  chatSocket.onerror = function(e){
+    // decrement from amount in room
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'decrement_users' %}",
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        data: {"roomName":roomName}
+    })  
+  }
 
   // Spawns the player at the start of the game
   function SpawnPlayer ( x, y ) {
