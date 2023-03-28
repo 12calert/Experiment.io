@@ -39,6 +39,10 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+def terms_and_conditions(request):
+    context = {}
+    return render(request, 'terms_and_conditions.html', context=context)
+
 # login page error message wrong credentials
 class CustomLoginView(LoginView):
     def form_invalid(self, form):
@@ -90,7 +94,7 @@ def all_rooms(request, game):
     # return response
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
-""" checks if two objects are intersecting"""
+""" TESTED checks if two objects are intersecting"""
 def intersect(r1, r2):
     if (r1["left"] < r2["left"] + r2["width"] and r1["left"] + r1["width"] > r2["left"] and
         r1["top"] < r2["top"] + r2["height"] and r1["top"] + r1["height"] > r2["top"]):
@@ -98,7 +102,7 @@ def intersect(r1, r2):
     else:
         return False
 
-""" checks if an object is out of bounds within some container"""
+""" TESTED checks if an object is out of bounds within some container"""
 def outOfBounds(obj, containerWidth):
     if (obj["left"] < 0):
         return True
@@ -110,7 +114,7 @@ def outOfBounds(obj, containerWidth):
         return True
     else:
         return False
-""" checks to see if the object is placeable in some container given a list of obstacles"""
+""" TESTED checks to see if the object is placeable in some container given a list of obstacles"""
 def place(obj, obstacles, containerWidth):
     for obstacle in obstacles:
         if intersect(obj,obstacle):
