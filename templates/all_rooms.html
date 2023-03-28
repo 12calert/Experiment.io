@@ -2,211 +2,274 @@
 {% load static %}
 {% block title %}Rooms{% endblock %}
 {% block content %}
-<style>
-  .terms-box {
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<style> 
+    .input-container {
+    display: flex;
+    align-items: center;
+    }
+    .input-container p {
+    margin-right: 10px;
+    }
+    .input-container label {
+    margin-right: 10px;
+    } 
+    .action-container {
+    width: 75%; /* Change this to adjust the input private room key width*/
+    }
+    .input-container input.form-control {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    width: 100%;
+    }
+    .rooms-card .action-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    }
+    /* .rooms-card .btn {
+    width: 100%;
+    max-width: 200px;
+    margin-top: 0;  
+    }
+    */
+    .rooms-card .btn {
+    width: 100%;
+    max-width: 500px; /* Increase the maximum width */
+    margin-top: 0; /* Remove the margin-top */
+    padding: 10px 20px; /* Increase the padding */
+    font-size: 20px; /* Increase the font size */
+    }
+    /* style for the private room key input */
+    .rooms-card .action-container input.form-control {
+    width: 100%;
+    max-width: 110%; /* Increase the maximum width */
+    }
+    .rooms-card {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem; /* space between the boxes */
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+    color: black;
+    align-items: center;
+    padding: 1rem;
+    justify-content: center;
+    text-align: center;
+    }
+    .terms-box {
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     max-height: 90vh;
     overflow-y: auto;
-  }
-  
-  .terms-content {
+    }
+    .rooms-card p {
+    text-align: left;
+    }
+    .terms-content {
     max-height: 60vh;
     overflow-y: auto;
     color: black;
-  }
-  </style>
- 
+    } 
+    .all_rooms_button {
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    border: none;
+    background-color: #04AA6D;
+    color: white;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    }
+</style>
 {% comment %} alert message for wrong input on private room key {% endcomment %}
 {% if messages %}
-      <div class="alert alert-danger" role="alert">
-        <span class="error-icon"></span>
-        {% for message in messages %}
-            <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
-        {% endfor %}
-      </div>
-    
+<div class="alert alert-danger" role="alert">
+    <span class="error-icon"></span>
+    {% for message in messages %}
+    <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+    {% endfor %}
+</div>
 {% endif %}
 <div class="container">
-  
-  <div class="row">
-    <!--Table for creating public or private rooms-->
-    <div class="col-sm-6">
-      <div class="table-responsive">
-        <table class="table table-bordered" style="background-color: #f0f0f0;">
-          <thead>
-            <tr>
-              <th>Create Room</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <form id="private-form" name="Private" action="actionUrl" method="POST" style="display:none;">
-                  {% csrf_token %}
-                  {{ form.as_p }}
-                  <input type="hidden" name="Private" value="Private">
-                </form>
-                <button class="btn btn-primary" name="Private" onclick="showTermsAndConditions('private'); return false;">Create a private room</button>
-              </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!--Table for selecting a public room or entering a private room key-->
-    <div class="col-sm-6">
-      <div class="table-responsive">
-        <table class="table table-bordered" style="background-color: #f0f0f0;">
-          <thead>
-            <tr>
-              <td>
+    <div class="row">
+        <div class="col-12">
+            <div class="rooms-card">
                 <form id="join-form" action="join_or_create_room" method="POST" style="display:none;">
-                  {% csrf_token %}
+                    {% csrf_token %}
                 </form>
-                <button class="btn btn-primary" onclick="showTermsAndConditions('join'); return false;">Join a room</button>
-              </td>
-            </tr>
-          </thead>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
- 
-<div id="terms-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
-  <div class="container h-100">
-    <div class="row h-100">
-      <div class="col-sm-12 col-md-8 col-lg-6 mx-auto my-auto">
-        <div class="terms-box bg-white p-4">
-          <h2 style="color:black">Terms and Conditions</h2>
-          <div class="terms-content">
-            <p>Your terms and conditions content here.</p>
-            <ol>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
-              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
-              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
-              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
-              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
-              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
-              <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
-              <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
-          </ol>
-          </div>
-          <br>
-          <button class="btn btn-primary" id="accept-button" type="button">Accept</button>
-          <button class="btn btn-primary" type="button" onclick="hideTermsAndConditions()">Decline</button>
+                <div class="form-group">
+                    <h6>Please join a designated room to be randomly paired with another participant for the purpose of conducting the experiment.</h6>
+                </div>
+                <div>
+                    <button class="btn btn-primary all_rooms_button" type="button" onclick="showTermsAndConditions('join'); return false;">Join a room</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
-
- 
-
-<!-- unique form NEWWW  -->
-<form id="private-room-form" action="join_private_room/" method="POST">
-  {% csrf_token %}
-    <div class="form-group">
-      <label for="unique_room_box">Private room key:</label>
-      <input type="text" class="form-control" id="unique_room_box" name="unique_room_box" placeholder="Your private room key..">
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="rooms-card">
+                <div>
+                    <p>Please proceed to create a private room and share the designated key with another individual in order to participate in the same experiment together</p>
+                </div>
+                <form id="private-form" name="Private" action="actionUrl" method="POST" style="display:none;">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input type="hidden" name="Private" value="Private">
+                </form>
+                <div>
+                    <button class="btn btn-primary all_rooms_button" type="button" name="Private" onclick="showTermsAndConditions('private'); return false;">Create a private room</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <button class="btn btn-primary" type="button" onclick="showTermsAndConditions('private_room_key');">Join a private room</button>
-  </form>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="rooms-card">
+                <form id="private-room-form" action="join_private_room/" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group d-flex align-items-center">
+                        <p class="mb-0 mr-2">Kindly enter your designated private room key in the provided input field</p>
+                        <input type="text" id="unique_room_box2" name="unique_room_box" placeholder="Your private room key.." class="mr-2">
+                    </div>
+                    <button class="btn btn-primary all_rooms_button" type="button" onclick="showTermsAndConditions('private_room_key');">Join a private room</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+<div id="terms-popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-sm-12 col-md-8 col-lg-6 mx-auto my-auto">
+                <div class="terms-box bg-white p-4">
+                    <h2 style="color:black">Terms and Conditions</h2>
+                    <div class="terms-content">
+                        <p>Your terms and conditions content here.</p>
+                        <ol>
+                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+                            <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+                            <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+                            <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+                            <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+                            <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+                            <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+                            <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+                            <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+                            <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+                            <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+                            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+                            <li>Elit scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. </li>
+                            <li>Sapien nec sagittis aliquam malesuada bibendum arcu.</li>
+                        </ol>
+                    </div>
+                    <br>
+                    <button class="btn btn-primary" id="accept-button" type="button">Accept</button>
+                    <button class="btn btn-primary" type="button" onclick="hideTermsAndConditions()">Decline</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 {% block javascript %}
 <script>
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+    return cookieValue;
     }
-	return cookieValue;
-}
-$(document).ready(function(){
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'set_screensize' %}",
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        data: {"width":window.screen.width, "height": window.screen.height},
-    })
-});
-
-  TOSaccept = "{{request.session.TOSaccept}}"
-
-  /* below methods should be done using jquery listeners for more compact and scaleable solution 
-  -> event listener on forms, which checks if TOS submitted if so, submit form as normal
-  -> (removes need for paramater passing and else if statements)
-  -> if not accepted show TOS and wait for accept*/
-  function showTermsAndConditions(buttonType) {
-    event.preventDefault();
-    // if the TOS hasn't been accepted before then prompt to accept
-    if (TOSaccept != "True"){
-      document.getElementById("terms-popup").style.display = "block";
-      document.getElementById("accept-button").onclick = function () {
-        acceptTermsAndConditions(buttonType);
-      };
-    }
-    // otherwise submit as normal
-    else{
-      submitForm(buttonType);
-    }
-  }
-
-  function hideTermsAndConditions() {
-    document.getElementById("terms-popup").style.display = "none";
-  }
-
-  function acceptTermsAndConditions(buttonType) {
-    hideTermsAndConditions();
-    // ajax to set TOS cookie so user only accepts once
-    $.ajax({
-      type: 'GET',
-      url: "{% url 'acceptTOS' %}",
-      success: function (response) {
-				submitForm(buttonType);
-        },
-        error: function (response) {
-          // alert the error if any error occured
-          alert(response["responseJSON"]["error"]);
-        }
-    })
-
+    $(document).ready(function(){
+      $.ajax({
+          type: 'POST',
+          url: "{% url 'set_screensize' %}",
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          data: {"width":window.screen.width, "height": window.screen.height},
+      })
+    });
     
-  }
-  function submitForm(buttonType){
-    let form;
-        if (buttonType === "private") {
-          form = document.getElementById("private-form");
-        } else if (buttonType === "join") {
-          form = document.getElementById("join-form");
-        } else if (buttonType === "private_room_key") {
-          form = document.getElementById("private-room-form");
-        }
-
-        if (form) {
-          form.submit();
-        }
-  }
-
+    TOSaccept = "{{request.session.TOSaccept}}"
+    
+    /* below methods should be done using jquery listeners for more compact and scaleable solution 
+    -> event listener on forms, which checks if TOS submitted if so, submit form as normal
+    -> (removes need for paramater passing and else if statements)
+    -> if not accepted show TOS and wait for accept*/
+    function showTermsAndConditions(buttonType) {
+      event.preventDefault();
+      // if the TOS hasn't been accepted before then prompt to accept
+      if (TOSaccept != "True"){
+        document.getElementById("terms-popup").style.display = "block";
+        document.getElementById("accept-button").onclick = function () {
+          acceptTermsAndConditions(buttonType);
+        };
+      }
+      // otherwise submit as normal
+      else{
+        submitForm(buttonType);
+      }
+    }
+    
+    function hideTermsAndConditions() {
+      document.getElementById("terms-popup").style.display = "none";
+    }
+    
+    function acceptTermsAndConditions(buttonType) {
+      hideTermsAndConditions();
+      // ajax to set TOS cookie so user only accepts once
+      $.ajax({
+        type: 'GET',
+        url: "{% url 'acceptTOS' %}",
+        success: function (response) {
+    		submitForm(buttonType);
+          },
+          error: function (response) {
+            // alert the error if any error occured
+            alert(response["responseJSON"]["error"]);
+          }
+      })
+    
+      
+    }
+    function submitForm(buttonType){
+      let form;
+          if (buttonType === "private") {
+            form = document.getElementById("private-form");
+          } else if (buttonType === "join") {
+            form = document.getElementById("join-form");
+          } else if (buttonType === "private_room_key") {
+            form = document.getElementById("private-room-form");
+          }
+    
+          if (form) {
+            form.submit();
+          }
+    }
+    
 </script>
-  
 {% endblock javascript %}
