@@ -19,30 +19,11 @@
   <!-- some extra styling that I should be moved, this effectively fixes the footer to the
      bottom of the page and removes white spaces-->
   <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
-
-      .wrapper {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .main-content {
-        flex: 1;
-      }
-      main {
-        flex: 1;
-      }
-
-      .footer {
-        margin-top:auto;
-        background-color: #f2f2f2;
-        padding: 20px;
-      }
+    .footer-distributed {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
   <body>
     <div class="wrapper">
@@ -79,6 +60,7 @@
         
           {# footer for every page reference: https://blog.eduonix.com/web-programming-tutorials/build-responsive-website-footer-using-html-css/#}
           </div>
+          
           <footer class="footer-distributed">
             <div class="footer-left">
               <img src="{% static 'images/logo.png'%}" alt="Map Game logo" >

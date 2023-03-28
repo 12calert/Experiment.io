@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Rooms{% endblock %}
-{% block content %}
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+{% block content %} 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style> 
+    
+    .footer-distributed {
+        
+        width: 100%;
+        
+        margin-left: auto;
+        margin-right: auto;
+      }
     .input-container {
     display: flex;
     align-items: center;
@@ -31,12 +38,7 @@
     align-items: center;
     width: 100%;
     }
-    /* .rooms-card .btn {
-    width: 100%;
-    max-width: 200px;
-    margin-top: 0;  
-    }
-    */
+   
     .rooms-card .btn {
     width: 100%;
     max-width: 500px; /* Increase the maximum width */
@@ -88,6 +90,8 @@
     text-align: center;
     }
 </style>
+<div class="main-content">
+
 {% comment %} alert message for wrong input on private room key {% endcomment %}
 {% if messages %}
 <div class="alert alert-danger" role="alert">
@@ -97,6 +101,7 @@
     {% endfor %}
 </div>
 {% endif %}
+
 <div class="container">
     <div class="row">
         <div class="col-12">
@@ -186,6 +191,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 {% endblock content %}
 {% block javascript %}
