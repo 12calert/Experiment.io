@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Researcher Login{% endblock %}
-{% block content %}
-<link rel="stylesheet" type = "text/css" href="{% static 'css/home.css' %}">  
+{% block content %}  
 <div class="login-container">
   <form method="POST">
     {% csrf_token %}
