@@ -97,6 +97,7 @@ DATABASES['default']['TEST'] = {
     'NAME': 'test_db',
 }
 
+
 #DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.sqlite3',

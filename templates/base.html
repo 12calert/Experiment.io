@@ -16,25 +16,35 @@
     {% bootstrap_javascript %}
     
   </head>
-  <!-- some extra styling that I should be moved, this effectively fixes the footer to the
-     bottom of the page and removes white spaces-->
   <style>
     .footer-distributed {
       width: 100%;
       margin-left: auto;
       margin-right: auto;
     }
+    body {
+      font: 16px/1.6 Arial, sans-serif;
+      background: #181818;
+      color: white;
+    }
+    
+    .light-theme {
+      background: white !important;
+      color: #080808!important;
+    }
+    .toggle_theme{
+      background-color: #1e1e1e;
+    }
   </style>
-  <body>
+  <body>{% if request.COOKIES.theme == 'light' %} class="light-theme"{% endif %}>
     <div class="wrapper">
       <div class="main-content">
         <main>
           {# header for every page #}
           <header class="navbar" style="z-index: 1;">
             <ul>
-              {# add the links to the other pages #}
-              <li><a href = "{% url 'home' %}">Home</a></li>
-              {# history of the game seems unneeded but will keep for now #}
+              <li><a href="{% url 'home' %}">Home</a></li>
+              <li><button class="toggle_theme" onclick="toggleTheme()">Switch Theme</button></li>
               {% if user.is_superuser %}
                 <li><a href="{% url 'admin:index' %}"> Admin Page</a></li>
                 <li style="float:right;"><a href="">Signed in as: {{request.user | title}}</a></li>
@@ -42,7 +52,6 @@
               {% elif user.is_superuser != True and user.is_authenticated %}
                 <li><a href="{% url 'research_data' %}"> View Data</a></li>
                 <li><a href="{% url 'game_conditions' %}"> Set Conditions</a></li>
-                <!-- dont use styles use bootstrap classses-->
                 <li style="float:right;"><a href="">Signed in as:{{request.user | title}}</a></li>
                 <li style="float:right;"><a href="{% url 'logout' %}">Logout</a></li>
               {% else %}
@@ -114,4 +123,14 @@
         </main>
       </div>
   </body>
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+      if (document.body.classList.contains('light-theme')) {// store user's preferred theme in a cookie
+        document.cookie = "theme=light;path=/";
+      } else {// remove the cookie 
+        document.cookie = "theme=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+      }
+    }
+  </script>
 </html>
