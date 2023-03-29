@@ -1,5 +1,6 @@
 daphne
 django
+djangorestframework
 jsonfield
 channels
 channels_redis
