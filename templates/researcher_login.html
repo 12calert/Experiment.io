@@ -1,31 +1,40 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Researcher Login{% endblock %}
-{% block content %}  
-<div class="login-container">
-  <form method="POST">
-    {% csrf_token %}
-    <div class="form-group">
-      <h5 class="sign_in_instructions">Please sign in:</h5>
-      <label for="username">Username</label>
-      <input type="username" class="form-control" id="username" name="username" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" class="form-control" id="password" name="password" required>
-    </div>
-    <div class="form-group text-center">
-      <input type="submit" value="Log in" class="custom-button">
-    </div>
-    <div class="form-group text-center">
-      <a href="{% url 'password_reset' %}">Forgot Password?</a>
-    </div>
-    {% if form.non_field_errors %}
-      <div class="alert alert-danger" role="alert">
-        <span class="error-icon"></span>
-        <strong>Error:</strong> {{ form.non_field_errors|join:", " }}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card mt-5">
+        <div class="card-header"> <br>
+          <h5 class="card-title text-center"> <strong> Please sign in by entering your credentials below: <br></strong> </h5><br>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+              <label for="username">Username</label>
+              <input type="username" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group mb-3">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group text-center">
+              <input type="submit" value="Log in" class="btn btn-primary">
+            </div>
+            <div class="form-group text-center">
+              <a href="{% url 'password_reset' %}" type="submit" class="btn btn-primary">Forgot Password?</a>
+            </div>
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                  <strong>Error:</strong> {{ form.non_field_errors|join:", " }}
+                </div>
+              {% endif %}
+            </form>
+          </div>
+        </div>
       </div>
-    {% endif %}
-  </form>
-</div>
+    </div>
+  </div>
 {% endblock %}

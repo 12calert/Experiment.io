@@ -17,6 +17,29 @@
     
   </head>
   <style>
+    body {
+      font: 16px/1.6 Arial, sans-serif;
+      background: #181818;
+      color: white;
+    }
+    
+    .light-theme {
+      background: white !important;
+      color: #080808 !important;
+    }
+    
+    .card-title, label {
+      color: #080808;
+    }
+    
+    .light-theme .card-title, .light-theme label {
+      color: #080808 !important;
+    }
+    
+    .light-theme:not(.card-title), .light-theme:not(label) {
+      color: #080808 !important;
+    }
+
     .footer-distributed {
       width: 100%;
       margin-left: auto;
@@ -28,10 +51,6 @@
       color: white;
     }
     
-    .light-theme {
-      background: white !important;
-      color: #080808!important;
-    }
     .toggle_theme{
       background-color: #1e1e1e;
     }
