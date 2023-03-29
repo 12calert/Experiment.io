@@ -2,7 +2,12 @@
 {% load static %}
 {% block title %}Game View{% endblock %}
 {% block content %}
+<style> .undo {
+  width: 21%;
+  height: 42%;
+  padding-left: 10px;
 
+}</style>
 {# Collapsible "view information" #}
 <div>
   
@@ -38,29 +43,32 @@
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}
     </div>
-  <div class="col-sm-8"></div>
+ 
+  {# Buttons #}
+  <div class="col-sm-8">
+    <form class="d-inline-block mr-2" id="complete">
+      {% csrf_token %}
+      <input type="submit" style="background-color: green; margin-right: 20px;" value="Complete" />
+    </form>
+    <form class="d-inline-block mr-2" id="give-up">
+      {% csrf_token %}
+      <input type="submit" style="background-color: red; margin-right: 20px;" value="Give Up" />
+    </form>
+    <button type="submit" class="btn btn-primary undo d-inline-block mr-2" style="padding-left: 10px; padding-right: 10px;" onclick="undo()">Undo move</button>
+  </div>
+  
+ 
   <div class="col-sm-4">  
   <input id="chat-message-input" placeholder="Type in here ... " type="text" size="100"><br>
   <input id="chat-message-submit" type="button" value="Send"> 
 </div>
 
-{# Buttons #}
-<div class="col-sm-8">
-  {# input types need to be changed when we implement the different behaviour for finishing the game #}
-  <form id = "complete">
-    {% csrf_token %}
-    <input type="submit" class="btn btn-primary" value="Complete" />
-  </form>
-  <form id = "complete">
-    {% csrf_token %}
-    <input type="submit" class="btn btn-primary" value="Give Up" />
-  </form>
-  <button onclick = "undo()">Undo move</button>
-</div>
+
 {{ gameCurr.rects|json_script:"rects" }}
 {{ gameCurr.path|json_script:"path" }}
 {{ player.role|json_script:"role"}}
 {% endblock content %}
+ 
 
 {# Collapsible "view information" Javascript function #}
 {% block javascript %}
