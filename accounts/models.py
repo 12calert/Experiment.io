@@ -100,7 +100,7 @@ class Move(models.Model):
 class Chat(models.Model):
     game = models.ForeignKey(Game, on_delete=models.DO_NOTHING, null = False)
     chat_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # PK
-    content = models.TextField(default="") # {"0": {"origin": leader/follower, "msg": msg, "timestamp": date}}
+    content = models.TextField(default="")
     role = models.TextField(default="")
     created = models.DateTimeField(auto_now_add=True, editable=False)
 

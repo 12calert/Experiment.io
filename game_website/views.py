@@ -13,6 +13,10 @@ import json
 from django.urls import reverse
 # custom shapes module allows us to easily change values (also to apply custom conditions)
 from game_website.shapes import randomColour, randomShape
+import game_website.serialize as customSerializers
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.response import Response
 # helper methods
 """checks a request to see if it is an ajax request"""
 def is_ajax(request):
@@ -741,6 +745,22 @@ def saveMove(request):
             return JsonResponse({},status = 200)
         else:
             return HttpResponse("")
+
+def downloadJson(request):
+    if request.method == "POST" and is_ajax(request):
+        experiment_name = request.POST["experiment_name"]
+        current_researcher = request.POST["current_researcher"]
+        experiment = Experiment.objects.get(name = experiment_name, created_by = current_researcher)
+        serializer = customSerializers.ExperimentSerializer(instance = experiment)
+        return JsonResponse(serializer.data, status=200)
+
+def downloadAll(request):
+    if request.method == "POST" and is_ajax(request):
+        current_researcher = request.POST["current_researcher"]
+        experiments = Experiment.objects.filter(created_by = current_researcher)
+        serializer = customSerializers.ExperimentSerializer(instance = experiments, many=True)
+        return JsonResponse(serializer.data, status=200, safe=False)
+
 
 
 # --- end of ajax views ---
