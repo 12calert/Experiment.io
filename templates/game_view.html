@@ -13,6 +13,7 @@
 <div>
   
 <button type="button" class="collapsible">View information</button>
+<button type="submit" class="btn btn-primary undo d-inline-block mr-2" style="padding-left: 10px; padding-right: 10px;" onclick="undo()">Undo move</button>
 <div class="content">
   <p>
     This game consits of 2 players, both randomly assigned to either a Giver/Follower.
@@ -52,11 +53,6 @@
       {% csrf_token %}
       <input type="submit" style="background-color: green; margin-right: 20px;" value="Complete" />
     </form>
-    <form class="d-inline-block mr-2" id="give-up">
-      {% csrf_token %}
-      <input type="submit" style="background-color: red; margin-right: 20px;" value="Give Up" />
-    </form>
-    <button type="submit" class="btn btn-primary undo d-inline-block mr-2" style="padding-left: 10px; padding-right: 10px;" onclick="undo()">Undo move</button>
   </div>
   
  
