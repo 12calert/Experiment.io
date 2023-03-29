@@ -2,11 +2,61 @@
 {% load static %}
 {% block title %}Game View{% endblock %}
 {% block content %}
-<div id = "game">
-    <img id = "followerMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{followerURL}}">
-    <img id = "giverMap" style="float:left;" width = "{{containerSize}}" height = "550" src = "{{giverURL}}">
+<style> 
+    #game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+    .image-container {
+    width: 100%;
+    max-width: {{containerSize}}px;
+    margin-bottom: 15px; /* Amount of space between the images */
+    }
+    .image-container img {
+    width: 100%;
+    height: auto;
+    border: 2px solid orange; /* Border of color orange around each image */
+    }
+    .rooms-card .action-container input.form-control {
+    width: 100%;
+    max-width: 100%; /* Increase the maximum width if needed */
+    }
+    .rooms-card {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem; /* space between the boxes */
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+    color: black;
+    align-items: center;
+    padding: 1rem;
+    justify-content: center;
+    text-align: center;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="rooms-card">
+                <div>
+                    <h5>Thank you for taking the time to participate in our experiment. <br> Your contribution is greatly appreciated.
+                        You may now compare your work with that of your partner. <br> If you have any questions or concerns, please do 
+                        not hesitate to reach out to our team.
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="game">
+    <div class="image-container">
+        <img id="followerMap" src="{{followerURL}}" alt="Follower Map">
+    </div>
+    <div class="image-container">
+        <img id="giverMap" src="{{giverURL}}" alt="Giver Map">
+    </div>
 </div>
 {% endblock content %}
-
 {% block javascript %}
 {% endblock javascript %}

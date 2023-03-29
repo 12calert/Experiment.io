@@ -6,10 +6,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
-from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove, viewChats
-from django.http import JsonResponse
-from django.test import TestCase, RequestFactory, Client
- 
+from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove, viewChats, viewConditions, saveMessage, acceptTOS, decrementUsers, is_ajax, viewGames
+from django.http import JsonResponse, HttpResponse, HttpRequest
+from django.test import TestCase, RequestFactory, Client # RequestFactory to simulate POST requests.
+from unittest.mock import MagicMock
+import json
+
 # Testing of Researcher registration
 class ResearcherRegistrationTest(TestCase):
     def setUp(self):
@@ -319,3 +321,98 @@ class ViewFunctionsTest(TestCase):
         self.assertEqual(move.move_type, 'mv')
         self.assertEqual(move.oldPos, {'x': 0, 'y': 0})
         self.assertEqual(move.newPos, {'x': 64, 'y': 96})
+  
+# Checks acceptTOS view function works properly  
+class TestAcceptTOSTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_acceptTOS(self):
+        request = self.factory.get('/acceptTOS/')
+        request.session = {}  # Mimic session behavior
+        response = acceptTOS(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(request.session['TOSaccept'])
+        
+# Checks decrementUsers view function works properly  
+class DecrementUsersTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        
+        # Create a user and researcher
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.researcher = Researcher.objects.create(userkey=self.user)
+
+        self.condition = Condition.objects.create(
+            amount_item=1,
+            restriction="Some restriction",
+            active=True,
+            name="Test Condition",
+            created_by=self.researcher  # Set created_by to the researcher instance
+        )
+        self.game = Game.objects.create(
+            room_name="test_room",
+            users=5,
+            has_condition=self.condition,
+            public=True
+        )
+            
+    def test_decrement_users(self):
+        request = self.factory.post('/some_path/', {'roomName': 'test_room'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = decrementUsers(request)
+
+        # Reload the game object to get the updated value of users
+        updated_game = Game.objects.get(room_name="test_room")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(updated_game.users, 4)
+
+# Checks viewChats from when researcher wants to view the data, it request a
+# POST to the function with the data and checks if the response has the correct data
+class ViewChatsTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.researcher = Researcher.objects.create(userkey=self.user)
+        self.experiment = Experiment.objects.create(name='Test Experiment', created_by=self.researcher)
+        self.condition = Condition.objects.create(name='Test Condition', created_by=self.researcher, experiment=self.experiment, amount_item=1)
+        self.game = Game.objects.create(room_name='test_room', has_condition=self.condition, public=True)
+        self.chat1 = Chat.objects.create(content='Hello from follower', role='Follower', game=self.game)
+        self.chat2 = Chat.objects.create(content='Hello from giver!', role='Giver', game=self.game)
+
+    def test_view_chats(self):
+        request = self.factory.post('/view_chats/', {'room_name': 'test_room'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        response = viewChats(request)
+
+        # Check if the response has a status code of 200
+        self.assertEqual(response.status_code, 200)
+
+        # Check if the response contains the correct chat messages
+        self.assertIn('Hello from follower', response.content.decode())
+        self.assertIn('Hello from giver!', response.content.decode())
+        
+# Checks saveMessage view function e.g. role, message etc that are POSTed
+class SaveMessageTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.researcher = Researcher.objects.create(userkey=self.user)
+        self.experiment = Experiment.objects.create(name='Test Experiment', created_by=self.researcher)
+        self.condition = Condition.objects.create(amount_item=1,restriction="Some restriction",active=True,name="Test Condition",created_by=self.researcher)
+        self.game = Game.objects.create(room_name="test_room",users=5,has_condition=self.condition,public=True)
+
+    def test_save_message(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.META['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest'
+        request.POST = {"role": "follower","message": "Test message","room_name": self.game.room_name
+        }
+        request.user = self.user
+
+        response = saveMessage(request)
+
+        self.assertEqual(response.status_code, 200)
+        chat = Chat.objects.first()
+        self.assertEqual(chat.role, "follower")
+        self.assertEqual(chat.content, "Test message")
+        self.assertEqual(chat.game, self.game)
