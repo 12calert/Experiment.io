@@ -2,15 +2,25 @@
 {% load static %}
 {% block title %}Researcher Registration{% endblock %}
 {% block content %}
-<div class="login-container">
-<h6 style="font-weight:bold">Please submit your details.  Our team will carefully verify the submitted details and get in touch with you promptly regarding your registration. </h6>
-<form action="" method="POST" class="form-group">
-  {% csrf_token %}  
-  {% comment %} csrf token for security reasons {% endcomment %}
-  {{ register.as_p }}
-  <div class="form-group text-center">
-    <input type="submit" value="Register" class="btn btn-primary">
-  </div>
-</form>
-</div>
+<div class="container">
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mt-5">
+            <div class="card-header">
+                <br><h5 class="card-title text-center"><strong>Researcher Registration</strong></h5><br>
+            </div>
+            <div class="card-body">
+                <p class="text-center" style="color: black;">Kindly submit your details. Our team will carefully verify the information provided and promptly contact you regarding your registration.</p>
+                <form action="" method="POST" style="color: black;">
+                    {% csrf_token %}
+                    {% comment %} csrf token for security reasons {% endcomment %}
+                    {{ register.as_p }}
+                    <div class="form-group text-center" style="color: black;">
+                        <input type="submit" value="Register" class="btn btn-primary btn-full-width">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> 
+</div><br> 
 {% endblock %}
