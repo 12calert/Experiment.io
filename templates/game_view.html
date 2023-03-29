@@ -28,6 +28,7 @@
 {# for now just use the room name as the key, can be changed later #}
 {% if not public %}
 <div> Your private key is: {{room_name}}. Share this with someone else to play together.</div>
+<button onclick = "undo()">Undo move</button>
 {% endif %}
 {# Game map and chat #}
 <div class="row">
@@ -51,11 +52,7 @@
     {% csrf_token %}
     <input type="submit" class="btn btn-primary" value="Complete" />
   </form>
-  <form id = "complete">
-    {% csrf_token %}
-    <input type="submit" class="btn btn-primary" value="Give Up" />
-  </form>
-  <button onclick = "undo()">Undo move</button>
+
 </div>
 {{ gameCurr.rects|json_script:"rects" }}
 {{ gameCurr.path|json_script:"path" }}
@@ -267,15 +264,26 @@ class Square extends Shape {
 // updates the player position
   function update( data ) {
     if (undoTrue != true){
-      path = new Square(oldx, oldy, 32)
-      path.draw("orange")
+      // work in progress
+      
+      ctx.clearRect(oldx,oldy,32,32);
+      ctx.beginPath();
+      ctx.moveTo(oldx+16, oldy+16);
+      ctx.lineTo(data["x"]+16, data["y"]+16);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "orange";
+      ctx.stroke();
+      ctx.closePath();
+
+      //path = new Square(oldx, oldy, 32)
+      //path.draw("orange")
       cPush()
       shape = new Square(data["x"], data["y"], 32);
       shape.draw("red")
     }
     else{
       // I have no idea why clearing it works but I won't complain
-      ctx.clearRect(0,0,canvas.width, canvas.height)
+      ctx.clearRect(oldx,oldy,canvas.width, canvas.height)
       cUndo()
       player = new Square(data["x"],data["y"], 32)
       player.draw("red")
@@ -371,14 +379,21 @@ class Square extends Shape {
   
 // creates the final path for the giver
   function InitializeFinalPath(path){
-    for( let i = 0; i < path.length; i++ ) {
-      const side = path[i].width
+    ctx.beginPath();
+    for( let i = 0; i < path.length - 1; i++ ) {
+      ctx.moveTo(path[i].left+16, path[i].top+16);
+      ctx.lineTo(path[i+1].left+16, path[i+1].top+16);
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "orange";
+      ctx.stroke();
+      /*const side = path[i].width
       const xS = path[i].left
       const yS = path[i].top
       shape = new Square(xS, yS, side);
-      shape.draw("orange");
+      shape.draw("orange");*/
 
     }
+    ctx.closePath();
   }
 // draws the start and end positions of the path
   function initializeStartandEnd(path){
