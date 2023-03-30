@@ -3,25 +3,9 @@ How to run:
 2. pip install -r requirements.txt
 3. python manage.py runserver
 
-What works:
-1. /game_website - root app
-2. /assets - images and css/js files available in html with the use of Django template language, eg. "{% static 'css/home.css' %}" or "{% static 'js/example.js' %}"
-3. /templates - stores html files
+JSON file contents:
+lists details of experiment(s), their condition(s), the game(s) played with those conditions active, the moves taken throughout the process of the game, as well as the chats
+The "rects" field specifies the rectangular boundaroes for each obstacle, they are stored with their positional values and width and height. 
+The moves are characterised with 2 types, "un" meaning undo and "mv" meaning move. They have an "oldpos" meaning the position before the move and "newpos" the position after the move.
 
-Placeholders:
-1. /accounts - holds db schema, login and registration logic - it will be useful later
-2. /chat - tutorial copied 1 to 1 by Athena - it won't be of any use unless heavily modified
-
-
-TODO:
-1. Pretty much implement the entire frontend
-  - start with the home page
-  - make a view where the actualy game takes place
-  - other useful ones such as "about"
-  - login for researchers and their view ( eg. statistics.html )
-  1.1. Decide on colour scheme, images, specific descrption text etc.
-2. Modify/Remake the chat in a way that is actually relevant to our needs
-3. Design db schema ( not only what we need to store, but it needs to be in depth, specifically naming tables and relations between them )
-4. Gameplay logic
-5. Statistics - pulled from db and displayed in a nice way to the researchers
-6. Last semester I got blamed for everything, so this time you've got the chance to shine
+^^^^ this would be given to the researcher at some point when before/when they download the json of the data.
