@@ -9,3 +9,5 @@ The "rects" field specifies the rectangular boundaroes for each obstacle, they a
 The moves are characterised with 2 types, "un" meaning undo and "mv" meaning move. They have an "oldpos" meaning the position before the move and "newpos" the position after the move.
 
 ^^^^ this would be given to the researcher at some point when before/when they download the json of the data.
+
+We would supply them a way to recreate games either within our website or we would give them a package (essentially possible in any programming language) that they can recreate it on their own without having to use the website 
