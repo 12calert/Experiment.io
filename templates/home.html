@@ -1,71 +1,100 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Home{% endblock %}
-{% block content %}
-<div class="container">
-    {% csrf_token %}
-    <div class="row">
-        <div class="col-md-6">
-            <h1 class="mb-4">About the Map Game</h1>
-            <p class="lead mb-5">Team up with a partner and communicate to traverse the map! You'll either take on the role of the Giver or the Follower. The Giver can see the path and must message their partner to help them reach the end. The Follower can only see the map and must speak to their partner to try and reach the end.</p>
-            <form method="POST">
-                {% csrf_token %}
-                {{ chooseGame.as_p }}
-                <button class="btn btn-primary" type="submit">Play Game</button>
-            </form>
-        </div>
-        <div class="col-md-6 ml-auto">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="cards mb-4">
-                        {% comment %} include another existing image when you have one, because otherwise testing fails {% endcomment %}
-                        <img src="{% static 'images/logo.png' %}" class="card-img-top" alt="Map from the instruction giver's point of view" style="height: 125px; width: 200px;">
+{% extends 'base.html' %} <!-- Extends the base.html template -->
+{% load static %} <!-- Loads the Django static files -->
+{% block title %}Home{% endblock %} <!-- Sets the title of the page to 'Home' -->
+{% block content %} <!-- Begins the content block -->
+<head>
+    <!-- Load the w3.css and Raleway font from external sources -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+</head>
+{% csrf_token %} <!-- Include the CSRF token for security -->
+<!-- Header -->
+<body>
+    <!-- Container for centered content with a max-width of 1400px -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32">
+            <h1><b>Map-Task Experiment</b></h1>
+            <p><span class="w3-tag">Welcome</span></p>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row w3-center">
+            <!-- Blog entry -->
+            <div class="w3-card-4 w3-margin w3-white w3-center">
+                <!-- Load the logo image from the static files -->
+                <img src="{% static 'images/logo.png' %}" width="80px" height="250px" alt="Nature" style="width:100%">
+                <div class="w3-container w3-center">
+                    <h3><b>About the Map-Task Experiment</b></h3>
+                    <h5>Brief Explanation, <span class="w3-opacity">May, 2023</span></h5>
+                </div>
+                <div class="w3-container">
+                    <!-- Add the first paragraph of the report -->
+                    <p>Here let's provide the first paragraph of our report...</p>
+                </div>
+                <!-- Equal-sized columns -->
+                <div class="w3-row">
+                    <div class="w3-col l6 m6 s12 w3-border">
+                        <!-- Column 1: Follower Instructions -->
+                        <div class="w3-container">
+                            <h2>Follower Instructions</h2>
+                            <p>Content for column 1, add the instructions...</p>
+                        </div>
                     </div>
-                    <div class="text-center">
-                        <h5 class="card-title">As the Giver</h5>
-                        <p class="card-text">You can see the path and must message your partner to help them reach the end.</p>
+                    <div class="w3-col l6 m6 s12 w3-border">
+                        <!-- Column 2: Giver Instructions -->
+                        <div class="w3-container">
+                            <h2>Giver Instructions</h2>
+                            <p>Content for column 2, add the instructions...</p>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="cards mb-4">
-                        {% comment %} include another existing image when you have one, because otherwise testing fails {% endcomment %}
-                        <img src="{% static 'images/logo.png' %}" class="card-img-top" alt="Map from the instruction follower's point of view" style="height: 125px; width: 200px;">
-                    </div>
-                    <div class="text-center">
-                        <h5 class="card-title">As the Follower</h5>
-                        <p class="card-text">You can only see the map and must speak to your partner to try and reach the end.</p>
-                    </div>
-                </div>
+                <!-- Form for submitting game choice -->
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ chooseGame.as_p }}
+                    <button class="btn btn-primary" type="submit" style="width: 150px; height: 60px;">Conduct the Experiment</button>
+                </form>
+                <br>
             </div>
         </div>
     </div>
-</div>
+    <!-- End of equal-sized columns -->
+</body>
 {% endblock %}
-
 {% block javascript %}
 <script>
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
+    // Define a function to retrieve a cookie by name
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
+            // Check if the cookie's name matches the one we're looking for
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+              // Decode and return the cookie's value
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
             }
+          }
         }
-    }
-	return cookieValue;
-}
-$(document).ready(function(){
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'set_screensize' %}",
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        data: {"width":window.screen.width, "height": window.screen.height},
-    })
-});
+        return cookieValue;
+      }
+      
+      // When the document is ready, execute this code
+      $(document).ready(function() {
+        // Send a POST request to the server
+        $.ajax({
+          type: 'POST', // Set the HTTP request method
+          url: "{% url 'set_screensize' %}", // Specify the URL to send the request to
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken") // Include the CSRF token in the request headers
+          },
+          data: {
+            "width": window.screen.width, // Include the screen width in the request data
+            "height": window.screen.height // Include the screen height in the request data
+          },
+        })
+      });  
 </script>
 {% endblock %}
