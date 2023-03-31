@@ -2,513 +2,543 @@
 {% load static %}
 {% block title %}Game View{% endblock %}
 {% block content %}
-<style>   
-.undo {
-  width: 21%;
-  height: 42%;
-  padding-left: 10px;
-
-}</style>
+<style>  
+  .content {
+    box-sizing: border-box; 
+    
+    color:black;
+    background-color: #f2f2f2;
+    overflow: hidden;
+    width: 100%; 
+  }
+    .collapsible {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    width: 100%;
+    text-align: center;
+    margin: none;
+    
+    }
+    .row {
+    margin-right: 0;
+    margin-left: 0;
+    }
+    .chat {
+    padding-right: 0;
+    } 
+    
+    .undo {
+    width: 100%;
+    max-width: 50%; 
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    }
+</style>
 {# Collapsible "view information" #}
-<div>
-  
-<button type="button" class="collapsible">View information</button>
-<div class="content">
-  <p>
-    This game consits of 2 players, both randomly assigned to either a Giver/Follower.
-    <br>This project was intented with researching how humans interact and try to guide each other with a disadvantage between each other.
-    <br>Both players must interact with the chat box and try to figure out how to guide each other in order to get from the starting path to the end path.
-    <br>It is recommended to explain each others maps at the start, and then go on from there, the Giver must pay attention to detail in order to guide the follower as much as they can.
-  </p>
-</div>
-<div>
-  your role is:
-  {{player.role}}
-  {% if player.role == "follower"%}
-    you will receive instructions, etc.
-  {% else %}
-    you will give instructions to the follower, etc.
-  {% endif %}
-</div>
 
+<div class="container-fluid no-space">
+  <div class="row">
+    <div class="col-12" style="padding-top: 0;">
+ 
+    <button type="button" class="collapsible btn btn-primary">View information</button>
+    <div  class="content">
+        <p    style="color:black;">
+          This game consits of 2 players, both randomly assigned to either a Giver/Follower.
+          <br>This project was intented with researching how humans interact and try to guide each other with a disadvantage between each other.
+          <br>Both players must interact with the chat box and try to figure out how to guide each other in order to get from the starting path to the end path.
+          <br>It is recommended to explain each others maps at the start, and then go on from there, the Giver must pay attention to detail in order to guide the follower as much as they can.      
+        </p>
+    </div></div></div></div>
+</div>
+<div>
+<div>
+    your role is:
+    {{player.role}}
+    {% if player.role == "follower"%}
+    you will receive instructions, etc.
+    {% else %}
+    you will give instructions to the follower, etc.
+    {% endif %}
+</div>
 {# for now just use the room name as the key, can be changed later #}
 {% if not public %}
 <div> Your private key is: {{room_name}}. Share this with someone else to play together.</div>
 {% endif %}
-<button type="submit" class="btn btn-primary undo d-inline-block mr-2" style="padding-left: 10px; padding-right: 10px;" onclick="undo()">Undo move</button>
-{# Game map and chat #}
+<div class="container-fluid">
 <div class="row">
-  <canvas id="canvas" class="col-sm-8 game" style = "border:0; padding:0; margin:0;  border: solid;" width = "{{containerSize}}" height = "550">
-   </canvas>
-     
-  <div class="col-sm-4 chat"><div  id="chat-log" ></div><br>
+    <div class="col-sm-8">
+        <button type="submit" class="btn btn-primary undo" onclick="undo()">Undo Move</button>
+    </div>
+</div>
+<div class="row">
+<canvas id="canvas" class="col-sm-8 game" style="border:0; padding:0; margin:0;  border: solid;" width="{{containerSize}}" height="550">
+</canvas>
+<div class="col-sm-4 chat">
+    <div  id="chat-log" ></div>
+    <br>
     {# below turns python dict of room name into json to be used in script (see context variable in views.py) #}
     {{ room_name|json_script:"room-name" }}
-    </div>
- 
-  {# Buttons #}
-  <div class="col-sm-8">
-    <form class="d-inline-block mr-2" id="complete">
-      {% csrf_token %}
-      <input type="submit" style="background-color: green; margin-right: 20px;" value="Complete" />
-    </form>
-  </div>
-  
- 
-  <div class="col-sm-4">  
-  <input id="chat-message-input" placeholder="Type in here ... " type="text" size="100"><br>
-  <input id="chat-message-submit" type="button" value="Send"> 
 </div>
-
-
+{# Buttons #}
+<div class="col-sm-8">
+    <form class="d-inline-block mr-2" id="complete">
+        {% csrf_token %}
+        <input type="submit" style="background-color: green; margin-right: 20px;" value="Complete" />
+    </form>
+</div>
+<div class="col-sm-4">  
+    <input id="chat-message-input" placeholder="Type in here ... " type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send"> 
+</div>
 {{ gameCurr.rects|json_script:"rects" }}
 {{ gameCurr.path|json_script:"path" }}
 {{ player.role|json_script:"role"}}
 {% endblock content %}
- 
-
 {# Collapsible "view information" Javascript function #}
 {% block javascript %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js" integrity="sha512-B4skI5FiLurS86aioJx9VfozI1wjqrn6aTdJH+YQUmCZum/ZibPBTX55k5d9XM6EsKePDInkLVrN7vPmJxc1qA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
-  var rects = JSON.parse(document.getElementById('rects').textContent)
-  var path = JSON.parse(document.getElementById('path').textContent)
-  var role = JSON.parse(document.getElementById('role').textContent)
-  // read the player's role from the Django template 
-  var playerRole = "{{ player.role }}";
-  // read the player's role from the Django template 
-  var coll = document.getElementsByClassName("collapsible");
-  // global variables bad
-  var i;
-  var rects;
-  var player;
-  var moveStack = [];
-  var undoTrue = false;
-  var canvas = document.getElementById('canvas');
-  var ctx = canvas.getContext('2d');
-  var oldx;
-  var oldy;
-  var cPushArray = new Array();
-  var cStep = -1;
-  // pushes the canvas instance to stack
-  function cPush() {
-    cStep++;
-    if (cStep < cPushArray.length) { cPushArray.length = cStep; }
-    cPushArray.push(canvas.toDataURL());
-
-}
-// sets the canvas to previous instance
-function cUndo() {
-    if (cStep > 0) {
-        cStep--;
-        var canvasPic = new Image();
-        canvasPic.src = cPushArray[cStep];
-        canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
+    var rects = JSON.parse(document.getElementById('rects').textContent)
+    var path = JSON.parse(document.getElementById('path').textContent)
+    var role = JSON.parse(document.getElementById('role').textContent)
+    // read the player's role from the Django template 
+    var playerRole = "{{ player.role }}";
+    // read the player's role from the Django template 
+    var coll = document.getElementsByClassName("collapsible");
+    // global variables bad
+    var i;
+    var rects;
+    var player;
+    var moveStack = [];
+    var undoTrue = false;
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var oldx;
+    var oldy;
+    var cPushArray = new Array();
+    var cStep = -1;
+    // pushes the canvas instance to stack
+    function cPush() {
+      cStep++;
+      if (cStep < cPushArray.length) { cPushArray.length = cStep; }
+      cPushArray.push(canvas.toDataURL());
+    
     }
-}
-// classes for each shape to draw to canvas
-  class Shape {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class Circle extends Shape {
-    constructor(x, y, radius) {
-        super(x, y);
-        this.radius = radius;
-    }
-
-    draw(color) {
-      ctx.beginPath();  // start a new path on the canvas
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);  // draw a circular path with the given center coordinates and radius
-      ctx.fillStyle = color; // set fill color
-      ctx.fill();  // fill the circle with the given color
-    }
-}
-
-class Rectangle extends Shape {
-    constructor(x, y, width, height) {
-        super(x, y);
-        this.width = width;
-        this.height = height;
-    }
-
-    draw(color) {
-      ctx.fillStyle = color; // set fill color
-      ctx.fillRect(this.x, this.y, this.width, this.height); // fill shape with color
-    }
-}
-
-class Square extends Shape {
-    constructor(x, y, side) {
-        super(x, y);
-        this.side = side;
-    }
-    draw(color) {
-      ctx.fillStyle = color; // set fill color
-      ctx.fillRect(this.x, this.y, this.side, this.side); // fill shape with color
-    }
-}
-
-  for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function() {
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      if (content.style.display === "block") {
-        content.style.display = "none";
-      } else {
-        content.style.display = "block";
+    // sets the canvas to previous instance
+    function cUndo() {
+      if (cStep > 0) {
+          cStep--;
+          var canvasPic = new Image();
+          canvasPic.src = cPushArray[cStep];
+          canvasPic.onload = function () { ctx.drawImage(canvasPic, 0, 0); }
       }
-    });
-  }
-
-  //read the current room name from context in views.py
-  const roomName = JSON.parse(document.getElementById('room-name').textContent);
-
-  //create new websocket for chat
-  let protocol = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
-  const chatSocket = new ReconnectingWebSocket(
-    // needs to be a wss connection to work over https
-    protocol
-    + window.location.host
-    + '/ws/all_rooms/game_view/'
-    + roomName
-    + '/'
-  );
-
-
-  /* after every message, log it in a JSON chat log 
-  ---         can be changed later     ---*/
-  chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    // do some more stuff when game finished
-    // both see a finished map, either as popup or redirect to new page
-    // this will have to change depending on if the game is given up or completed
-    if (data.finished === true){
-      let canvasURL = canvas.toDataURL()
+    }
+    // classes for each shape to draw to canvas
+    class Shape {
+      constructor(x, y) {
+          this.x = x;
+          this.y = y;
+      }
+    }
+    
+    class Circle extends Shape {
+      constructor(x, y, radius) {
+          super(x, y);
+          this.radius = radius;
+      }
+    
+      draw(color) {
+        ctx.beginPath();  // start a new path on the canvas
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);  // draw a circular path with the given center coordinates and radius
+        ctx.fillStyle = color; // set fill color
+        ctx.fill();  // fill the circle with the given color
+      }
+    }
+    
+    class Rectangle extends Shape {
+      constructor(x, y, width, height) {
+          super(x, y);
+          this.width = width;
+          this.height = height;
+      }
+    
+      draw(color) {
+        ctx.fillStyle = color; // set fill color
+        ctx.fillRect(this.x, this.y, this.width, this.height); // fill shape with color
+      }
+    }
+    
+    class Square extends Shape {
+      constructor(x, y, side) {
+          super(x, y);
+          this.side = side;
+      }
+      draw(color) {
+        ctx.fillStyle = color; // set fill color
+        ctx.fillRect(this.x, this.y, this.side, this.side); // fill shape with color
+      }
+    }
+    
+    for (i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.display === "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+      });
+    }
+    
+    //read the current room name from context in views.py
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    
+    //create new websocket for chat
+    let protocol = (window.location.protocol === 'https:' ? 'wss' : 'ws') + '://';
+    const chatSocket = new ReconnectingWebSocket(
+      // needs to be a wss connection to work over https
+      protocol
+      + window.location.host
+      + '/ws/all_rooms/game_view/'
+      + roomName
+      + '/'
+    );
+    
+    
+    /* after every message, log it in a JSON chat log 
+    ---         can be changed later     ---*/
+    chatSocket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      // do some more stuff when game finished
+      // both see a finished map, either as popup or redirect to new page
+      // this will have to change depending on if the game is given up or completed
+      if (data.finished === true){
+        let canvasURL = canvas.toDataURL()
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'compare_maps' %}",
+          data: {"roomName":roomName,"canvasURL":canvasURL,"role":playerRole},
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          success: function (response) {
+            game_type = response["gameType"]
+            room_name = response["room_name"]
+            var url = "{% url 'see_maps' game=0 room_name=1 %}".replace(0, game_type);
+            url = url.replace(1,room_name);
+            window.location = url;
+          },
+      })
+      return
+      }
+      // Get the current time
+      const time = new Date();
+      const hours = time.getHours().toString().padStart(2, '0');
+      const minutes = time.getMinutes().toString().padStart(2, '0');
+      const formattedTime = hours + ':' + minutes;
+    
+      // Check if message was sent by current player or other player
+      if (data.type == "announcement"){
+        document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.message + "<br></span>";
+      }
+      else if (data.role === playerRole) {
+        document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
+      } 
+      else if ( data.type == "move" ) {
+        if (playerRole === "follower"){
+          update( data.message )
+        }
+      }
+      else {
+        document.getElementById('chat-log').innerHTML += "<span class='message chat-received'>" + data.role + ": " + data.message + "<br></span>";
+      }
+      // Scroll chat log to bottom
+      const chatLog = document.getElementById('chat-log');
+      chatLog.scrollTop = chatLog.scrollHeight;
+    };
+    
+    /* do something when the chat socket is closed */
+    //chatSocket.onclose = function(e) {
+    //  console.log('Socket closed unexpectedly');
+    //};
+    chatSocket.onerror = function(e){
+      // decrement from amount in room
+      $.ajax({
+          type: 'POST',
+          url: "{% url 'decrement_users' %}",
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          data: {"roomName":roomName}
+      })  
+    }
+    
+    // Spawns the player at the start of the game
+    function SpawnPlayer ( x, y ) {
+      let width = 32;
+      shape = new Square(x, y, width);
+      shape.draw("red")
+      oldx = x
+      oldy = y
+      cPush()
+      let data = {}
+      $.ajax({
+          type: 'POST',
+          url: "{% url 'initial_player' %}",
+          data: {"x":Math.floor(x),"y":Math.floor(y),"room_name":roomName},
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          success: function (response) {
+              data["x"] = x
+              data["y"] = y
+              update(data)
+              // global variables bad
+              oldx = x
+              oldy = y
+              return;
+            // show them the map drawn compared to the initial map
+          }
+      })
+    }
+    // updates the player position
+    function update( data ) {
+      if (undoTrue != true){
+        // work in progress
+        
+        ctx.clearRect(oldx,oldy,32,32);
+        ctx.beginPath();
+        ctx.moveTo(oldx+16, oldy+16);
+        ctx.lineTo(data["x"]+16, data["y"]+16);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "orange";
+        ctx.stroke();
+        ctx.closePath();
+    
+        //path = new Square(oldx, oldy, 32)
+        //path.draw("orange")
+        cPush()
+        shape = new Square(data["x"], data["y"], 32);
+        shape.draw("red")
+      }
+      else{
+        // I have no idea why clearing it works but I won't complain
+        ctx.clearRect(oldx,oldy,canvas.width, canvas.height)
+        cUndo()
+        player = new Square(data["x"],data["y"], 32)
+        player.draw("red")
+    
+      }
+      oldx = data["x"]
+      oldy = data["y"]
+      undoTrue = false
+    }
+    // function which sends input to server side
+    function sendInput( x, y ) {
       $.ajax({
         type: 'POST',
-        url: "{% url 'compare_maps' %}",
-        data: {"roomName":roomName,"canvasURL":canvasURL,"role":playerRole},
+        url: "{% url 'save_move' %}",
+        data: {"roomName":roomName,"type":"mv","x":x,"y":y},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
         success: function (response) {
-          game_type = response["gameType"]
-          room_name = response["room_name"]
-          var url = "{% url 'see_maps' game=0 room_name=1 %}".replace(0, game_type);
-          url = url.replace(1,room_name);
-          window.location = url;
-        },
-    })
-    return
-    }
-    // Get the current time
-    const time = new Date();
-    const hours = time.getHours().toString().padStart(2, '0');
-    const minutes = time.getMinutes().toString().padStart(2, '0');
-    const formattedTime = hours + ':' + minutes;
-
-    // Check if message was sent by current player or other player
-    if (data.type == "announcement"){
-      document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.message + "<br></span>";
-    }
-    else if (data.role === playerRole) {
-      document.getElementById('chat-log').innerHTML += "<span class='message chat-sent'>" + data.role + ": " + data.message + "<br></span>";
-    } 
-    else if ( data.type == "move" ) {
-      if (playerRole === "follower"){
-        update( data.message )
-      }
-    }
-    else {
-      document.getElementById('chat-log').innerHTML += "<span class='message chat-received'>" + data.role + ": " + data.message + "<br></span>";
-    }
-    // Scroll chat log to bottom
-    const chatLog = document.getElementById('chat-log');
-    chatLog.scrollTop = chatLog.scrollHeight;
-  };
- 
-  /* do something when the chat socket is closed */
-  //chatSocket.onclose = function(e) {
-  //  console.log('Socket closed unexpectedly');
-  //};
-  chatSocket.onerror = function(e){
-    // decrement from amount in room
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'decrement_users' %}",
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        data: {"roomName":roomName}
-    })  
-  }
-
-  // Spawns the player at the start of the game
-  function SpawnPlayer ( x, y ) {
-    let width = 32;
-    shape = new Square(x, y, width);
-    shape.draw("red")
-    oldx = x
-    oldy = y
-    cPush()
-    let data = {}
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'initial_player' %}",
-        data: {"x":Math.floor(x),"y":Math.floor(y),"room_name":roomName},
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        success: function (response) {
-            data["x"] = x
-            data["y"] = y
-            update(data)
-            // global variables bad
-            oldx = x
-            oldy = y
-            return;
-          // show them the map drawn compared to the initial map
-        }
-    })
-  }
-// updates the player position
-  function update( data ) {
-    if (undoTrue != true){
-      // work in progress
-      
-      ctx.clearRect(oldx,oldy,32,32);
-      ctx.beginPath();
-      ctx.moveTo(oldx+16, oldy+16);
-      ctx.lineTo(data["x"]+16, data["y"]+16);
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = "orange";
-      ctx.stroke();
-      ctx.closePath();
-
-      //path = new Square(oldx, oldy, 32)
-      //path.draw("orange")
-      cPush()
-      shape = new Square(data["x"], data["y"], 32);
-      shape.draw("red")
-    }
-    else{
-      // I have no idea why clearing it works but I won't complain
-      ctx.clearRect(oldx,oldy,canvas.width, canvas.height)
-      cUndo()
-      player = new Square(data["x"],data["y"], 32)
-      player.draw("red")
-
-    }
-    oldx = data["x"]
-    oldy = data["y"]
-    undoTrue = false
-  }
-  // function which sends input to server side
-  function sendInput( x, y ) {
-    $.ajax({
-      type: 'POST',
-      url: "{% url 'save_move' %}",
-      data: {"roomName":roomName,"type":"mv","x":x,"y":y},
-      headers: { "X-CSRFToken": getCookie("csrftoken") },
-      success: function (response) {
-        moveStack.push({"x":x, "y":y})
-        chatSocket.send(JSON.stringify({
-          'message': { "x": x, "y": y },
-          'role': "move",
-          'finished' : false,
-        }));
-      },
-      error: function (response) {
-        // alert the error if any error occured
-        console.log(response["responseJSON"]["error"]);
-      }
-    })
-  }
-// function which undoes the last move
-  function undo() {
-    $.ajax({
-      type: 'POST',
-      url: "{% url 'save_move' %}",
-      data: {"roomName":roomName,"type":"un","x":null,"y":null},
-      headers: { "X-CSRFToken": getCookie("csrftoken") },
-      success: function (response) {
-        undoTrue = true
-        lastMove = moveStack.pop()
-        chatSocket.send(JSON.stringify({
-          'message': {"x": -lastMove["x"], "y": -lastMove["y"] },
-          'role': "move",
-          'finished' : false,
-        }));
-      },
-      error: function (response) {
-        // alert the error if any error occured
-        console.log(response["responseJSON"]["error"]);
-      }
-    })
-  }
-  // initialises the game objects
-  function InitializeObstacles( rects ) {
-    
-    for (let i = 0; i < rects.length; i++) {
-      var shapeType = rects[i].shape;
-      let width, height, radius;
-      xS = rects[i].left;
-      yS = rects[i].top
-      width = rects[i].width
-      height = rects[i].height
-      let shape;
-      //Each of the three intervals [(0, 1/3), (1/3, 2/3), (2/3, 1)] has the same length (1/3), 
-      //so the probabilities of selecting a rectangle, square, and circle are equal to 1/3.
-      switch(shapeType){
-        case "rectangle": // rectangle
-          shape = new Rectangle(xS, yS, width, height);
-          break;
-        case "square": // square
-          shape = new Square(xS, yS, width);
-          break;
-        case "circle":// circle
-          radius = width/2 // 2 to 50 since its radius the diameter will be double = 100
-          shape = new Circle(xS + radius, yS+radius, radius);
-          break;
-      }
-      shape.draw(rects[i].colour); // draw the shape
-    }
-
-    document.addEventListener( 'keydown', function( event ) {
-      if( event.keyCode == 37 ) sendInput( -1, 0 )
-      else if( event.keyCode == 39 ) sendInput( 1, 0 )
-      else if( event.keyCode == 38 ) sendInput( 0, -1 )
-      else if( event.keyCode == 40 ) sendInput( 0, 1 )
-
-      if( [ "Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight" ].indexOf( event.code ) > -1) {
-        event.preventDefault();
-      }
-    } );
-
-  }
-  
-// creates the final path for the giver
-  function InitializeFinalPath(path){
-    ctx.beginPath();
-    for( let i = 0; i < path.length - 1; i++ ) {
-      ctx.moveTo(path[i].left+16, path[i].top+16);
-      ctx.lineTo(path[i+1].left+16, path[i+1].top+16);
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = "orange";
-      ctx.stroke();
-      /*const side = path[i].width
-      const xS = path[i].left
-      const yS = path[i].top
-      shape = new Square(xS, yS, side);
-      shape.draw("orange");*/
-
-    }
-    ctx.closePath();
-  }
-// draws the start and end positions of the path
-  function initializeStartandEnd(path){
-    var side = path[path.length-1].width
-    var xS = path[path.length-1].left
-    var yS = path[path.length-1].top
-    shape = new Square(xS, yS, side);
-    shape.draw("black");
-
-    side = path[0].width
-    xS = path[0].left
-    yS = path[0].top
-    shape = new Square(xS, yS, side);
-    shape.draw("black");
-    }
-  /* allows for submitting messages via pressing enter*/
-  document.querySelector('#chat-message-input').focus();
-  document.querySelector('#chat-message-input').onkeyup = function(e) {
-    if (e.keyCode === 13) {  // enter, return
-        document.querySelector('#chat-message-submit').click();
-    }
-  };
-
-  /* submitting messages sends messages via web socket*/
-  document.querySelector('#chat-message-submit').onclick = function(e) {
-    const messageInputDom = document.querySelector('#chat-message-input');
-    const playerRole = "{{player.role}}";
-    const message = messageInputDom.value;
-    // some ajax to save the message to database asynchronously
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'save_message' %}",
-        data: {"message":message, "role": playerRole, "room_name":roomName},
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        success: function (response) {
+          moveStack.push({"x":x, "y":y})
           chatSocket.send(JSON.stringify({
-          'message': message,
-          'role': playerRole,
-          'finished' : false
-        }));
-        },
-        error: function (response) {
-          // alert the error if any error occured
-          alert(response["responseJSON"]["error"]);
-        }
-    })
-    messageInputDom.value = '';
-  };
-
-  // gets cookie from name, needed for ajax POST requests
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-$("#complete").submit(function (e) {
-  e.preventDefault()
-    // serialize the data for sending the form data.
-    // make POST ajax call
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'complete_game' %}",
-        data: {"roomName":roomName},
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        success: function (response) {
-          // let other players in websocket group that game is finished
-          chatSocket.send(JSON.stringify({
-          'message': "",
-          'role': "",
-          'finished' : true
-        }));
+            'message': { "x": x, "y": y },
+            'role': "move",
+            'finished' : false,
+          }));
         },
         error: function (response) {
           // alert the error if any error occured
           console.log(response["responseJSON"]["error"]);
         }
-    })  
-})
-
-InitializeObstacles(JSON.parse(rects))
-if (role == "follower"){
-  initializeStartandEnd(JSON.parse(path))
-  SpawnPlayer(0,0)
-}
-else{
-  InitializeFinalPath(JSON.parse(path))
-  // save the giver's canvas to the database on game creation
-  let canvasURL = canvas.toDataURL()
+      })
+    }
+    // function which undoes the last move
+    function undo() {
       $.ajax({
         type: 'POST',
-        url: "{% url 'compare_maps' %}",
-        data: {"roomName":roomName,"canvasURL":canvasURL,"role":playerRole},
+        url: "{% url 'save_move' %}",
+        data: {"roomName":roomName,"type":"un","x":null,"y":null},
         headers: { "X-CSRFToken": getCookie("csrftoken") },
+        success: function (response) {
+          undoTrue = true
+          lastMove = moveStack.pop()
+          chatSocket.send(JSON.stringify({
+            'message': {"x": -lastMove["x"], "y": -lastMove["y"] },
+            'role': "move",
+            'finished' : false,
+          }));
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          console.log(response["responseJSON"]["error"]);
+        }
+      })
+    }
+    // initialises the game objects
+    function InitializeObstacles( rects ) {
+      
+      for (let i = 0; i < rects.length; i++) {
+        var shapeType = rects[i].shape;
+        let width, height, radius;
+        xS = rects[i].left;
+        yS = rects[i].top
+        width = rects[i].width
+        height = rects[i].height
+        let shape;
+        //Each of the three intervals [(0, 1/3), (1/3, 2/3), (2/3, 1)] has the same length (1/3), 
+        //so the probabilities of selecting a rectangle, square, and circle are equal to 1/3.
+        switch(shapeType){
+          case "rectangle": // rectangle
+            shape = new Rectangle(xS, yS, width, height);
+            break;
+          case "square": // square
+            shape = new Square(xS, yS, width);
+            break;
+          case "circle":// circle
+            radius = width/2 // 2 to 50 since its radius the diameter will be double = 100
+            shape = new Circle(xS + radius, yS+radius, radius);
+            break;
+        }
+        shape.draw(rects[i].colour); // draw the shape
+      }
+    
+      document.addEventListener( 'keydown', function( event ) {
+        if( event.keyCode == 37 ) sendInput( -1, 0 )
+        else if( event.keyCode == 39 ) sendInput( 1, 0 )
+        else if( event.keyCode == 38 ) sendInput( 0, -1 )
+        else if( event.keyCode == 40 ) sendInput( 0, 1 )
+    
+        if( [ "Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight" ].indexOf( event.code ) > -1) {
+          event.preventDefault();
+        }
+      } );
+    
+    }
+    
+    // creates the final path for the giver
+    function InitializeFinalPath(path){
+      ctx.beginPath();
+      for( let i = 0; i < path.length - 1; i++ ) {
+        ctx.moveTo(path[i].left+16, path[i].top+16);
+        ctx.lineTo(path[i+1].left+16, path[i+1].top+16);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "orange";
+        ctx.stroke();
+        /*const side = path[i].width
+        const xS = path[i].left
+        const yS = path[i].top
+        shape = new Square(xS, yS, side);
+        shape.draw("orange");*/
+    
+      }
+      ctx.closePath();
+    }
+    // draws the start and end positions of the path
+    function initializeStartandEnd(path){
+      var side = path[path.length-1].width
+      var xS = path[path.length-1].left
+      var yS = path[path.length-1].top
+      shape = new Square(xS, yS, side);
+      shape.draw("black");
+    
+      side = path[0].width
+      xS = path[0].left
+      yS = path[0].top
+      shape = new Square(xS, yS, side);
+      shape.draw("black");
+      }
+    /* allows for submitting messages via pressing enter*/
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+      if (e.keyCode === 13) {  // enter, return
+          document.querySelector('#chat-message-submit').click();
+      }
+    };
+    
+    /* submitting messages sends messages via web socket*/
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+      const messageInputDom = document.querySelector('#chat-message-input');
+      const playerRole = "{{player.role}}";
+      const message = messageInputDom.value;
+      // some ajax to save the message to database asynchronously
+      $.ajax({
+          type: 'POST',
+          url: "{% url 'save_message' %}",
+          data: {"message":message, "role": playerRole, "room_name":roomName},
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          success: function (response) {
+            chatSocket.send(JSON.stringify({
+            'message': message,
+            'role': playerRole,
+            'finished' : false
+          }));
+          },
+          error: function (response) {
+            // alert the error if any error occured
+            alert(response["responseJSON"]["error"]);
+          }
+      })
+      messageInputDom.value = '';
+    };
+    
+    // gets cookie from name, needed for ajax POST requests
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+    }
+    
+    $("#complete").submit(function (e) {
+    e.preventDefault()
+      // serialize the data for sending the form data.
+      // make POST ajax call
+      $.ajax({
+          type: 'POST',
+          url: "{% url 'complete_game' %}",
+          data: {"roomName":roomName},
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+          success: function (response) {
+            // let other players in websocket group that game is finished
+            chatSocket.send(JSON.stringify({
+            'message': "",
+            'role': "",
+            'finished' : true
+          }));
+          },
+          error: function (response) {
+            // alert the error if any error occured
+            console.log(response["responseJSON"]["error"]);
+          }
+      })  
     })
-  initializeStartandEnd(JSON.parse(path))
-}
-
-  </script>
+    
+    InitializeObstacles(JSON.parse(rects))
+    if (role == "follower"){
+    initializeStartandEnd(JSON.parse(path))
+    SpawnPlayer(0,0)
+    }
+    else{
+    InitializeFinalPath(JSON.parse(path))
+    // save the giver's canvas to the database on game creation
+    let canvasURL = canvas.toDataURL()
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'compare_maps' %}",
+          data: {"roomName":roomName,"canvasURL":canvasURL,"role":playerRole},
+          headers: { "X-CSRFToken": getCookie("csrftoken") },
+      })
+    initializeStartandEnd(JSON.parse(path))
+    }
+    
+</script>
 {% endblock javascript %}
