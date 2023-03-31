@@ -13,7 +13,6 @@
 <div>
   
 <button type="button" class="collapsible">View information</button>
-<button type="submit" class="btn btn-primary undo d-inline-block mr-2" style="padding-left: 10px; padding-right: 10px;" onclick="undo()">Undo move</button>
 <div class="content">
   <p>
     This game consits of 2 players, both randomly assigned to either a Giver/Follower.
@@ -36,6 +35,7 @@
 {% if not public %}
 <div> Your private key is: {{room_name}}. Share this with someone else to play together.</div>
 {% endif %}
+<button type="submit" class="btn btn-primary undo d-inline-block mr-2" style="padding-left: 10px; padding-right: 10px;" onclick="undo()">Undo move</button>
 {# Game map and chat #}
 <div class="row">
   <canvas id="canvas" class="col-sm-8 game" style = "border:0; padding:0; margin:0;  border: solid;" width = "{{containerSize}}" height = "550">
@@ -61,14 +61,6 @@
 </div>
 
 
-{# Buttons #}
-<div class="col-sm-8">
-  <form id = "complete">
-    {% csrf_token %}
-    <input type="submit" class="btn btn-primary" value="Complete" />
-  </form>
-
-</div>
 {{ gameCurr.rects|json_script:"rects" }}
 {{ gameCurr.path|json_script:"path" }}
 {{ player.role|json_script:"role"}}
