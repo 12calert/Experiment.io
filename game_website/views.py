@@ -43,11 +43,12 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
+""" view to render the terms and conditions page """
 def terms_and_conditions(request):
     context = {}
     return render(request, 'terms_and_conditions.html', context=context)
 
-# login page error message wrong credentials
+""" login page error message wrong credentials handling """
 class CustomLoginView(LoginView):
     def form_invalid(self, form):
         messages.set_level(self.request, messages.ERROR)
@@ -273,6 +274,7 @@ def create_room(request, game):
         # do stuff, let user know there was error
         return redirect("home")
 
+""" If there is an already created public room, join that one, otherwise create a new one (button functionality of all_rooms.html") """ 
 def join_or_create_room(request, game):
     # Get a list of available public rooms
     available_rooms = Game.objects.filter(public=True)
@@ -298,7 +300,7 @@ def join_or_create_room(request, game):
     # if no suitable rooms were found, create a new room
     return create_room2(request, game)
 
-
+""" Create a public room """ 
 def create_room2(request, game,):
     #first filter all the conditions we can use for our game
     conditions = Condition.objects.filter(game_type = game)
@@ -434,8 +436,7 @@ def create_room2(request, game,):
 
         return redirect('game_view',  game = game, room_name = new_room.room_name)
 
- 
-
+""" Function to join a private room, if it exists, otherwise create a new one.""" 
 def join_private_room(request, game):
     if request.method == 'POST':
         unique_room_key = request.POST.get("unique_room_box")
@@ -468,8 +469,6 @@ def join_private_room(request, game):
     else:
         return redirect('all_rooms', game)
  
-
-
 """ renders the data page"""
 def data(request):
     context = {}
@@ -574,6 +573,7 @@ def researcher_registration(request):
         return redirect(reverse('home'))
     return render(request, 'researcher_registration.html', context)
 
+""" HTML page that renders the two different maps after a game completes """ 
 def compareMaps(request):
     # query the database to find the correct game instance
     if request.method == "POST" and is_ajax(request):
@@ -689,11 +689,13 @@ def saveMessage(request):
         return JsonResponse({},status = 200)
     return HttpResponse("")
 
-# TESTED
+""" Accept terms and conditions """ 
 def acceptTOS(request):
     request.session['TOSaccept'] = True
     return JsonResponse({},status = 200)
+
 # TESTED
+""" This function handles AJAX POST requests to decrement the number of users in a game.""" 
 def decrementUsers(request):
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
@@ -702,6 +704,7 @@ def decrementUsers(request):
         game.save()
         return JsonResponse({},status = 200)
 # TESTED
+""" This function handles AJAX POST requests to set the initial position of a player in a game.""" 
 def initialPlayer(request):
     if request.method == "POST" and is_ajax(request):
         x = int(request.POST["x"])
@@ -713,6 +716,8 @@ def initialPlayer(request):
         game.save()
         return JsonResponse({},status = 200)
     return HttpResponse("")
+
+""" This function handles AJAX POST requests to store the screen size in the user's session. """ 
 # TESTED
 def setScreensize(request):
     if request.method == "POST" and is_ajax(request):
@@ -722,7 +727,9 @@ def setScreensize(request):
         request.session['height'] = height
         return JsonResponse({},status = 200)
     return HttpResponse("")
+
 # TESTED
+""" This function handles AJAX POST requests to save a move in a game. """
 def saveMove(request):
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
@@ -745,7 +752,8 @@ def saveMove(request):
             return JsonResponse({},status = 200)
         else:
             return HttpResponse("")
-
+        
+""" This function handles AJAX POST requests to download JSON data for a single experiment. """
 def downloadJson(request):
     if request.method == "POST" and is_ajax(request):
         experiment_name = request.POST["experiment_name"]
@@ -753,14 +761,13 @@ def downloadJson(request):
         experiment = Experiment.objects.get(name = experiment_name, created_by = current_researcher)
         serializer = customSerializers.ExperimentSerializer(instance = experiment)
         return JsonResponse(serializer.data, status=200)
-
+    
+""" This function handles AJAX POST requests to download JSON data for all experiments by a researcher. """
 def downloadAll(request):
     if request.method == "POST" and is_ajax(request):
         current_researcher = request.POST["current_researcher"]
         experiments = Experiment.objects.filter(created_by = current_researcher)
         serializer = customSerializers.ExperimentSerializer(instance = experiments, many=True)
         return JsonResponse(serializer.data, status=200, safe=False)
-
-
 
 # --- end of ajax views ---
