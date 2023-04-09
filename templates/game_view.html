@@ -58,9 +58,11 @@
     your role is:
     {{player.role}}
     {% if player.role == "follower"%}
-    you will receive instructions, etc.
+    You are the follower. Use the arrow keys to create a path to the black end square based of the instructions you receive from the other player. 
+    You may use the undo button to go back a move. When you think you have finished press the complete button under the map.
     {% else %}
-    you will give instructions to the follower, etc.
+    You are the giver. You will give instructions to the other player using the chat. Try to get the other player to follow the orange path, 
+    starting from the top left and ending at the black square.
     {% endif %}
 </div>
 {# for now just use the room name as the key, can be changed later #}
@@ -68,11 +70,13 @@
 <div> Your private key is: {{room_name}}. Share this with someone else to play together.</div>
 {% endif %}
 <div class="container-fluid">
+{% if player.role == "follower" %}
 <div class="row">
     <div class="col-sm-8">
         <button type="submit" class="btn btn-primary undo" onclick="undo()">Undo Move</button>
     </div>
 </div>
+{% endif %}
 <div class="row">
 <canvas id="canvas" class="col-sm-8 game" style="border:0; padding:0; margin:0;  border: solid;" width="{{containerSize}}" height="550">
 </canvas>
