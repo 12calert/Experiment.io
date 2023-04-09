@@ -6,19 +6,34 @@
 {% comment %}
 page so researchers can view data on games
 {% endcomment %}
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
     /* styling for all buttons and when you expand it. I'll move it into home.css later */
+    table {
+        margin:5px auto;
+    }
+    table td, table th {
+        border: 1px;
+        padding: 8px;
+    }
+    .download-button{
+        background-color: #34a8eb;
+        border: none;
+        color: black;
+        padding: 12px 30px;
+        cursor: pointer;
+        font-size: 16px;
+        margin:5px auto;
+    }
     .button {
         color: white;
         background-color: #e0ac1c;
         font-size: 16px;
         cursor: pointer;
-        margin: 5px;
+        margin: 5px auto;
         padding: 10px;
         border-radius: 10px;
         width: 80%;
-        text-align: left;
         overflow: hidden;
         white-space: nowrap;
         border: none;
@@ -37,7 +52,6 @@ page so researchers can view data on games
         border: 2px solid #e0ac1c;
         padding: 20px;
         width: 80%;
-        
     }
 
     .button-expanded p {
@@ -49,6 +63,7 @@ page so researchers can view data on games
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        margin:auto;
         
     }
 
@@ -59,7 +74,7 @@ page so researchers can view data on games
         margin-top: 5px;
         padding: 10px;
         width: 80%;
-        margin: 5px;
+        margin: auto;
     }
 
     .experiment-description {
@@ -70,7 +85,7 @@ page so researchers can view data on games
 </style>
 
 <div><p>click an experiment to see further information</p></div>
-<button onclick="downloadAll()">Download all experiments as a JSON file</button>
+<button class="download-button" onclick="downloadAll()"><i class="fa fa-download"></i>Download all experiments as a JSON file</button>
 {% if experiments %}
 <div id="viewConditions">
     {% for experiment in experiments %}
@@ -80,7 +95,7 @@ page so researchers can view data on games
                 {{ experiment }}
             </button>
     </div>
-    <button onclick="downloadJson('{{experiment}}')">Download as Json</button>
+    <button class="download-button" onclick="downloadJson('{{experiment}}')"><i class="fa fa-download"></i>Download {{experiment}} data as Json</button>
     {% endfor %}
 </div>
 {% endif %}
@@ -170,19 +185,40 @@ function viewConditions(experiment_name){
                 experimentId = "experiment_"+experiment_name
                 var id = "conditions_"+experiment_name;
                 $("#"+experimentId).append(
-                    `<div class="experiment-info" id = "${id}"> <p>some info for experiment here, ${fieldsExp["active"]}, also some 
-                        summarised data but that is heavy effort</p></div>`
+                    `<div class="experiment-info" id = "${id}"> 
+                        <table>
+                            <tr>
+                                <th>Active</th>
+                            </tr>
+                            <tr>
+                                <td>${fieldsExp["active"]}</td>
+                            </tr>
+                        </table>    
+                        
+                    </div>`
                 )
 				for (let i = 0; i<instance.length; i++){
                     // fields for the conditions
 					fields = instance[i]["fields"]
+                    console.log(fields)
 					$("#"+id).append(
                     `
-                    <table>
-                    </table>
                     <button class = "button" id = "condition_${fields["name"]}" 
                     value="${fields["name"]}" onclick="viewGames('${fields["name"]}', '${experiment_name}')">${fields["name"]}</button>
-                    <div><p>The info for condition here ${fields["amount_item"]},${fields["active"]}</p></div>
+                    <div>
+                        <table>
+                            <tr>
+                                <th>Active</th>
+                                <th>Amount of Obstacles</th>
+                                <th>Game Type</th>
+                            </tr>
+                            <tr>
+                                <td>${fields["active"]}</td>
+                                <td>${fields["amount_item"]}</td>
+                                <td>${fields["game_type"]}</td>
+                            </tr>
+                        </table>    
+                    </div>
 					<div class = "experiment-info" style="display:none"
                     id = "games_${fields["name"]}_${experiment_name}"></div>`
                 )
@@ -232,7 +268,18 @@ function viewGames(condition_name, experiment_name){
 					// ADD ONCLICK EVENT FOR CHATS/PLAYERS
                     `<button class = "button" id = "game_${fields["room_name"]}" value="${fields["room_name"]}" 
                     onclick="viewChats('${fields["room_name"]}')">${fields["room_name"]}</button>
-                    <p> the info for the game here </p>
+                    <div>
+                        <table>
+                            <tr>
+                                <th>Completed</th>
+                                <th>Public</th>
+                            </tr>
+                            <tr>
+                                <td>${fields["completed"]}</td>
+                                <td>${fields["public"]}</td>
+                            </tr>
+                        </table> 
+                    </div>
 					<div class = "experiment-info" style="display:none"
                     id = "chats_${fields["room_name"]}"></div>`
                 )
@@ -281,6 +328,9 @@ function viewChats(room_name){
 				}
                 experimentButton.classList.add("button-expanded");
 			}
+            else{
+                alert(`There are no chats for ${room_name}`)
+            }
         },
         error: function (response) {
           // alert the error if any error occured
@@ -288,6 +338,5 @@ function viewChats(room_name){
         }
     })
 };
-// frontend -> need to have a nice way to view all the data for each entry
 </script>
 {% endblock javascript %}
