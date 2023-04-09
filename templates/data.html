@@ -10,7 +10,7 @@ page so researchers can view data on games
 <style>
     /* styling for all buttons and when you expand it. I'll move it into home.css later */
     table {
-        margin:auto;
+        margin:5px auto;
     }
     table td, table th {
         border: 1px;
@@ -23,7 +23,7 @@ page so researchers can view data on games
         padding: 12px 30px;
         cursor: pointer;
         font-size: 16px;
-        margin:auto;
+        margin:5px auto;
     }
     .button {
         color: white;
@@ -328,6 +328,9 @@ function viewChats(room_name){
 				}
                 experimentButton.classList.add("button-expanded");
 			}
+            else{
+                alert(`There are no chats for ${room_name}`)
+            }
         },
         error: function (response) {
           // alert the error if any error occured
@@ -335,6 +338,5 @@ function viewChats(room_name){
         }
     })
 };
-// frontend -> need to have a nice way to view all the data for each entry
 </script>
 {% endblock javascript %}
