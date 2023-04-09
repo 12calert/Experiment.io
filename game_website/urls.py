@@ -38,7 +38,6 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
-
     path('admin/', admin.site.urls, name="admin"),
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('', views.homepage, name='home'),
@@ -47,7 +46,6 @@ urlpatterns = [
     # joining, creating, routing to room
     path('<game>/all_rooms/', views.all_rooms, name="all_rooms"),
     path('<game>/all_rooms/actionUrl', views.create_room),
-    
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),
     path('<game>/all_rooms/game_view/<room_name>/seeMaps', views.seeMaps, name='see_maps'),
     path('completedGame/', views.compareMaps, name='compare_maps'),

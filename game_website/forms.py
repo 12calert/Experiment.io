@@ -4,9 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm  
 from django.contrib.auth import get_user_model
 from accounts.models import Researcher
-# bad but we can make a model to store each game later
 # define choices for the game type dropdown
-GAME_CHOICES = [("MG", "Map Game")]
+GAME_CHOICES = [("MG", "Multi-Map Task")]
 
 class ResearcherRegisterForm(UserCreationForm):
     """ A form to register a new researcher. Inherits from Django's UserCreationForm. """
@@ -73,9 +72,8 @@ class ExperimentForm(forms.ModelForm):
             return experiment_name
         raise forms.ValidationError(("This experiment name already exists"))
 
-
-
 class GameConditions(forms.ModelForm):
+    """ This form is used to create and edit game conditions."""
     amount_of_items = forms.IntegerField(
         widget=forms.NumberInput(attrs={'class': 'form-control text-center', 'style': 'width: 150px; margin: auto;'})
     )
@@ -105,13 +103,14 @@ class GameConditions(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
-        # store value of request so we can access the currently logged in user in validation
+        """ Store value of request so we can access the currently logged in user in validation. """
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
         if self.request.user:
             self.fields['experiment'].queryset = Experiment.objects.filter(created_by = Researcher.objects.get(userkey = self.request.user))
 
     def clean_condition_name(self):
+        """ This function validates the condition name. """
         condition_name = self.cleaned_data['condition_name']
         try:
             current_researcher = Researcher.objects.get(userkey=self.request.user)
@@ -121,6 +120,7 @@ class GameConditions(forms.ModelForm):
         raise forms.ValidationError(("This condition name already exists"))
     
     def clean_amount_of_items(self):
+        """ This function validates the amount of items. """
         amount_of_items = self.cleaned_data['amount_of_items']
         if amount_of_items < 0:
             raise forms.ValidationError(("You cannot set negative items"))
@@ -132,6 +132,7 @@ class GameConditions(forms.ModelForm):
 
 
 class ChooseGame(forms.Form):
+    """ This form is used to choose a game type. """
     game_choice = forms.ChoiceField(
         choices=GAME_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select mb-3'})
