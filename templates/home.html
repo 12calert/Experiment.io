@@ -14,57 +14,27 @@
     <div class="w3-content" style="max-width:1400px">
         <!-- Header -->
         <header class="w3-container w3-center w3-padding-32">
-            <h1><b>Map-Task Experiment</b></h1>
-            <p><span class="w3-tag">Welcome</span></p>
+            <h1><b>Welcome to ExperimentNation</b></h1>
+            <h2> A place to open your experiment to the world </h2>
         </header>
         <!-- Grid -->
         <div class="w3-row w3-center">
-            <!-- Blog entry -->
-            <div class="w3-card-4 w3-margin w3-white w3-center">
-                <!-- Load the logo image from the static files -->
-                <img src="{% static 'images/logo.png' %}"   height="250px" alt="Nature" >
-                <div class="w3-container w3-center">
-                    <h3><b>About the Map-Task Experiment</b></h3>
-                    <h5>Brief Explanation, <span class="w3-opacity">May, 2023</span></h5>
-                </div>
-                <div class="w3-container">
-                    <!-- Add the first paragraph of the report -->
-                    <p>The game is based around connecting two users who are then each designated roles, the “Giver” and the “Follower”. Both members involved are able to see an identical map, however the Giver can see a path through it and it is their role to feed via text the given path that will take the Follower to the end. 
-                   The Giver cannot see the Follower's path that they have been taking and can only communicate with them.
-
-                    The Map is a randomly generated assortment of easily identifiable shapes with varying basic colours and sizes.
-                    </p>
-                </div>
-                <!-- Equal-sized columns -->
-                <div class="w3-row">
-                    <div class="w3-col l6 m6 s12 w3-border">
-                        <!-- Column 1: Follower Instructions -->
-                        <div class="w3-container">
-                            <h2>Follower Instructions</h2> 
-                            <ol><li> Type in the chat to ask for or clarify instructions about the route.</li>
-                          <li>Mark their route on their version of the map.</li>
-                          <li>Indicate when they are satisfied they have reached the target destination on the map or indicate that they wish to stop the session.</li></ol>
-                              </p>
-                        </div>
-                    </div>
-                    <div class="w3-col l6 m6 s12 w3-border">
-                        <!-- Column 2: Giver Instructions -->
-                        <div class="w3-container">
-                            <h2>Giver Instructions</h2>
-                            <p> <ol>
-                        <li>  Type instruction on how to follow the route in the chat to the follower.  </li></ol>
-                              </p>
-                        </div>
-                    </div>
-                </div>
+          <div class="w3-card-4 w3-margin w3-white w3-center" style="padding:10px;">
+            <div>
+              <h3> Choose the experiments which you want to take part in below.</h3>
+            </div>
                 <!-- Form for submitting game choice -->
                 <form method="POST">
                     {% csrf_token %}
                     {{ chooseGame.as_p }}
-                    <button class="btn btn-primary" type="submit" style="width: 150px; height: 60px;">Conduct the Experiment</button>
+                    <button class="btn btn-primary" type="submit" style="width: 150px; height: 60px;">Join Game</button>
                 </form>
-                <br>
             </div>
+            <div>
+              <h3>Want to create your own experiments?</h3>
+              <p><a href="{% url 'researcher_registration' %}">Register for an account</a></p>
+            </div>
+          </div>
         </div>
     </div>
     <!-- End of equal-sized columns -->

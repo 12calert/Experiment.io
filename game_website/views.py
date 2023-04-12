@@ -35,8 +35,23 @@ def homepage(request):
     if request.POST:  # if form submission
         if chooseGame.is_valid():   # if the form is valid (no inputs are invalid)
             #send to appropriate game rooms page
-            return redirect("all_rooms", game = chooseGame.cleaned_data.get("game_choice"))
+            game_type = chooseGame.cleaned_data.get("game_choice")
+            if game_type == "MG":
+                return redirect("map_task", game = game_type)
+            # this where the other game type redirects would go
+            else:
+                return render(request, 'map_task.html', context)
+            
     return render(request, 'home.html', context)
+
+def mapTask(request, game):
+    context={}
+    # create the ChooseGame form
+    chooseGame = ChooseGame(request.POST or None)
+    if request.POST:  # if form submission
+        #send to appropriate rooms page
+        return redirect("all_rooms", game = game)
+    return render(request, 'map_task.html', context)
 
 """ view to render the login page, currently unused"""
 def researcher_login(request):
