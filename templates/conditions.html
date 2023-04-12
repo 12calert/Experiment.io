@@ -93,6 +93,7 @@
                     <th>Special Restrictions</th>
                     <th>Game Type</th>
                     <th>Active</th>
+                    <th>Toggle active</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -105,6 +106,13 @@
                     <td>{{ condition.restriction }}</td>
                     <td>{{ condition.game_type }}</td>
                     <td>{{ condition.active }}</td>
+                    <td><button class = "btn btn-primary" id = "{{condition}}" onclick = "toggleActivity()"> 
+                      {% if condition.active %}
+                        Set as inactive
+                      {% else %}
+                        Set as active
+                      {% endif %}
+                    </button></td>
                   </tr>
                   {% endif %}
                   {% endfor %}
@@ -122,3 +130,11 @@
 </div
 
 {% endblock %}
+{% block javascript %}
+<script>
+  function toggleActivity(){
+    alert("sorry this button doesn't do anything yet :(")
+  }
+</script>
+
+{% endblock javascript %}

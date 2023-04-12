@@ -5,7 +5,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from accounts.models import Researcher
 # define choices for the game type dropdown
-GAME_CHOICES = [("MG", "Multi-Map Task")]
+GAME_CHOICES = [("MT", "Map Task"),
+                ("PD", "Prisoner's Dilemma"),
+                ("TG", "Trust Game")]
 
 class ResearcherRegisterForm(UserCreationForm):
     """ A form to register a new researcher. Inherits from Django's UserCreationForm. """

@@ -14,9 +14,7 @@ from django.urls import reverse
 # custom shapes module allows us to easily change values (also to apply custom conditions)
 from game_website.shapes import randomColour, randomShape
 import game_website.serialize as customSerializers
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
-from rest_framework.response import Response
+
 # helper methods
 """checks a request to see if it is an ajax request"""
 def is_ajax(request):
@@ -35,8 +33,23 @@ def homepage(request):
     if request.POST:  # if form submission
         if chooseGame.is_valid():   # if the form is valid (no inputs are invalid)
             #send to appropriate game rooms page
-            return redirect("all_rooms", game = chooseGame.cleaned_data.get("game_choice"))
+            game_type = chooseGame.cleaned_data.get("game_choice")
+            if game_type == "MT":
+                return redirect("map_task", game = game_type)
+            # this where the other game type redirects would go
+            else:
+                return render(request, 'home.html', context)
+            
     return render(request, 'home.html', context)
+
+def mapTask(request, game):
+    context={}
+    # create the ChooseGame form
+    chooseGame = ChooseGame(request.POST or None)
+    if request.POST:  # if form submission
+        #send to appropriate rooms page
+        return redirect("all_rooms", game = game)
+    return render(request, 'map_task.html', context)
 
 """ view to render the login page, currently unused"""
 def researcher_login(request):

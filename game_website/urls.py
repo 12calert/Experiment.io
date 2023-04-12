@@ -44,6 +44,7 @@ urlpatterns = [
     path('home', views.homepage, name='home'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('images/favicon.ico'))),
     # joining, creating, routing to room
+    path('<game>/map_task/', views.mapTask, name="map_task"),
     path('<game>/all_rooms/', views.all_rooms, name="all_rooms"),
     path('<game>/all_rooms/actionUrl', views.create_room),
     path('<game>/all_rooms/game_view/<room_name>/', views.game_view, name='game_view'),

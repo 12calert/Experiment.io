@@ -39,15 +39,15 @@ class Condition(models.Model):
     created_by = models.ForeignKey(Researcher, on_delete=models.DO_NOTHING, null=False)
     name = models.TextField(null = False)
     experiment = models.ForeignKey(Experiment, on_delete = models.DO_NOTHING, null = True)
-    MAPGAME = "MG"
+    MAPTASK = "MT"
     GAME_TYPE_CHOICES = [
-        (MAPGAME, 'Map Game'),
+        (MAPTASK, 'Map Task'),
 
     ]
     game_type = models.CharField(
         max_length=2,
         choices=GAME_TYPE_CHOICES,
-        default=MAPGAME,
+        default=MAPTASK,
     )
     class Meta:
         constraints = [
@@ -69,19 +69,19 @@ class Game(models.Model):
     public = models.BooleanField()
     follower_position = models.JSONField( default=dict(x = 0, y = 0 ) )
     # used to filter what rooms the user sees depending on the game they choose to play
-    MAPGAME = "MG"
+    MAPTASK = "MT"
     rects = models.JSONField(null = True)
     path = models.JSONField(null = True)
     finishedFollowerURL = models.TextField(null = True)
     finishedGiverURL = models.TextField(null = True)
     GAME_TYPE_CHOICES = [
-        (MAPGAME, 'Map Game'),
+        (MAPTASK, 'Map Task'),
 
     ]
     game_type = models.CharField(
         max_length=2,
         choices=GAME_TYPE_CHOICES,
-        default=MAPGAME,
+        default=MAPTASK,
     )
 
 class Move(models.Model):
