@@ -106,7 +106,7 @@
                     <td>{{ condition.restriction }}</td>
                     <td>{{ condition.game_type }}</td>
                     <td>{{ condition.active }}</td>
-                    <td><button class = "btn btn-primary" id = "{{condition}}" onclick = "toggleActivity()"> 
+                    <td><button class = "btn btn-primary" id = "{{condition}}" onclick = "toggleActivity('{{condition.condition_id}}')"> 
                       {% if condition.active %}
                         Set as inactive
                       {% else %}
@@ -132,8 +132,37 @@
 {% endblock %}
 {% block javascript %}
 <script>
-  function toggleActivity(){
-    alert("sorry this button doesn't do anything yet :(")
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Check if the cookie's name matches the one we're looking for
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          // Decode and return the cookie's value
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function toggleActivity(condition_id){
+    $.ajax({
+          type: 'POST', // Set the HTTP request method
+          url: "{% url 'toggleCondition' %}", // Specify the URL to send the request to
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken") // Include the CSRF token in the request headers
+          },
+          data: {
+            "condition_id": condition_id
+          },
+          success: function(response){
+            window.location.reload();
+          }
+        })
   }
 </script>
 

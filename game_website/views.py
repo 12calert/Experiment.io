@@ -783,4 +783,12 @@ def downloadAll(request):
         serializer = customSerializers.ExperimentSerializer(instance = experiments, many=True)
         return JsonResponse(serializer.data, status=200, safe=False)
 
+def toggleCondition(request):
+    if request.method == "POST" and is_ajax(request):
+        condition_id = request.POST["condition_id"]
+        condition = Condition.objects.get(condition_id = condition_id)
+        condition.active = not condition.active
+        condition.save()
+        return JsonResponse({}, status=200)
+
 # --- end of ajax views ---
