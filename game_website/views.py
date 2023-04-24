@@ -16,14 +16,41 @@ from game_website.shapes import randomColour, randomShape
 import game_website.serialize as customSerializers
 
 # helper methods
-"""checks a request to see if it is an ajax request"""
+"""Summary line.
+
+    Extended description of function.
+
+    Args:
+        arg1 (int): Description of arg1
+        arg2 (str): Description of arg2
+
+    Returns:
+        bool: Description of return value
+
+"""
+
 def is_ajax(request):
+    """checks a request to see if it is an ajax request
+    
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        request (HttpRequest): modified HttpRequest object with metadata modified to specify it is a XMLHttpRequest"""
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 ROLE_CHOICES = ["follower", "giver"]  # Array of roles, either follower or giver
 
-""" view which renders the home page"""
 def homepage(request):
+    """ view which renders the home page
+    
+    creates HTML file from homepage.html inserts django form
+    ChooseGame into into html data
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    """
     # create a session id for anonymous users and add to cookies
     request.session['user_id'] = secrets.token_hex(5)
     context={}
@@ -43,9 +70,17 @@ def homepage(request):
     return render(request, 'home.html', context)
 
 def mapTask(request, game):
+    """ view which renders the mapTask information page or redirects to room page
+    
+    creates HTML file from map_task.html inserts django form
+    chooseGame into into html data. If POST request then redirect to room page
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying which game it is
+    
+    """
     context={}
-    # create the ChooseGame form
-    chooseGame = ChooseGame(request.POST or None)
     if request.POST:  # if form submission
         #send to appropriate rooms page
         return redirect("all_rooms", game = game)
@@ -56,13 +91,20 @@ def researcher_login(request):
     context = {}
     return render(request, 'researcher_login.html', context=context)
 
-""" view to render the terms and conditions page """
 def terms_and_conditions(request):
+    """ view which renders the terms and conditions page
+    
+    creates HTML file from terms_and_conditions.html
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    """
     context = {}
     return render(request, 'terms_and_conditions.html', context=context)
 
-""" login page error message wrong credentials handling """
 class CustomLoginView(LoginView):
+    """ custom login view which creates a custom message on invalid username/password """
     def form_invalid(self, form):
         messages.set_level(self.request, messages.ERROR)
         messages.error(self.request, 'Invalid username or password.')
@@ -70,6 +112,16 @@ class CustomLoginView(LoginView):
     
 """ renders the game view page which users play the game and chat to each other in"""
 def game_view(request, game, room_name):
+    """ view which renders the game view page
+    
+    creates HTML file from game_view.html, passes the current Game object to html data
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+        room_name (str): the unique string of to identify room
+    
+    """
     # query the database to find the correct game instance
     foundGame = Game.objects.get(room_name = room_name, game_type = game)
     # Using filter() and first() to allow the case in which someone chooses to play with themself
@@ -96,8 +148,19 @@ def game_view(request, game, room_name):
                                               "game":game, "player":foundPlayer, "public":foundGame.public, "gameCurr":foundGame, 
                                               "containerSize":conatinerSize}) # dict to store room number
 
-""" renders the page to see both maps"""
 def seeMaps(request, game, room_name):
+    """ view which renders the map comparison page
+    
+    creates HTML file from compare_maps.html, passes the current Game object to html data.
+    Queries database for the completed game and passes the urls of the 2 completed images to page
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+        room_name (str): the unique string of to identify room
+    
+    """
+    
     foundGame = Game.objects.get(room_name = room_name)
     foundGame.refresh_from_db()
     containerSize = (request.session.get("width", 1366)/12*8)
@@ -105,23 +168,54 @@ def seeMaps(request, game, room_name):
     return render(request, 'compare_maps.html', {"followerURL":foundGame.finishedFollowerURL, "giverURL":foundGame.finishedGiverURL,
                                                   "containerSize":containerSize, "moves":moves})
 
-""" view which renders the page containing the list of rooms"""
 def all_rooms(request, game):
+    """ view which renders the rooms page
+    
+    creates HTML file from all_rooms.html, queries the database to find all
+    games with only one current player for the specified game, passes this
+    data to the html page
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+    
+    """
     #query all rooms with one player waiting for another
     rooms = Game.objects.filter(users=1, game_type=game)
     # return response
     return render(request, 'all_rooms.html', {'rooms':rooms})
 
-""" TESTED checks if two objects are intersecting"""
 def intersect(r1, r2):
+    """ checks to see if two rectangle boundaries interesect
+
+    Params:
+        r1 (dict): dictionary containing 4 keys, "left", "top", "width", "height". All keys have values as int
+        keys left and top are coordinates, width and height are the dimensions of the boundary
+        r2 (dict): dictionary containing 4 keys, "left", "top", "width", "height". All keys have values as int
+        keys left and top are coordinates, width and height are the dimensions of the boundary
+    
+    Returns:
+        True (bool): when 2 rectangle boundaries are not intersecting
+        True (bool): when 2 rectangle boundaries are intersecting
+    """
     if (r1["left"] < r2["left"] + r2["width"] and r1["left"] + r1["width"] > r2["left"] and
         r1["top"] < r2["top"] + r2["height"] and r1["top"] + r1["height"] > r2["top"]):
         return True
     else:
         return False
 
-""" TESTED checks if an object is out of bounds within some container"""
 def outOfBounds(obj, containerWidth):
+    """ checks to see if object boundary rectangle is out of bounds from its container
+
+    Params:
+        obj (dict): dictionary containing 4 keys, "left", "top", "width", "height". All keys have values as int
+        keys left and top are coordinates, width and height are the dimensions of the boundary
+        containerWidth (int): the width of the container in which the boundary is to be placed
+    
+    Returns:
+        True (bool): when object boundary is out of bounds
+        False (bool): when object boundary is not out of bounds 
+    """
     if (obj["left"] < 0):
         return True
     elif (obj["left"]+obj["width"] > containerWidth):
@@ -132,8 +226,22 @@ def outOfBounds(obj, containerWidth):
         return True
     else:
         return False
-""" TESTED checks to see if the object is placeable in some container given a list of obstacles"""
+
 def place(obj, obstacles, containerWidth):
+    """ checks to see if the object is placeable in some container given a list of obstacles
+
+    Params:
+        obj (dict): dictionary containing 4 keys, "left", "top", "width", "height". All keys have values as int
+        keys left and top are coordinates, width and height are the dimensions of the boundary
+        obstacles (list): list containing dicts specifying the rectangle boundaries of objects 
+        containing 4 keys, "left", "top", "width", "height". All keys have values as int
+        keys left and top are coordinates, width and height are the dimensions of the boundary
+        containerWidth (int): the width of the container in which the boundary is to be placed
+    
+    Returns:
+        True (bool): when object boundary is out of bounds
+        False (bool): when object boundary is not out of bounds 
+    """
     for obstacle in obstacles:
         if intersect(obj,obstacle):
             return False
@@ -142,9 +250,19 @@ def place(obj, obstacles, containerWidth):
     else:
         return True
 
-""" creates a private room"""
 def create_room(request, game):
+    """ view which creates the private room
+    
+    creates HTML file from game_view.html via redirecting to game_view function, 
+    creates rectangle boundaries within some container boundaries. Picks a random
+    condition from the database to allocate to the game. Saves position of rectangle boundries
+    in the database along with the condition allocated.
 
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+    
+    """
     # choose a random condition, can be extended to choose a condition fairly
     # (choose the condition with the least amount of games, etc...)
 
@@ -287,8 +405,17 @@ def create_room(request, game):
         # do stuff, let user know there was error
         return redirect("home")
 
-""" If there is an already created public room, join that one, otherwise create a new one (button functionality of all_rooms.html") """ 
 def join_or_create_room(request, game):
+    """ If there is an already created public room, join that one, otherwise create a new one (button functionality of all_rooms.html")
+    
+    creates HTML file from game_view.html via redirecting to game_view function if a room is already created and has one player.
+    If no room with one player then create a new room and waitm done via a redirect to function create_room2.
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+    
+    """
     # Get a list of available public rooms
     available_rooms = Game.objects.filter(public=True)
 
@@ -313,8 +440,19 @@ def join_or_create_room(request, game):
     # if no suitable rooms were found, create a new room
     return create_room2(request, game)
 
-""" Create a public room """ 
 def create_room2(request, game,):
+    """ view which creates the public room
+    
+    creates HTML file from game_view.html via redirecting to game_view function, 
+    creates rectangle boundaries within some container boundaries. Picks a random
+    condition from the database to allocate to the game. Saves position of rectangle boundries
+    in the database along with the condition allocated.
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+    
+    """
     #first filter all the conditions we can use for our game
     conditions = Condition.objects.filter(game_type = game)
     # pick a random condition
@@ -449,8 +587,17 @@ def create_room2(request, game,):
 
         return redirect('game_view',  game = game, room_name = new_room.room_name)
 
-""" Function to join a private room, if it exists, otherwise create a new one.""" 
 def join_private_room(request, game):
+    """ join private room from given key.
+    
+    creates HTML file from game_view.html via redirecting to game_view function if a room is already created and the key given is valid.
+    Only allow page redirect if there is one person in the room
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+        game (str): string of length 2 specifying game being played
+    
+    """
     if request.method == 'POST':
         unique_room_key = request.POST.get("unique_room_box")
         try:
@@ -482,8 +629,16 @@ def join_private_room(request, game):
     else:
         return redirect('all_rooms', game)
  
-""" renders the data page"""
 def data(request):
+    """ view which renders the data page
+    
+    creates HTML file from data.html, passes the current logged in Researcher to HTML as well
+    as the experiments which they have created
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    """
     context = {}
     # get the currently logged in researcher
     current_researcher = Researcher.objects.get(userkey=request.user)
@@ -492,8 +647,16 @@ def data(request):
     context['researcher'] = current_researcher
     return render(request, 'data.html', context)
 
-""" renders the conditions page"""
 def conditions(request):
+    """ view which renders the create conditiions/experiments page
+    
+    creates HTML file from conditions.html, passes the already create experiments and conditions to HTML as well
+    as GameConditions and ExperimentForm Django forms. 
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    """
     #filter by the researcher's ID
     context = {}
     # initialise the create experiment and condition form
@@ -508,8 +671,12 @@ def conditions(request):
 
     return render(request, 'conditions.html', context)
 
-""" called after experiment form complete, adds the input to the database"""
 def createExperiment(request):
+    """ adds input from user forms from conditions.html page to database
+    
+    Params:
+        request (HttpRequest): object containing metadata about page
+    """
     # initialise the create experiment form
     create_experiment = ExperimentForm(request.POST or None, request=request)
     # if the form is valid
@@ -534,8 +701,12 @@ def createExperiment(request):
         context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
         return render(request, "conditions.html", context)
 
-"""called after experiment form complete, adds the input to the database"""
 def createCondition(request):
+    """ adds input from user forms from conditions.html page to database
+    
+    Params:
+        request (HttpRequest): object containing metadata about page
+    """
     # initialise game condition form
     create_condition = GameConditions(request.POST or None, request=request)
     #if the form input is valid
@@ -563,8 +734,16 @@ def createCondition(request):
         context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
         return render(request, "conditions.html", context)
 
-""" renders page for researchers to register"""
 def researcher_registration(request):
+    """ join private room from given key.
+    
+    creates HTML file from researcher_registration.html. passes django form ResearcherRegistration to data in html page
+    if POST request then updates database with new information. shows appropriate messages if validation fails
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    """
     # initialise registration form
     create_researcher_registration = ResearcherRegisterForm(request.POST or None)
     context = {}
@@ -586,8 +765,19 @@ def researcher_registration(request):
         return redirect(reverse('home'))
     return render(request, 'researcher_registration.html', context)
 
-""" HTML page that renders the two different maps after a game completes """ 
 def compareMaps(request):
+    """ view which renders the page with the two maps to compare
+    
+    creates HTML file from compare_maps.html. Gets two image URLS from database and passes
+    to the data in the same HTML page via JsonResponse object
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): dict of key "gameType" with value of the game type placed and "room_name" 
+        of the unique room name of the game just played with status 200 (success)
+    """
     # query the database to find the correct game instance
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
@@ -605,8 +795,16 @@ def compareMaps(request):
         HttpResponse("")
 
 # --- start of ajax views ---
-""" called when the game is completed"""
 def gameComplete(request):
+    """ when the game complete
+    
+    if request is POST then save the game in the database as complete
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+    """
     # request should be ajax and method should be POST.
     if request.method == "POST" and is_ajax(request):
         # get the room name from JSON
@@ -622,8 +820,20 @@ def gameComplete(request):
         print("something went wrong")
         return HttpResponse('')
 
-""" called when researcher chooses to view conditions from an experiment"""
 def viewConditions(request):
+    """ researcher chooses to view conditions from an experiment
+    
+    if request is POST then get the conditions of the experiment they chose. via data in HttpRequest obj.
+    get query database for data and pass to page via JsonResponse
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): dict of key "exist" with bool value if there is a condition for the experiment, 
+        "conditions" a json seriliasedList of the conditions of the experiment, "experiment" the json serialised data for the
+        experiment, with status 200 (success)
+    """
     # if valid request
     if request.method == "POST" and is_ajax(request):
         # get the experiment and find all its conditions
@@ -646,9 +856,19 @@ def viewConditions(request):
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
-""" called when researcher chooses to view the games that have been played or are in progress which have some 
-specified condition set on them"""
 def viewGames(request):
+    """ researcher chooses to view games played from a ceratain condition
+    
+    if request is POST then get the games of the condition they chose. via data in HttpRequest obj.
+    get query database for data and pass to page via JsonResponse
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): dict of key "exist" with bool value if there is a game for the condition, 
+        "games" a json seriliasedList of the games of the condition, with status 200 (success)
+    """
     # if the request is valid
     if request.method == "POST" and is_ajax(request):
         # get the condition name from the page request
@@ -668,8 +888,19 @@ def viewGames(request):
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
-""" TESTED called when researcher chooses to view the chat logs for a specified game"""
 def viewChats(request):
+    """ researcher chooses to view the chat logs for a specified game
+    
+    if request is POST then get the chat log of the game they chose. via data in HttpRequest obj.
+    get query database for data and pass to page via JsonResponse
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): dict of key "exist" with bool value if there is any chats for the game, 
+        "chats" a json seriliasedList of the chat log of the game, with status 200 (success)
+    """
     # if request is valid
     if request.method == "POST" and is_ajax(request):
         # get the room name of the game from the page
@@ -688,9 +919,17 @@ def viewChats(request):
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
 
-
-""" tested called when a user sends a message in the chat box. Saves the message along with the role to the database"""
 def saveMessage(request):
+    """ save message within the chat box to db
+    
+    if request is POST then save the data from request metadata in the db.
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     # if request is valid
     if request.method == "POST" and is_ajax(request):
         # get the variables from post data
@@ -702,23 +941,49 @@ def saveMessage(request):
         return JsonResponse({},status = 200)
     return HttpResponse("")
 
-""" Accept terms and conditions """ 
 def acceptTOS(request):
+    """ after accepts the TOS popup save as cookie
+    
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     request.session['TOSaccept'] = True
     return JsonResponse({},status = 200)
 
-# TESTED
-""" This function handles AJAX POST requests to decrement the number of users in a game.""" 
 def decrementUsers(request):
+    """ decrement the number of users in a game
+    
+    if request is POST then get the meta data from HttpRequest and decrement
+    the database entry.
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
         game = Game.objects.get( room_name=room_name )
         game.users -= 1
         game.save()
         return JsonResponse({},status = 200)
-# TESTED
-""" This function handles AJAX POST requests to set the initial position of a player in a game.""" 
+
 def initialPlayer(request):
+    """ This function handles AJAX POST requests to set the initial position of a player in a game
+    
+    if request is POST then get the meta data from HttpRequest and set the initial player 
+    position in the db
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         x = int(request.POST["x"])
         y = int(request.POST["y"])
@@ -730,9 +995,15 @@ def initialPlayer(request):
         return JsonResponse({},status = 200)
     return HttpResponse("")
 
-""" This function handles AJAX POST requests to store the screen size in the user's session. """ 
-# TESTED
 def setScreensize(request):
+    """ saves screensize as cookie
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         width = int(request.POST["width"])
         height = int(request.POST["height"])
@@ -741,9 +1012,18 @@ def setScreensize(request):
         return JsonResponse({},status = 200)
     return HttpResponse("")
 
-# TESTED
-""" This function handles AJAX POST requests to save a move in a game. """
 def saveMove(request):
+    """ save a move played in game to DB
+    
+    if request is POST then get the meta data from HttpRequest and save the move
+    position and type in the db
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         room_name = request.POST["roomName"]
         game = Game.objects.get( room_name=room_name )
@@ -766,8 +1046,18 @@ def saveMove(request):
         else:
             return HttpResponse("")
         
-""" This function handles AJAX POST requests to download JSON data for a single experiment. """
 def downloadJson(request):
+    """ download Json for one experiment
+    
+    if request is POST then get the meta data from HttpRequest and serialise the data obtained
+    from HttpRequest then pass to browser to download.
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): dict with serialised data of the experiment, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         experiment_name = request.POST["experiment_name"]
         current_researcher = request.POST["current_researcher"]
@@ -775,8 +1065,18 @@ def downloadJson(request):
         serializer = customSerializers.ExperimentSerializer(instance = experiment)
         return JsonResponse(serializer.data, status=200)
     
-""" This function handles AJAX POST requests to download JSON data for all experiments by a researcher. """
 def downloadAll(request):
+    """ download Json for all experiments
+    
+    if request is POST then get the meta data from HttpRequest and serialise the data obtained
+    from HttpRequest then pass to browser to download.
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): dict with serialised data of the experiments, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         current_researcher = request.POST["current_researcher"]
         experiments = Experiment.objects.filter(created_by = current_researcher)
@@ -784,6 +1084,17 @@ def downloadAll(request):
         return JsonResponse(serializer.data, status=200, safe=False)
 
 def toggleCondition(request):
+    """ toggle the condition as active/inactive
+
+    if request is POST then get the meta data from HttpRequest. From metadata
+    query DB and toggle activity
+
+    Params:
+        request (HttpRequest): object containing metadata about page
+    
+    Returns:
+        (JsonResponse): empty dict, with status 200 (success)
+    """
     if request.method == "POST" and is_ajax(request):
         condition_id = request.POST["condition_id"]
         condition = Condition.objects.get(condition_id = condition_id)
