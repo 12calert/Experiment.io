@@ -23,5 +23,3 @@ The JSON file contains the following information:
 - The "rects" field in the JSON specifies the rectangular boundaries for each obstacle. They are stored with their positional values, width, and height.
 
 The moves are characterized by two types, "un" meaning undo and "mv" meaning move. They have an "oldpos" meaning the position before the move and "newpos" the position after the move.
-
-We would provide a way for the researcher to recreate the games either within our website or by giving them a package (possible in any programming language) that they can use to recreate it on their own without having to use the website.
