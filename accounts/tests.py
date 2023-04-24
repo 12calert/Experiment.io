@@ -1,16 +1,13 @@
 from django.test import TestCase, Client
-from django.urls import reverse 
-from .models import Researcher, Chat, Player, Experiment, Condition, Game, Move
+from .models import Researcher, Chat, Experiment, Condition, Game, Move
 from game_website.forms import ResearcherRegisterForm
 from django.contrib.auth import get_user_model
-from django.contrib.auth.views import LoginView
 from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
 from game_website.views import intersect, outOfBounds, place, initialPlayer, setScreensize, saveMove, viewChats, viewConditions, saveMessage, acceptTOS, decrementUsers, is_ajax, viewGames
-from django.http import JsonResponse, HttpResponse, HttpRequest
+from django.http import HttpRequest
 from django.test import TestCase, RequestFactory, Client # RequestFactory to simulate POST requests.
-from unittest.mock import MagicMock
-import json
+
 
 # Testing of Researcher registration
 class ResearcherRegistrationTest(TestCase):
