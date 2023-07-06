@@ -644,6 +644,150 @@ def data(request):
     current_researcher = Researcher.objects.get(userkey=request.user)
     # pass the researcher and experiments objects to the html page
     context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
+    if not context['experiments']:
+        new_exp = Experiment(created_by=current_researcher, name="default_exp", active=True)
+        new_exp.save()
+        context['experiments'] = Experiment.objects.filter(created_by = current_researcher)
+    conditions = list(Condition.objects.filter(experiment = context['experiments'].first()))
+    if not conditions:
+        conditions = Condition(experiment=context['experiments'].first(), amount_item=10, created_by=current_researcher, name="test123")
+        conditions.save()
+    games = list(Game.objects.filter(has_condition = Condition.objects.get(name = "test123", 
+                                experiment = Experiment.objects.get(name = "default_exp", created_by = current_researcher))))
+    if not games:
+        itemNo = conditions[0].amount_item
+        rects = []
+        containerWidth = floor(request.session.get("width", 1366)/12*8)
+        rects.append({"top": (randint(0,450)), #hardcoded values bad
+                    "left": (randint(0,(containerWidth-100))),
+                    "width": randint(50,100), # change as needed or take from condition (depending on how much control we give researcher)
+                    "height": randint(50,100),
+                    "shape": randomShape(),
+                    "colour": randomColour()})
+        if rects[0]["shape"] == "square":
+            rects[0]["height"] = rects[0]["width"]
+        failCounter = 0
+        # width of the container to stop objects from overflowing
+        placed = False
+        failed = False
+        # for each object to place on map
+        for i in range(0, itemNo-1):
+            placed = False
+            while(not placed or failCounter > 1000):
+                tempRect = {"top": (randint(0,450)), #hardcoded values bad
+                    "left": (randint(0,(containerWidth-100))),
+                    "width": randint(50,100),
+                    "height": randint(50,100),
+                    "shape": randomShape(),
+                    "colour": randomColour()}
+                if tempRect["shape"] == "square":
+                    tempRect["height"] = tempRect["width"]
+            # check if it intersects with any already added
+                for j in range(0, len(rects)):
+                    if intersect(tempRect, rects[j]):
+                        failCounter += 1
+                        # if too many failures, then stop
+                        failed = True
+                        break
+                if (not failed):
+                    rects.append(tempRect)
+                    placed = True
+                else:
+                    failed = False
+        # the finished path
+        path = []
+        # initial placement
+        path.append({"top":0,
+                "left": 0,
+                "width": 32,
+                "height":32})
+        # the last step which was taken
+        lastStep = path[0]
+        # the directions which the path can take
+        directions = ["right", "left", "up", "down"]
+        # the direction to take on the next move
+        direction = "right"
+        # how many succesful steps has there been
+        successfulSteps = 0
+        for k in range(0, 150): # change these values to make path longer/shorter
+            if successfulSteps % 15 == 0: # change modulo to make path more/less sporadic (change direction more/less)
+                # pick a new direction
+                new_direction = [v for v in directions if v != direction]
+                direction = choice(new_direction)
+            if direction == "right":
+                # temporarily create the step 
+                tempStep = ({"top":lastStep["top"],
+                            "left":lastStep["left"]+lastStep["width"],
+                            "width": 32,
+                            "height": 32})
+                # check if its able to be added to the map
+                if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
+                    path.append(tempStep)
+                    lastStep = tempStep
+                    successfulSteps += 1
+                else:
+                    # pick a new direction
+                    new_direction = [v for v in directions if v != direction]
+                    direction = choice(new_direction)
+                    continue
+            elif direction == "left":
+                tempStep = ({"top":lastStep["top"],
+                            "left":lastStep["left"]-lastStep["width"],
+                            "width": 32,
+                            "height": 32})
+                if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
+                    path.append(tempStep)
+                    lastStep = tempStep
+                    successfulSteps += 1
+                else:
+                    new_direction = [v for v in directions if v != direction]
+                    direction = choice(new_direction)
+                    continue
+            elif direction == "down":
+                tempStep = ({"top":lastStep["top"]-lastStep["height"],
+                            "left":lastStep["left"],
+                            "width": 32,
+                            "height": 32})
+                if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
+                    path.append(tempStep)
+                    lastStep = tempStep
+                    successfulSteps += 1
+                else:
+                    new_direction = [v for v in directions if v != direction]
+                    direction = choice(new_direction)
+                    continue
+            else:
+                tempStep = ({"top":lastStep["top"]+lastStep["height"],
+                            "left":lastStep["left"],
+                            "width": 32,
+                            "height": 32})
+                if(place(tempStep,rects, containerWidth) and (tempStep not in path)):
+                    path.append(tempStep)
+                    lastStep = tempStep
+                    successfulSteps += 1
+                else:
+                    new_direction = [v for v in directions if v != direction]
+                    direction = choice(new_direction)
+                    continue
+                
+        new_game = Game(completed=True, room_name="test_room_name", has_condition=conditions[0], public=True, rects=json.dumps(rects), path=json.dumps(path), follower_position={"x": 0, "y": 0})
+        new_game.save()
+        games = list(Game.objects.filter(has_condition = Condition.objects.get(name = "test123", 
+                                experiment = Experiment.objects.get(name = "default_exp", created_by = current_researcher))))
+        moves = path[:len(path) // 2]
+        prev_move = {"left": 0, "top": 0}
+        for m in moves:
+            new_mv = Move(move_type="mv", oldPos={"x": prev_move["left"], "y": prev_move["top"] }, newPos={"x": m["left"], "y": m["top"]}, game=games[0])
+            prev_move["left"] = m["left"]
+            prev_move["top"] = m["top"]
+            new_mv.save()
+
+    chats = list(Chat.objects.filter(game = Game.objects.get(room_name = "test_room_name")))
+    if not chats:
+        chat1 = Chat.objects.create(content='Hello from follower', role='Follower', game=games[0])
+        chat2 = Chat.objects.create(content='Hello from giver!', role='Giver', game=games[0])
+        chat1.save()
+        chat2.save()
     context['researcher'] = current_researcher
     return render(request, 'data.html', context)
 
@@ -910,11 +1054,45 @@ def viewChats(request):
             print("something went wrong")
             return HttpResponse("")
         # get a list of chats in which for the specified game
-        chats = list(Chat.objects.filter(game = Game.objects.get(room_name = room_name)))
+        game = Game.objects.get(room_name = room_name)
+        chats = list(Chat.objects.filter(game = game))
+        moves_q = Move.objects.filter(game = game)
+        moves = []
+        for m in moves_q:
+            moves.append({"left": m.newPos["x"], "top": m.newPos["y"]})
+
+        container_width = floor(request.session.get("width", 1366)/12*8)
+        container_width_ratio = 400 / container_width
+        path = json.loads(game.path)
+
+        score = 0
+        for m in moves:
+            for p in path:
+                if p["left"] == m["left"] and p["top"] == m["top"]:
+                    score += 1
+                    break
+        score = f"{ floor( ( score * 100 ) / len( path ) ) }%"
+
+        for p in path:
+            p["left"] = p["left"]* container_width_ratio
+            p["top"] = p["top"]* container_width_ratio
+            p["width"] = p["width"]* container_width_ratio
+            p["height"] = p["width"]
+        rects = json.loads(game.rects)
+        for r in rects:
+            r["left"] = r["left"] * container_width_ratio
+            r["top"] = r["top"] * container_width_ratio
+            r["width"] = r["width"] * container_width_ratio
+            r["height"] = r["width"]
+        for m in moves:
+            m["left"] = m["left"] * container_width_ratio
+            m["top"] = m["top"] * container_width_ratio
+        follower_position = game.follower_position
+        follower_position["x"] = follower_position["x"] * container_width_ratio
         if chats:
             # serialise to JSON to view in html
             serialisedChats = serializers.serialize('json', chats )
-            return JsonResponse({"exist": True, "chats": serialisedChats }, status=200)
+            return JsonResponse({"exist": True, "chats": serialisedChats , "path": path, "rects": rects, "follower_position": follower_position, "moves": moves, "score": score}, status=200)
         else:
             return JsonResponse({"exist": False}, status = 200)
     return HttpResponse("")
